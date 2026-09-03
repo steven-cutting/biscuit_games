@@ -149,10 +149,11 @@ must vary per visitor has to happen in the browser.
 
 ## Commits fail in another worktree after `just install-hooks`
 
-`just install-hooks` was run from a secondary worktree — or `just initialize` was, which
-ends with the same command. Git keeps one `.git/hooks` directory and shares it across every
-worktree of the repository, and the recipe passes `--overwrite`, so the hook installed here
-replaced the one every other worktree also commits through.
+`just install-hooks` was run by hand from a secondary worktree. Git keeps one `.git/hooks`
+directory and shares it across every worktree of the repository, and the recipe passes
+`--overwrite`, so the hook installed here replaced the one every other worktree also
+commits through. `just initialize` is not a way in: it compares the common directory
+against the git directory and skips the hook in a secondary worktree, saying so.
 
 The installed hook records an absolute path into the virtual environment of the worktree
 that installed it, which is why the fault surfaces late and somewhere else. While this

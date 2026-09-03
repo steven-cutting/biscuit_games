@@ -29,7 +29,7 @@ this order:
 just sync                 # exactly what the lockfiles say
 just storybook-browsers   # Chromium, into a per-user cache outside the repository
 just install-allium       # the pinned checker, into .tools/bin/
-just install-hooks        # primary worktree only — read the warning below first
+just install-hooks        # primary checkout only — read the warning below first
 ```
 
 The two downloads in the middle are not optional. `just storybook-test` refuses to run
@@ -39,15 +39,16 @@ Neither is repaired by `just sync`: sync installs exactly what the lockfiles say
 lockfile can name a binary.
 
 `just initialize` is the single-command form of the same sequence, and it also relocks and
-normalises formatting on the way through. It never stages, commits, tags or pushes. Its
-last line is `just install-hooks`, which is the reason it is the wrong command in some
-checkouts.
+normalises formatting on the way through. It never stages, commits, tags or pushes, and it
+is safe to run from any worktree: it installs the hook only when the checkout is the
+primary one, and says so when it declines.
 
 ### Do not install the hook from a secondary worktree
 
-Check before you run either command. If `.git` is a file rather than a directory, or if
-`git worktree list` prints more than one row, this checkout is a secondary worktree: run
-the first three steps only, and skip `just install-hooks` and `just initialize` entirely.
+If `.git` is a file rather than a directory, or if `git worktree list` prints more than
+one row, this checkout is a secondary worktree and `just install-hooks` is the wrong
+command here. `just initialize` makes the same comparison itself and skips the hook, so
+that one is safe to run anywhere.
 
 Git keeps one `.git/hooks` directory and shares it across every worktree of the
 repository. The installed hook records an absolute path into the virtual environment of the

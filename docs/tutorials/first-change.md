@@ -31,10 +31,12 @@ downloads no lockfile can account for: the Chromium build the story gate renders
 pinned Allium checker that reads `docs/specs/`. Without either, the gate cannot reach green.
 
 `just initialize` runs that list, normalises formatting, and then installs the pre-commit
-hook. Do not run `just install-hooks` — and therefore do not run `just initialize` — from a
-secondary git worktree. Git keeps one `.git/hooks` for every worktree of a repository, so
-installing the hook here quietly changes what each of the others runs on commit. In a
-standalone clone, `just initialize` is the single command and the list above is what it does.
+hook — but only when the checkout is the primary one. Git keeps one `.git/hooks` for every
+worktree of a repository, so a hook installed from a secondary worktree quietly changes
+what each of the others runs on commit; `just initialize` compares the two git directories
+and declines rather than doing that. So it is the single command here whatever kind of
+checkout this is, and `just install-hooks` on its own is the one to run only from the
+primary checkout.
 
 Then confirm you are starting from green:
 

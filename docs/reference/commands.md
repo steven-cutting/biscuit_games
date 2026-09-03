@@ -17,9 +17,9 @@ shell history.
 
 | Recipe | Purpose |
 | --- | --- |
-| `just initialize` | One explicit first run. Creates both lockfiles, installs both toolchains, the pinned `allium` binary and the browser the story tests need, normalises formatting, installs the hook. Never stages, commits, tags or pushes. Its last line is `just install-hooks`, so read the warning below before running it. |
+| `just initialize` | One explicit first run. Creates both lockfiles, installs both toolchains, the pinned `allium` binary and the browser the story tests need, normalises formatting, and installs the hook when the checkout is the primary one. Never stages, commits, tags or pushes. Safe in any worktree: it skips the hook rather than installing a shared one from the wrong place. |
 | `just sync` | Install exactly what the lockfiles say. Run after pulling. |
-| `just install-hooks` | Install the read-only pre-commit gate. Primary clone only — see the warning below. |
+| `just install-hooks` | Install the read-only pre-commit gate. Primary checkout only — see the warning below. |
 | `just install-allium` | Download, verify and install the pinned `allium` binary into `.tools/bin/`. Over the network; no lockfile can name a binary. |
 | `just storybook-browsers` | Download the Chromium the story tests render in. Over the network, into a cache outside the repository. |
 | `just storybook-browsers-deps` | The system libraries Chromium links against. Linux only; CI runs it first. |
@@ -31,9 +31,12 @@ repository. The installed hook records an absolute path into the virtual environ
 the worktree that installed it, and `just install-hooks` passes `--overwrite`, so
 installing from a secondary worktree silently replaces the hook every other worktree also
 commits through. Check first: if `.git` is a file rather than a directory, or if `git
-worktree list` prints more than one row, skip both `just install-hooks` and `just
-initialize`, and run `just sync`, `just storybook-browsers` and `just install-allium`
-instead. Nothing warns you at the time; the breakage surfaces in another worktree, later.
+worktree list` prints more than one row, this is a secondary worktree and
+`just install-hooks` is the wrong command here. `just initialize` already knows: it
+compares the common directory against the git directory and skips the hook, saying so,
+rather than installing one from the wrong place. Run it freely; run `just install-hooks`
+by hand only from the primary checkout. Nothing else warns you, and the breakage
+surfaces in another worktree, later.
 The full account is in [Develop locally](../how-to/develop-locally.md#do-not-install-the-hook-from-a-secondary-worktree).
 
 ## Dependencies
