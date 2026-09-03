@@ -1,8 +1,10 @@
 name: Chromatic
 
-# Visual review of the component workshop. It lives apart from `ci.yml` for the
-# same reason the Pages deploy does: it holds a secret nothing else holds, and it
-# answers to triggers the gate has no use for. It is not a required check.
+# Visual review of the component workshop. It lives apart from `ci.yml` because it
+# holds a secret — the only one this repository has — and answers to triggers the
+# gate has no use for. It is not a required check. Nothing else here is separated
+# for that reason, because nothing else here deploys: there is no Pages workflow,
+# and decision 0012 says why.
 
 on:
   # The baseline. `chromatic.config.json` auto-accepts on this branch, so what
@@ -226,12 +228,13 @@ jobs:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Report back on the pull request
-        if: always() && github.event_name == 'issue_comment' && steps.token.outputs.present == 'true'
+        if: always() && github.event_name == 'issue_comment'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.issue.number }}
           STATUS: ${{ job.status }}
+          PUBLISHED: ${{ steps.token.outputs.present }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           # The same reasoning as the reaction above, at the other end. This
@@ -239,7 +242,24 @@ jobs:
           # in no checks list — but it reports on a build that has already
           # happened, and a published build must not be coloured red by the note
           # about it.
+          #
+          # It runs whatever the token step said. While CHROMATIC_PROJECT_TOKEN
+          # is unset — the state this workflow exists to survive — a request
+          # would otherwise collect the rocket above and then nothing at all,
+          # which reads as a build that was published and simply says little.
+          # The skip is the one outcome that has to be said out loud.
+          case "${PUBLISHED:-}" in
+            true)
+              body="Chromatic run finished \`$STATUS\`. The build and its diffs are linked from $RUN_URL"
+              ;;
+            false)
+              body="No Chromatic build was published: \`CHROMATIC_PROJECT_TOKEN\` is not set on this repository. The run finished \`$STATUS\` and is at $RUN_URL"
+              ;;
+            *)
+              body="The Chromatic run finished \`$STATUS\` before reaching the publish step. It is at $RUN_URL"
+              ;;
+          esac
           if ! gh api --silent --method POST "repos/$GH_REPO/issues/$NUMBER/comments" \
-            -f "body=Chromatic run finished \`$STATUS\`. The build and its diffs are linked from $RUN_URL"; then
+            -f "body=$body"; then
             printf '::notice::could not reply on the pull request; the run is at %s\n' "$RUN_URL"
           fi

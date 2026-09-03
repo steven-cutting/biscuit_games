@@ -25,11 +25,15 @@ JSON is a subset of YAML. No trailing commas, no comments.
  "canonical_for": ["command_reference"], "requires": []}
 ```
 
-Every entry carries exactly those six keys — extra keys fail as loudly as missing ones.
+Every entry carries exactly those six keys — extra keys fail as loudly as missing ones,
+and a key written twice is an error rather than an overwrite. The default JSON decoder
+keeps the last of a repeated pair, which would let a seven-line entry satisfy a rule about
+six on whichever copy happened to survive.
 
 ## Frontmatter
 
-Every page carries exactly five keys, and each must equal the manifest entry.
+Every page carries exactly five keys, and each must equal the manifest entry. A repeated
+key fails here too, for the same reason it does in the manifest.
 
 ```markdown
 ---

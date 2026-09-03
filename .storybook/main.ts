@@ -7,9 +7,13 @@ import { mergeConfig } from 'vite';
  *
  * The hub has one route, so the workshop is not a convenience here — it is the
  * only way to see a component at all. Storybook renders one component at a
- * time, in every state its surface names, with axe over each render. It is
- * local: `just storybook` serves it and `just storybook-build` proves it still
- * compiles. Nothing here is published; see decision 0012.
+ * time, in every state its surface names, with axe over each render. It is local
+ * first: `just storybook` serves it and `just storybook-build` proves it still
+ * compiles. The hub itself is published nowhere, which is decision 0012 — but
+ * the workshop is the one thing here that does leave the repository, because
+ * `just chromatic` and `.github/workflows/chromatic.yml` publish a build of it
+ * for visual review. That is decision 0009, which supersedes 0008's "nothing
+ * publishes it" and says why.
  *
  * Stories live in a root-level `stories/` directory rather than beside the
  * components, for the same reason `tests/` does: a component's source stays one

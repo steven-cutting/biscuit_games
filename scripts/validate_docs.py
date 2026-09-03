@@ -71,6 +71,11 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
             raise ValueError(message)
         key, raw = line.split(":", 1)
         key, value = key.strip(), raw.strip()
+        # Last-wins would let a block carrying six lines satisfy a rule about
+        # five keys, so the repeat is the error rather than the survivor.
+        if key in metadata:
+            message = f"duplicate frontmatter key: {key}"
+            raise ValueError(message)
         metadata[key] = (
             _parse_list(value)
             if key in {"audience", "canonical_for", "requires"}
@@ -114,10 +119,30 @@ def _exact_case(path: Path) -> bool:
     return True
 
 
+def _reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Refuse an object that names the same key twice.
+
+    The default decoder keeps the last of two identical keys, which would let an
+    entry carrying seven lines satisfy a rule about six -- the same last-wins
+    hole the frontmatter parsers above close.
+    """
+    mapping: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in mapping:
+            message = f"duplicate key: {key}"
+            raise ValueError(message)
+        mapping[key] = value
+    return mapping
+
+
 def _load_manifest(errors: list[str]) -> list[dict[str, Any]]:
     try:
-        data = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+        # JSONDecodeError is a ValueError, so the one clause catches the decoder
+        # and the hook alike.
+        data = json.loads(
+            MANIFEST.read_text(encoding="utf-8"), object_pairs_hook=_reject_duplicates
+        )
+    except (OSError, ValueError) as error:
         errors.append(f"manifest.yml: cannot read JSON-compatible YAML: {error}")
         return []
     if not isinstance(data, dict) or data.get("schema_version") != 1:

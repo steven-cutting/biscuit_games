@@ -63,7 +63,9 @@ belongs in `.agents/skills/` with bridges, or somewhere else entirely.
 
 A bridge under `.claude/` or `.codex/` has grown content, or its frontmatter has drifted
 from the canonical skill. Regenerate it: the canonical frontmatter verbatim, one blank
-line, one sentence pointing at the canonical path, under forty words.
+line, then the fixed pointer sentence and nothing else. The body is compared against a
+template rather than measured, so a clause of your own fails however short it is —
+[Agent contract](../reference/agent-contract.md#what-a-bridge-must-be) carries the text.
 
 ## `just lint` fails on the specifications, and you changed no specification
 
@@ -125,8 +127,13 @@ reads as a GitHub Pages artefact, and this repository publishes nothing
 The story gate renders in a real browser, and the browser is in neither lockfile, so
 `just sync` does not install it — `just sync` installs exactly what the lockfiles say. Run
 `just storybook-browsers` once per machine, and again after the `playwright` pin moves. On
-Linux, run `just storybook-browsers-deps` first. `just initialize` does both for you on a
-fresh clone.
+Linux, run `just storybook-browsers-deps` as well.
+
+`just initialize` installs the browser on a fresh clone, but it only *names* that second
+recipe. `playwright install-deps` says of itself that it will ask for sudo permissions, and
+a first-run script that escalates unasked is what the authorization rule in `AGENTS.md`
+exists to prevent — so on Linux the two commands are still two commands. CI runs the
+recipe unconditionally.
 
 ## Tests fail on `localStorage` or `navigator.clipboard`
 

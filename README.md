@@ -23,10 +23,14 @@ just initialize
 just check
 ```
 
-`just initialize` is the whole first run: both lockfiles, both toolchains, the pinned `allium`
-binary and the Chromium build the story tests render in. Installing less than that leaves
-`just check` failing on the piece you skipped — the browser especially, which no lockfile
-accounts for.
+`just initialize` is the whole first run on macOS: both lockfiles, both toolchains, the
+pinned `allium` binary and the Chromium build the story tests render in. Installing less
+than that leaves `just check` failing on the piece you skipped — the browser especially,
+which no lockfile accounts for.
+
+On Linux that Chromium also needs system libraries. They are the one piece
+`just initialize` names rather than installs, because installing them asks for sudo, so run
+`just storybook-browsers-deps` once as well. See [Commands](docs/reference/commands.md).
 
 `just --list` prints every recipe. Each one is described in
 [Commands](docs/reference/commands.md).

@@ -16,7 +16,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_SKILLS = ROOT / ".agents/skills"
 PROVIDERS = ("claude", "codex")
-BRIDGE_WORD_LIMIT = 40
+# The whole of a bridge body. Compared against this rather than measured: a word
+# budget lets a bridge carry an instruction of its own as long as it is brief,
+# and an instruction surface that says "this bridge adds nothing" has to mean it.
+BRIDGE_BODY = (
+    "Follow `../../../.agents/skills/{name}/SKILL.md`. "
+    "That file is canonical and this bridge adds nothing to it."
+)
 MANAGED_DIRECTORIES = (Path(".agents"), *(Path(f".{provider}") for provider in PROVIDERS))
 
 # Committed provider configuration that is neither a skill nor an adapter.
@@ -117,7 +123,13 @@ def _parse_frontmatter(path: Path) -> tuple[dict[str, str], str]:
             message = f"invalid frontmatter line: {line}"
             raise ValueError(message)
         key, value = line.split(":", 1)
-        fields[key.strip()] = value.strip()
+        key = key.strip()
+        # Last-wins would let a block carrying three lines satisfy a rule about
+        # two keys, so the repeat is the error rather than the survivor.
+        if key in fields:
+            message = f"duplicate frontmatter key: {key}"
+            raise ValueError(message)
+        fields[key] = value.strip()
     return fields, "\n".join(lines[end + 1 :])
 
 
@@ -155,9 +167,12 @@ def _check_canonical(errors: list[str]) -> None:
 
 
 def _check_adapters(errors: list[str]) -> None:
+    # Compared whole rather than stripped. docs/reference/agent-contract.md calls
+    # these byte-pinned, and a comparison that forgave surrounding whitespace or a
+    # missing final newline would be enforcing something weaker than the word.
     for relative, expected in ADAPTERS.items():
         path = ROOT / relative
-        if path.is_file() and path.read_text(encoding="utf-8").strip() != expected.strip():
+        if path.is_file() and path.read_text(encoding="utf-8") != expected:
             errors.append(f"{relative} must remain the exact thin adapter")
 
 
@@ -202,8 +217,7 @@ def _check_skills(names: tuple[str, ...], errors: list[str]) -> None:
                 errors.append(
                     f".{provider}/skills/{name}/SKILL.md: frontmatter must match the canonical skill"
                 )
-            pointer = f"`../../../.agents/skills/{name}/SKILL.md`"
-            if bridge_body.count(pointer) != 1 or len(bridge_body.split()) > BRIDGE_WORD_LIMIT:
+            if bridge_body.strip() != BRIDGE_BODY.format(name=name):
                 errors.append(
                     f".{provider}/skills/{name}/SKILL.md: must stay a thin pointer to the canonical skill"
                 )

@@ -22,6 +22,11 @@ find it.
 | `.github/copilot-instructions.md` | A pointer, byte-pinned to one paragraph. |
 | `.agents/skills/` | Canonical task procedures, mirrored by thin bridges under `.claude/skills/` and `.codex/skills/`. |
 
+Byte-pinned is meant literally for the two pointers: the validator compares the whole file
+against the expected text, final newline included, rather than a stripped copy of it. A
+pointer that forgave surrounding whitespace would be enforcing something weaker than the
+word in the table above.
+
 A `CODEX.md` at the repository root is forbidden: Codex reads `AGENTS.md` directly, and a
 second file would be a second source of truth.
 
@@ -58,12 +63,25 @@ inside the block fails the check with `invalid frontmatter line`. Keep the two k
 adjacent, with nothing between them. The same parser reads the bridges, so the rule holds
 there too.
 
+A key that appears twice is an error rather than an overwrite. Left to the usual last-wins
+behaviour, a block of three lines would satisfy a rule about two keys on whichever copy
+happened to survive, which is the opposite of what "exactly two" is for.
+
 ## What a bridge must be
 
 Each of `.claude/skills/<name>/SKILL.md` and `.codex/skills/<name>/SKILL.md` carries the
-canonical frontmatter verbatim, then one sentence pointing at
-`../../../.agents/skills/<name>/SKILL.md` — exactly one such reference, and at most forty
-words in total. A bridge that grows content of its own fails.
+canonical frontmatter verbatim, then exactly this sentence and nothing else:
+
+```markdown
+Follow `../../../.agents/skills/<name>/SKILL.md`. That file is canonical and this bridge adds nothing to it.
+```
+
+The body is compared against that template rather than measured against a word budget. A
+budget was the earlier rule and it enforced the wrong thing: a bridge could carry an
+instruction of its own — an extra step, a caveat, a second pointer — and pass on being
+brief. This is an instruction surface, so a clause smuggled into it is read as guidance and
+becomes a second source of truth for the skill it points at. A bridge that grows content
+fails whether or not it is short.
 
 ## The inventory
 

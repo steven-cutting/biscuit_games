@@ -29,7 +29,7 @@
 
   <h2>The games</h2>
 
-  <ul>
+  <ul role="list">
     <li>
       <a href="https://pnut.fans/poodl/">Poodl</a> — an unlimited-play word game. Guess a five-letter
       word in six attempts, then play again.
@@ -70,6 +70,13 @@
     text-transform: uppercase;
   }
 
+  /*
+   * `role="list"` on the element above is what keeps this a list. WebKit drops
+   * list semantics from a `<ul>` whose markers are removed, so VoiceOver would
+   * stop announcing the games as a collection; the role restores what the markup
+   * already said. It is redundant only where the marker survives, which is why
+   * it sits beside the declaration that removes it.
+   */
   ul {
     margin-block: var(--s-4) 0;
     padding: 0;
