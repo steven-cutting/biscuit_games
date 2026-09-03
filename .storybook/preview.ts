@@ -239,7 +239,7 @@ const preview: Preview = {
       // Every surface in `docs/specs/` carries an accessibility `@guarantee`, so
       // a violation is a failure rather than a note nobody reads. The addon's
       // own default is 'todo', which reports and passes. No rule is disabled:
-      // decision 0006 records the palette repair that made that possible.
+      // decision 0008 records the palette repairs that made that possible.
       test: 'error'
     },
     // `app.css` owns the page background through `--background`. A background

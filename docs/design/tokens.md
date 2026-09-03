@@ -185,10 +185,11 @@ this repository's. `--fs-board` is sized to the 48px cell decision 0010 records 
 the design reference's 56px.
 
 Nothing resolves a token name, either. A declaration naming a token no block defines is
-invalid at computed-value time and silently falls back to the inherited value:
-`src/routes/+page.svelte` names `--fs-1` for its section heading, which this file does not
-define, so that heading inherits its size rather than taking one from the scale. No gate
-says so, in `src/` or in a game's copy.
+invalid at computed-value time and silently falls back to the inherited value, so a
+misspelt or invented token name is a size that never arrives and never complains. The front
+door did exactly that once, naming `--fs-1` for its section heading, and the heading sat at
+the inherited 16px until someone read the file. No gate says so, in `src/` or in a game's
+copy; write the name against the table above rather than from memory.
 
 ## Space, form and motion
 

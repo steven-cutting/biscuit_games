@@ -26,8 +26,8 @@ one. A recipe that modifies a file fails the run, because checks are read-only.
 | 11 | `analyse-specs` | Every specification reports an empty `findings` array too. |
 | 12 | `check-clean` | The run changed nothing. |
 
-Gates 10 and 11 joined the aggregate on 2026-08-28, which closes the follow-up
-[decision 0007](../decisions/0007-project-managed-allium-cli.md) left open. They cost
+Gates 10 and 11 have been in the aggregate from the first commit, which is what
+[decision 0007](../decisions/0007-project-managed-allium-cli.md) says. They cost
 the gate something real: the pinned `allium` binary lives in the gitignored `.tools/bin/`,
 which is a per-worktree install, so a worktree that has never run `just initialize` now
 fails `just lint` and `just check` until `just install-allium` puts one there. The
@@ -95,7 +95,7 @@ installed as a hook and runs only from `just fix`.
 ## In continuous integration
 
 `.github/workflows/ci.yml` runs the same recipes in three jobs, and those three are the
-whole of continuous integration here. `frontend` runs the install, the lockfile dry run,
+whole of continuous integration here. `frontend` runs the install, then `lock-check`,
 `frontend-static`, `frontend-coverage` and `frontend-build`; `documents` runs `sync`, then
 `install-allium` — the binary no lockfile can name — then `lint`, `check-docs`,
 `check-agents`, `check-specs` and `analyse-specs`; `stories` restores the Playwright cache,

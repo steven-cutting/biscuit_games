@@ -47,7 +47,7 @@
   .words {
     color: var(--text);
     font-family: var(--font-display);
-    font-size: 0.9375rem;
+    font-size: var(--fs-body);
     font-weight: 600;
     line-height: 1;
     letter-spacing: var(--track-display);

@@ -37,7 +37,7 @@ jobs:
       - run: uv tool install rust-just==1.51.0
       - run: npm install --global npm@11.17.0
       - run: just sync
-      - run: npm ci --ignore-scripts --dry-run --no-audit
+      - run: just lock-check
       - run: just frontend-static
       - run: just frontend-coverage
       - run: just frontend-build

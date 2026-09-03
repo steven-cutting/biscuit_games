@@ -64,9 +64,9 @@
     margin-block: var(--s-8) 0;
     color: var(--text-3);
     font-family: var(--font-ui);
-    font-size: var(--fs-1);
+    font-size: var(--fs-mono-label);
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
   }
 

@@ -48,10 +48,9 @@ copy of logic the pinned dependency already holds, and its documented `@latest` 
 cannot satisfy this repository's SHA pinning.
 
 The recipe sits outside `just check`, beside `check-links-online`, because it needs the
-network and a token. The gate stays offline: nothing `just check` runs needs either. (An
-earlier wording counted the gates, and that count moved on 2026-08-28 when the two
-specification gates joined the aggregate.
-[Quality gates](../reference/quality-gates.md) owns the list and is the count to trust.)
+network and a token. The gate stays offline: nothing `just check` runs needs either. (This
+decision does not count the gates. [Quality gates](../reference/quality-gates.md) owns the
+list and is the count to trust.)
 
 `.github/workflows/chromatic.yml` has two entry points, and they do different jobs:
 

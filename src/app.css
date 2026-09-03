@@ -194,7 +194,8 @@
    * cannot is exempt from the floor entirely, by
    * `Appearance.@guarantee AnUnavailableControlIsExempt`, which is why
    * --text-disabled and the disabled button's --rule border are the two inks
-   * in this file that `tests/contrast.test.ts` deliberately does not measure.
+   * that Poodl's `tests/contrast.test.ts` deliberately does not measure — and
+   * here nothing measures any of them, because that test is not ported.
    * Being unmeasured is exactly why they are the values the design system
    * states rather than values chosen here — n-8 light, n-7 in both
    * high-contrast palettes, n-6 dark — and the four are copied from that
@@ -298,18 +299,18 @@
  * The dark theme is reached two ways — by the device while the player has
  * chosen system, and by the dark choice itself, which is the default and the
  * one the markup ships — and both must carry the same values.
- * `tests/contrast.test.ts` can only drive the attribute; jsdom answers no
- * media query, so the block below is the one the gate never sees. Keep them
- * in step by hand, and change neither alone: the drift check compares the
- * two texts.
+ * In Poodl a jsdom test could only drive the attribute — jsdom answers no
+ * media query — so it read the two blocks as text and held them equal. That
+ * test is not ported, so here neither block is seen by any gate at all. Keep
+ * them in step by hand, and change neither alone: nothing will tell you.
  *
  * The high-contrast pair inside the media block exists for specificity: the
  * light high-contrast block below is (0,2,0) and sits later in the sheet than
  * this (0,2,0) base, so without a (0,3,0) pair here every token the light
  * block declares would leak into a device-dark player who asked for high
  * contrast. That is also why the two high-contrast blocks declare exactly the
- * same set of token names — parity is what makes the shadowing total — and
- * the gate asserts the sets match.
+ * same set of token names — parity is what makes the shadowing total. No gate
+ * here asserts that the sets match; it is held by whoever edits them.
  */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
@@ -412,7 +413,7 @@
  * same as `[data-theme='dark']`, so it sits after it to win at equal weight;
  * the dark pair below is (0,3,0) and wins outright. Some of these
  * declarations repeat the bare-root value — that redundancy is the parity the
- * media comment above explains, and the gate holds the two sets equal.
+ * media comment above explains, and nothing but review holds the sets equal.
  */
 :root[data-high-contrast='true'] {
   --background: var(--n-11);
@@ -487,15 +488,17 @@ body {
 /*
  * The one place the interface spends its warm family, and the design system's
  * own. Biscuit is rationed to the brand, and a selection is where the ration is
- * affordable: `sharing.allium`'s TheGridIsAvailableAsText asks for the grid to
- * be "selected by hand before it is sent", so this paints an interaction a
- * specification names rather than a decoration. `background-color` rather than
- * the shorthand because that is the property that applies to `::selection`.
+ * affordable: Poodl's `sharing.allium` asks in TheGridIsAvailableAsText for the
+ * grid to be "selected by hand before it is sent", so this paints an interaction
+ * a game's specification names rather than a decoration. That module is not in
+ * `docs/specs/` here, so nothing in this repository asks for the rule — it comes
+ * over with the file. `background-color` rather than the shorthand because that
+ * is the property that applies to `::selection`.
  *
  * The pair is pinned once on bare `:root` rather than answered per theme, and
- * measures 6.93 in all four combinations. `tests/contrast.test.ts` recomputes
- * that figure and asserts this rule is what spends it — a token measured and
- * never rendered is a figure that cannot regress where anyone would see it.
+ * measured 6.93 in all four combinations. Poodl's `tests/contrast.test.ts`
+ * recomputes that figure and asserts this rule is what spends it; that test is
+ * not ported, so here the figure is one more of the header's inherited claims.
  */
 ::selection {
   background-color: var(--brand-warm);
@@ -503,10 +506,14 @@ body {
 }
 
 /*
- * `game.allium` — contract DirectManipulation. Ten surfaces fulfil it and not
- * one of them owns it, which is why the rules sit here rather than in any one
- * component. Everything below is measured by `tests/directManipulation.test.ts`
- * and by the width stories in `stories/Keyboard.stories.svelte`.
+ * Poodl's `game.allium` — contract DirectManipulation. Ten surfaces fulfil it
+ * there and not one of them owns it, which is why the rules sit in the
+ * stylesheet rather than in any one component. Over there they are measured by
+ * `tests/directManipulation.test.ts` and by the width stories in
+ * `stories/Keyboard.stories.svelte`. None of that came here: this repository
+ * has neither the module, the test, the stories, nor a control to apply them
+ * to. The rules stay because the file is carried whole rather than pruned —
+ * see the header — and they are inert until a component arrives.
  *
  * ATapDoesOnlyWhatTheControlDoes. `manipulation` declines the platform's guess
  * at what a second tap meant, which is what makes fast repeated tapping on the
@@ -532,10 +539,11 @@ input[type='radio'] {
  * second fast tap in the link field or the shared grid is a caret placed twice,
  * never a zoom, so `manipulation` belongs here as much as it does on a key.
  *
- * The other four are deliberately absent rather than forgotten. `sharing.allium`
- * asks in TheGridIsAvailableAsText for the grid to be "selected by hand before
- * it is sent", and on a phone the callout is how a selection is copied — so
- * suppressing either would satisfy this contract by spending that guarantee.
+ * The other four are deliberately absent rather than forgotten. Poodl's
+ * `sharing.allium`, again, asks in TheGridIsAvailableAsText for the grid to be
+ * "selected by hand before it is sent", and on a phone the callout is how a
+ * selection is copied — so suppressing either would satisfy this contract by
+ * spending that guarantee.
  * Leaving the tap highlight alone is the same decision seen from the other side:
  * nothing here removes the platform's acknowledgement, so nothing here owes a
  * replacement, and the caret and the focus outline arrive on contact anyway.
@@ -552,9 +560,10 @@ textarea {
  * control in the app already says this in its own scoped styles, so this rule
  * changes nothing on the screen today; what it changes is that a control which
  * arrives without them inherits the body's figure instead of the user agent's
- * smaller one. Measured in Chromium by `stories/LinkReady.stories.svelte`,
- * because jsdom's default input font is already 16px and an assertion there
- * would pass whether or not this rule existed.
+ * smaller one. Poodl measures this in Chromium by its
+ * `stories/LinkReady.stories.svelte`, because jsdom's default input font is
+ * already 16px and an assertion there would pass whether or not this rule
+ * existed. That story is not here, and the hub has no text control to measure.
  */
 input,
 textarea {
@@ -563,9 +572,11 @@ textarea {
 
 /*
  * EveryControlIsAComfortableTarget, top to bottom, where every control meets the
- * figure outright. 44px is `game.allium`'s `config.minimum_touch_target`;
- * `MINIMUM_TOUCH_TARGET` in `src/lib/config.ts` is the same number, and the test
- * compares this resolved value against it so the two cannot drift apart.
+ * figure outright. 44px is `config.minimum_touch_target` in Poodl's
+ * `game.allium`, where `MINIMUM_TOUCH_TARGET` in `src/lib/config.ts` is the same
+ * number and a test compares the resolved value against it so the two cannot
+ * drift apart. Neither the module nor the constant exists here, so the 44 below
+ * is a literal nothing in this repository can check.
  *
  * Across is deliberately not declared. The on-screen keyboard is the one place
  * the figure cannot be met in that direction, so a floor here would be wrong for
@@ -595,8 +606,9 @@ textarea {
  * raised surface, a primary button on the ink itself — and ink and paper
  * between them always do, because one of the two is always at the far end of
  * the range. The narrowest edge either ring meets on the two key grounds is
- * 17.04 to one, far past the 3.0 a control's boundary answers to, and
- * `tests/contrast.test.ts` recomputes both rather than trusting this sentence.
+ * 17.04 to one, far past the 3.0 a control's boundary answers to. Poodl's
+ * `tests/contrast.test.ts` recomputes both rather than trusting this sentence;
+ * here the sentence is all there is.
  *
  * A ring rather than a filter, which was the first thing tried. `filter` dims
  * the letter along with the key, which costs

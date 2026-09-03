@@ -7,8 +7,12 @@ describe('Wordmark', () => {
   it('reads as the platform lockup, with the mark silent', () => {
     render(Wordmark, {});
 
-    // The mark's "b" is aria-hidden, so the words are the whole accessible
-    // text. The anchors are the assertion: a leading "b" would fail them.
+    // Two assertions because neither holds the claim alone. Testing Library
+    // matches an element's own text nodes, so `/biscuit/` finds the words
+    // whether or not the mark beside them is hidden — the anchors catch the
+    // words gaining text, not the mark gaining a voice. The mark is therefore
+    // asserted directly, and without this line an unhidden "b" passes.
+    expect(screen.getByText('b')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText(/biscuit/)).toHaveTextContent(/^biscuit games$/);
   });
 });

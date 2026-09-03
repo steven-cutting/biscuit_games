@@ -130,6 +130,16 @@ happened that has not, which is the failure mode this whole page is written agai
   for "Dark is home". Allium is not Markdown, so no link checker reads it and no gate will
   report it. It is corrected by hand or it stays wrong indefinitely.
 
+Nothing is owed on `src/app.css`, but one thing about it is worth knowing before the next
+copy. Poodl's landing page wears this stylesheet, and the comments in the copy here have
+been rewritten to say which of the tests and gates they describe are Poodl's — because none
+of them exist in this repository, and read plainly they claimed a gate was watching values
+that nothing here reads. No declaration moved: not a token name, not a value, not a
+selector, not a font path. So the two files still agree about everything that renders, and
+they now disagree about prose that is correct on each side of the boundary. A copy taken
+raw from here would carry sentences that name Poodl in the third person inside Poodl. Take
+the declarations and leave the comments, or re-point them on arrival.
+
 And the sharpest item, which is a rewrite only in the sense that someone has to decide what
 it should say.
 

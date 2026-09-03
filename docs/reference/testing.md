@@ -54,15 +54,20 @@ screen reader uses. The front door's one link is `screen.getByRole('link', { nam
 to whichever test reaches for it first; no route test exists yet.
 
 Text that is not a control is the stated exception, and the single test here is it. A
-wordmark has no role, so it is found by its text and the assertion is anchored:
+wordmark has no role, so it is found by its text — and it takes two assertions, not one:
 
 ```ts
+expect(screen.getByText('b')).toHaveAttribute('aria-hidden', 'true');
 expect(screen.getByText(/biscuit/)).toHaveTextContent(/^biscuit games$/);
 ```
 
-The anchors are the whole point. The mark's "b" is `aria-hidden`, so the accessible text
-of the lockup is exactly the two words; an unhidden mark would read "b biscuit games", and
-an unanchored assertion would not notice.
+The second is the obvious one: the anchors catch the words gaining text, so a lockup that
+read "biscuit games beta" would fail. The first is the one worth explaining. A text query
+matches an element's **own** text nodes rather than everything inside it, so
+`getByText(/biscuit/)` resolves to the span holding the words and never to the lockup
+around it — which means it finds them whether or not the mark beside them is hidden.
+Anchoring does not repair that. The mark's silence is a separate claim and takes a separate
+assertion, and without it deleting `aria-hidden` leaves the suite green.
 
 **Inject fakes; never stub a global.** There is no `src/lib/ports/` here and no side effect
 to put in one. When the first arrives it arrives behind a port that exports an in-memory
