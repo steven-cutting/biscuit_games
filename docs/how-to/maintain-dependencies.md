@@ -88,6 +88,22 @@ would leave the repair answering to a different version of the rules from the ch
 the SHA-256 of each supported artefact; see
 [decision 0007](../decisions/0007-project-managed-allium-cli.md).
 
+Before moving it, know which thing you are moving. Three version series carry the name
+Allium and only one of them is this pin.
+
+| Series | What it numbers | Where it is pinned |
+| --- | --- | --- |
+| `juxt/allium-tools` | The command-line binary this repository installs and runs. | `VERSION` in `scripts/install_allium.py` |
+| `juxt/allium` | The language, and the editor and assistant plugin built from it. | `.claude/settings.json`, which enables the plugin and pins no version |
+| The language version | Which dialect a module is written in. | The `-- allium: 3` header on each `.allium` file |
+
+They advance independently, and the plugin's number runs well ahead of the tool's: an
+assistant plugin at 3.8.0 alongside a binary at 3.6.1 is the normal state and not a
+mismatch to correct. The binary is the only one of the three that `just check` executes, so
+a plugin release is never a reason to move this pin. Move it when
+`juxt/allium-tools` publishes a release, which is the repository the checksums below are
+computed from.
+
 Upstream publishes no checksums for these files — its `SHA256SUMS.txt` covers only the
 editor extension and the language server — so all four have to be recomputed by hand:
 

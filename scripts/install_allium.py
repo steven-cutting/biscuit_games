@@ -26,6 +26,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 INSTALL_DIRECTORY = PROJECT_ROOT / ".tools" / "bin"
 BINARY = INSTALL_DIRECTORY / "allium"
 
+# The command-line tool from `juxt/allium-tools`, which is a different repository
+# from `juxt/allium` and carries a different version series. The assistant
+# plugin `.claude/settings.json` enables is built from the latter and numbers
+# well ahead of this -- 3.8.0 against 3.6.1 at the time of writing -- and that
+# gap is the normal state rather than a mismatch to close. A third number, the
+# language version, is the `-- allium: 3` header on each module. Only this one
+# names something `just check` executes.
 VERSION = "3.6.1"
 RELEASE = (
     "https://github.com/juxt/allium-tools/releases/download/v{version}/allium-{target}.tar.gz"
