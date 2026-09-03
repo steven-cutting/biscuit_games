@@ -1,0 +1,58 @@
+---
+title: "Architecture decisions"
+kind: "decision"
+audience: [contributor, maintainer, agent]
+canonical_for: [decision_index]
+requires: []
+---
+
+# Architecture decisions
+
+A record of what was chosen, what it cost, and what would have to change for the choice
+to be revisited. Each entry is numbered and never renumbered; a decision that is
+superseded is marked rather than deleted, because the reasoning is what makes the
+successor legible.
+
+These are decisions about the platform, and about how this repository is built. A game
+repository keeps its own record for its own game, and
+[What the hub owns](../project/what-the-hub-owns.md) says which is which. Decisions about
+*what* a shared surface does belong in the specifications under `docs/specs/`, and
+unresolved ones are recorded there as `open question` blocks — see
+[Specifications](../explanation/specifications.md).
+
+## The record
+
+| Number | Decision |
+| --- | --- |
+| [0001](0001-biscuit-games-is-the-source-of-truth.md) | Biscuit Games is the platform's source of truth |
+| [0002](0002-shared-material-travels-by-citation.md) | Shared material travels by citation |
+| [0003](0003-static-site-no-backend.md) | A static site with no backend |
+| [0004](0004-specs-are-the-source-of-truth.md) | Specifications decide shared behaviour |
+| [0005](0005-ports-and-fakes.md) | Side effects behind ports |
+| [0006](0006-python-toolchain.md) | A Python toolchain in a frontend repository |
+| [0007](0007-project-managed-allium-cli.md) | A project-managed Allium binary |
+| [0008](0008-component-workshop.md) | A component workshop |
+| [0009](0009-visual-review-in-chromatic.md) | Visual review in Chromatic |
+| [0010](0010-biscuit-games-design-system.md) | The Biscuit Games design system |
+| [0011](0011-skeleton-not-a-second-application.md) | A skeleton, not a second application |
+| [0012](0012-the-domain-root-stays-with-poodl.md) | The domain root stays with Poodl |
+
+## The numbering
+
+The series starts at 0001 because it is this repository's own. Eight entries were ported
+from Poodl at commit `c26cc4642afa6b1349db70a0f497203db3986599` and each says so under its
+heading; three of Poodl's were about the game rather than the platform and were not ported
+at all. A ported entry keeps the topic it was canonical for even though its number moved,
+because the topic is what a cross-repository reference names.
+
+## Writing a new one
+
+Copy the shape of an existing entry: context, the decision, the consequences including
+the ones that hurt, and what would reopen it. Add the file, add a manifest entry, add a
+row above. A decision nobody can find is not recorded.
+
+## Related pages
+
+- [Documentation map](../README.md)
+- [What the hub owns](../project/what-the-hub-owns.md)
+- [Architecture](../explanation/architecture.md)
