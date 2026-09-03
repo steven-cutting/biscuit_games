@@ -211,6 +211,13 @@ permission is write or better — a fork's pull request is refused, for the reas
 was accepted; silence means one of those checks said no, and the reason is a notice on the
 run. The workflow also has to be on `main` before the comment does anything at all.
 
+An accepted request always replies, and the reply says which of three things happened: the
+build was published, or `CHROMATIC_PROJECT_TOKEN` is not set so nothing was, or the run
+ended before it reached the publish step. The second is the state today, because no
+Chromatic project exists yet — so a 🚀 followed by *no build was published* is the expected
+answer rather than a fault. The reply is the only report there is: an `issue_comment` run
+appears in no checks list.
+
 **From a laptop**, with the project token exported:
 
 ```console
