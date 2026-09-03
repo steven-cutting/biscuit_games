@@ -1,0 +1,195 @@
+-- allium: 3
+--
+-- Biscuit Games — appearance
+--
+-- Scope
+--   How every Biscuit Games surface looks: the three preferences that decide
+--   it, how each negotiates with a preference the operating system has
+--   already expressed, and the legibility the result has to reach.
+--
+-- Includes
+--   - Theme, high contrast and animations, as the platform's shared
+--     appearance settings.
+--   - Theme starting dark, with system as the choice that follows the device
+--     as it changes; animations deferring to a reduced-motion preference;
+--     and high contrast turning on for a device that asks for more of it.
+--   - The legibility every combination of theme and high contrast has to
+--     reach, stated as ratios rather than as colours, and the one case that
+--     is exempt from it.
+--
+-- Excludes
+--   - The controls that change these settings. A settings panel belongs to
+--     the product that owns it: this module states what the settings mean and
+--     what the result owes the reader, never where the switches live, how
+--     they are guarded, or how they are stored.
+--   - Colour values, palettes, markup and animation mechanics. Naming a floor
+--     the colours have to clear is not the same as choosing them: this module
+--     says how far apart two things must be, never what either one is.
+--     src/app.css is what answers it.
+--   - Anything a particular game does with the result. A game states its own
+--     states and any separation those states need between them.
+--
+-- Dependencies
+--   None. This is the platform's root module, and it imports nothing so that
+--   a game can inherit the surface below rather than restate it.
+
+------------------------------------------------------------
+-- Given
+------------------------------------------------------------
+
+given {
+    -- Preferences the reader expressed to their operating system rather than
+    -- to Biscuit Games. Biscuit Games reads them and never writes them.
+    --
+    -- They are stated one by one rather than gathered behind an entity because
+    -- this module imports nothing: a root module has no governing
+    -- specification for an external entity to come from, and three named
+    -- booleans say where they come from just as well.
+    prefers_dark_colour_scheme: Boolean
+    prefers_reduced_motion: Boolean
+
+    -- The reader asked their operating system for more contrast everywhere,
+    -- not Biscuit Games in particular. It is a separate question from the
+    -- colour scheme: a device can ask for more contrast in either one.
+    prefers_more_contrast: Boolean
+}
+
+------------------------------------------------------------
+-- Enumerations
+------------------------------------------------------------
+
+-- system means "whatever the device asks for, as it changes". light and dark
+-- each hold, whatever the device asks for; dark is where Biscuit Games starts.
+enum ThemeChoice { system | light | dark }
+
+------------------------------------------------------------
+-- Entities and Variants
+------------------------------------------------------------
+
+entity AppearanceSettings {
+    theme: ThemeChoice
+    high_contrast: Boolean
+    animations: Boolean
+
+    -- High contrast as it actually applies, which is what anything rendering
+    -- should read. high_contrast above is the reader's own answer and stays
+    -- exactly as they left it; a device asking for more contrast turns the
+    -- palette on without overwriting that answer.
+    high_contrast_active: high_contrast or prefers_more_contrast
+}
+
+------------------------------------------------------------
+-- Config
+------------------------------------------------------------
+
+config {
+    -- Contrast ratios, as WCAG 2.2 computes them, for the guarantee that names
+    -- them. They are thresholds a rendering either meets or does not, and they
+    -- name no colour. These are the two AA bars: one for text, one for
+    -- everything that is not text.
+    minimum_text_contrast: Decimal = 4.5
+    minimum_boundary_contrast: Decimal = 3.0
+}
+
+------------------------------------------------------------
+-- Defaults
+------------------------------------------------------------
+
+-- One appearance record, existing from the first visit. Theme starts dark, not
+-- at system: near-black is the platform's identity (docs/design/direction.md,
+-- "Dark is home"), so a first visit lands on it whatever the device prefers.
+-- Light, and system's following of the device, stay one choice away.
+default AppearanceSettings appearance_settings = {
+    theme: dark,
+    high_contrast: false,
+    animations: true
+}
+
+------------------------------------------------------------
+-- Surfaces
+------------------------------------------------------------
+
+-- How Biscuit Games looks, decided jointly by the reader's settings and the
+-- device. This surface applies to the hub and to every game wearing the
+-- design system.
+surface Appearance {
+    let settings = appearance_settings
+    let dark_active =
+        if settings.theme = system: prefers_dark_colour_scheme
+        else: settings.theme = dark
+    let animations_active = settings.animations and not prefers_reduced_motion
+
+    exposes:
+        dark_active
+        animations_active
+        settings.high_contrast_active
+
+    @guarantee SystemFollowsTheDeviceAsItChanges
+        -- While theme is system, Biscuit Games matches the device's colour
+        -- scheme and keeps matching it as it changes. Light and dark — the
+        -- default included — hold on their own, and the device is not
+        -- consulted.
+
+    @guarantee ReducedMotionOverridesTheAnimationSetting
+        -- Animations run only when the animations setting is on and the device
+        -- expresses no reduced-motion preference. The device preference wins: a
+        -- reader who asked their system for less motion gets none from Biscuit
+        -- Games, whatever the setting says.
+
+    @guarantee MoreContrastFromTheDeviceTurnsHighContrastOn
+        -- High contrast applies when the setting is on or the device asks for
+        -- more contrast. The device wins the same way it does for motion: a
+        -- reader who asked their system for more contrast gets it without
+        -- having to find the setting and ask a second time.
+
+    @guarantee AppearanceNeverCarriesMeaningAlone
+        -- Neither the theme nor high contrast is what makes anything readable.
+        -- Nothing on any surface is distinguished by colour alone in any
+        -- combination of these settings: every state colour helps to show also
+        -- carries a shape, a word, or both. A game that adds states of its own
+        -- inherits this obligation and states how it meets them.
+
+    @guarantee EveryCombinationMeetsTheLegibilityFloor
+        -- The floor holds in all four combinations of theme and high contrast,
+        -- not only the one a change happened to be looked at in. Text on any
+        -- control the reader can operate reaches config.minimum_text_contrast
+        -- against what is behind it, and so does body copy; every such control
+        -- is identifiable as one — by a boundary reaching
+        -- config.minimum_boundary_contrast against the page where it draws a
+        -- boundary, and by its own words where it draws none, since a control
+        -- with no drawn edge is found by reading it and an edge that is not
+        -- there cannot be measured. High contrast raises the floor nowhere: it
+        -- is a second palette that has to clear the same bar, not the version
+        -- where legibility is finally attended to. A game that puts two of its
+        -- own states side by side owes a separation between them as well and
+        -- states that figure itself; this module states the bars every surface
+        -- owes the page.
+
+    @guarantee AnUnavailableControlIsExempt
+        -- A control the reader cannot operate is held to none of those
+        -- figures, exactly as WCAG 2.2 exempts an inactive component from
+        -- 1.4.3 and 1.4.11 — and so is the text that names it, because a label
+        -- that stayed bright beside a control that had gone quiet would
+        -- disagree with it about whether the thing can be used. Dimming is how
+        -- unavailability reads, and a dim that had to clear the bar a live
+        -- control clears would not read as one.
+        -- What the exemption does not buy is anything about how that state is
+        -- known. It is spent only while the control genuinely cannot be
+        -- operated, never on one that is merely quiet or incidental; the
+        -- unavailability is carried in the accessibility tree, so a screen
+        -- reader is told in words what the eye reads as dim; and a dimmed
+        -- control keeps every non-colour indication its live form carried,
+        -- because AppearanceNeverCarriesMeaningAlone admits no exemption at
+        -- all.
+}
+
+------------------------------------------------------------
+-- Open Questions
+------------------------------------------------------------
+
+-- That the device wins is settled, and matches how reduced motion already
+-- behaves. What is not settled is whether it is the last word: a reader who
+-- asked their system for more contrast but wants this palette left alone has
+-- nowhere to say so, because the setting they would reach for is the one the
+-- device is already overriding.
+open question "Contrast escape hatch - may a reader turn high contrast off while the device asks for more?"

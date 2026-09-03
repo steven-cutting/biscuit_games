@@ -1,0 +1,155 @@
+---
+title: "Quality gates"
+kind: "reference"
+audience: [contributor, maintainer, agent]
+canonical_for: [quality_gate_reference]
+requires: []
+---
+
+# Quality gates
+
+`just check` runs the gates in the order below and snapshots the worktree between each
+one. A recipe that modifies a file fails the run, because checks are read-only.
+
+| Order | Gate | Proves |
+| --- | --- | --- |
+| 1 | `lock-check` | Both manifests agree with both lockfiles. |
+| 2 | `lint` | The whole hook gate passes over every file. |
+| 3 | `frontend-static` | ESLint, Prettier and `svelte-check --fail-on-warnings` are clean. |
+| 4 | `frontend-coverage` | Every test passes and coverage is at or above the floor. |
+| 5 | `frontend-build` | The site actually builds, with every route prerenderable. |
+| 6 | `storybook-build` | The workshop builds, documentation pages included. |
+| 7 | `storybook-test` | Every story renders in Chromium, passes axe, and its play function completes. |
+| 8 | `check-docs` | The documentation contract holds. |
+| 9 | `check-agents` | The agent contract holds. |
+| 10 | `check-specs` | Every specification reports an empty `diagnostics` array. |
+| 11 | `analyse-specs` | Every specification reports an empty `findings` array too. |
+| 12 | `check-clean` | The run changed nothing. |
+
+Gates 10 and 11 have been in the aggregate from the first commit, which is what
+[decision 0007](../decisions/0007-project-managed-allium-cli.md) says. They cost
+the gate something real: the pinned `allium` binary lives in the gitignored `.tools/bin/`,
+which is a per-worktree install, so a worktree that has never run `just initialize` now
+fails `just lint` and `just check` until `just install-allium` puts one there. The
+alternative was a gate that skipped itself whenever its tool was absent, which asserts
+nothing.
+
+Neither gate trusts the tool's exit code, because neither exit code means what this
+project means by clean. `allium check` exits 0 on an `info` diagnostic —
+`allium.field.unused` is one — and `allium analyse` keys its status on findings alone and
+ignores diagnostics entirely, so a module that does not parse passes it with the `error`
+sitting in the JSON it has just printed. `scripts/run_allium.py` runs the subcommand,
+prints its output whole, and asserts what the contract actually says: every module reports
+an empty `diagnostics` array and an empty `findings` array. A diagnostic may be waived
+only where the checker itself is wrong, on the terms in
+[Work with the specifications](../how-to/work-with-the-specs.md); a finding cannot be
+waived at all. `docs/specs/` holds one module today, `appearance.allium`, and both gates
+report empty on it.
+
+One check is still deliberately missing from the table. `check-links-online` needs the
+network, and a check that can fail because a third party is down is not a gate. It is
+listed in [Commands](commands.md).
+
+Storybook writes a cache and a static build, and Vitest's browser mode can write failure
+screenshots. All of them are ignored by Git, because a gate that changes one byte of the
+worktree fails before its own exit code is read. Gate 7 needs a browser that no lockfile
+accounts for; see [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
+
+## What the hook gate contains
+
+`just lint` runs `.pre-commit-config.yaml` over every file. This is the read-only
+configuration, and it is the one installed as the pre-commit hook.
+
+| Hook | Checks |
+| --- | --- |
+| `ruff-check`, `ruff-format-check` | Every Python script under `scripts/`. |
+| `editorconfig-checker` | Whitespace, line endings, final newlines. |
+| `eslint` | ESLint and `prettier --check` across the application, the stories, and the workshop configuration. |
+| `validate-docs`, `validate-agents` | The two contracts, so a hook catches them before the aggregate does. |
+| `check-specs`, `analyse-specs` | The specifications, through `allium`. Needs the pinned binary; see above. |
+| `markdownlint-cli2` | Markdown structure. Prettier does not touch Markdown, so they cannot disagree. |
+| `typos` | Spelling, excluding the lockfiles. |
+| `lychee` | Link targets, offline. |
+| `shellcheck` | `scripts/initialize.sh`. |
+| `actionlint` | Every GitHub Actions workflow, its structure only — see below. |
+| `ripsecrets` | Credential material, with its output suppressed so a match is never logged. |
+| Builtin `check-*` | Large files, case conflicts, merge markers, JSON, TOML, YAML, private keys, shebangs. |
+
+Third-party hooks are pinned to commit SHAs with a version comment beside each.
+
+One gap is worth knowing about rather than being surprised by. `actionlint` analyses a
+`run:` block by handing it to `shellcheck`, and it reports nothing at all when it cannot
+find `shellcheck` on its own `PATH`. Under `prek` each hook gets its own environment, so
+the `shellcheck` hook two rows up is not the one `actionlint` can see, and the shell
+embedded in a workflow goes unread. The `authorize` job in
+`.github/workflows/chromatic.yml` is the only place that shell is more than a line, and it
+was checked by extracting it and running `shellcheck` over it by hand. Anything comparable
+added later deserves the same treatment until the gap is closed.
+
+## The mutating counterpart
+
+`.pre-commit-fix.yaml` holds the hooks that write: Ruff autofix and format,
+end-of-file and trailing-whitespace repair, and `markdownlint --fix`. It is never
+installed as a hook and runs only from `just fix`.
+
+## In continuous integration
+
+`.github/workflows/ci.yml` runs the same recipes in three jobs, and those three are the
+whole of continuous integration here. `frontend` runs the install, then `lock-check`,
+`frontend-static`, `frontend-coverage` and `frontend-build`; `documents` runs `sync`, then
+`install-allium` — the binary no lockfile can name — then `lint`, `check-docs`,
+`check-agents`, `check-specs` and `analyse-specs`; `stories` restores the Playwright cache,
+installs the browser, then runs `storybook-build` and `storybook-test`. Nothing in CI runs
+a command that does not exist in the `Justfile`. The workshop build the gate makes is
+proved and then discarded: that one is uploaded nowhere.
+
+No job here ships the site, because the site is published nowhere: this repository has no
+Pages workflow and no address of its own; see
+[decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
+
+A separate workflow uploads the one build that does leave the runner, and what it uploads
+is the workshop rather than the site. `.github/workflows/chromatic.yml` runs
+`just chromatic`, which builds the workshop again and publishes it for visual review; see
+[decision 0009](../decisions/0009-visual-review-in-chromatic.md). It is a workflow rather
+than a fourth `ci.yml` job because it holds a secret nothing else holds and answers to
+triggers the gate has no use for: a push to `main`, which sets the baseline, and a
+`/chromatic` comment on a pull request, which publishes that branch for review. The comment
+publishes for a commenter with write permission or better, and only for a branch in this
+repository; the checks and what they are for are in
+[the security model](../explanation/security-model.md).
+
+No Chromatic project exists for Biscuit Games yet, so `CHROMATIC_PROJECT_TOKEN` is a
+repository secret nobody has set. The workflow records whether the token is present and
+skips the publish when it is not, leaving a notice rather than a failure, so a push to
+`main` does not go red over a publish that cannot happen. Only the token's presence leaves
+that step, never its value. Setting the secret is the whole of turning visual review on.
+
+## On `main`
+
+`main` is protected, and `frontend`, `documents` and `stories` must all pass before a
+branch merges into it. Those three names are the CI jobs, and they are the only required
+checks. Chromatic is not among them, and deliberately so — a visual change is a thing to
+look at, not a thing to fail on, so the job reports and passes; today it also skips itself
+for want of a token.
+
+The branch is not required to be up to date with `main` first, and no review is required —
+neither earns its cost on a repository with one author. Force pushes and deletion are
+refused. Administrators are not bound by the rule, so the direct push remains available
+when it is genuinely wanted; the protection is there to stop an unproved merge, not to stop
+the author.
+
+What the protection buys is narrower than it sounds, and narrower here than in a repository
+that ships. Nothing in this repository deploys, so an unproved `main` reaches nobody: it is
+wrong in place until the next commit fixes it, and there is no published site to roll back.
+Two paths still reach `main` ahead of a green run. One is the administrator pushing
+directly. The other is an ordinary merge, because the branch is not required to be up to
+date first — three green checks are green for the branch, not for the `main` the merge
+produces. Watch the run in both cases, because `main` is what the next branch starts from,
+and what the Chromatic baseline will be taken from once that token exists.
+
+## Related pages
+
+- [Commands](commands.md)
+- [Quality philosophy](../explanation/quality-philosophy.md)
+- [Documentation contract](documentation-contract.md)
+- [Agent contract](agent-contract.md)
