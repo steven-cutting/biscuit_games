@@ -45,10 +45,23 @@ primary one, and says so when it declines.
 
 ### Do not install the hook from a secondary worktree
 
-If `.git` is a file rather than a directory, or if `git worktree list` prints more than
-one row, this checkout is a secondary worktree and `just install-hooks` is the wrong
-command here. `just initialize` makes the same comparison itself and skips the hook, so
-that one is safe to run anywhere.
+The test is the one git itself makes: in a secondary worktree the common directory and the
+git directory differ.
+
+```console
+git rev-parse --git-common-dir   # the shared .git
+git rev-parse --git-dir          # .git/worktrees/<name> in a secondary worktree
+```
+
+Equal means this is the primary checkout and `just install-hooks` belongs here. Different
+means it is secondary and the command is the wrong one to run. `.git` being a file rather
+than a directory says the same thing for a worktree added with `git worktree add`, and is
+quicker to eyeball. **Do not count the rows of `git worktree list`** — it enumerates every
+worktree of the repository whatever it is run from, so the primary checkout prints more than
+one row as soon as any secondary exists, which is exactly when you are reading this.
+
+`scripts/initialize.sh` makes that same comparison and skips the hook when it differs, so
+`just initialize` is safe to run anywhere.
 
 Git keeps one `.git/hooks` directory and shares it across every worktree of the
 repository. The installed hook records an absolute path into the virtual environment of the
@@ -99,8 +112,10 @@ just fix       # formats and applies the safe automatic repairs
 just check     # the whole gate, read-only
 ```
 
-`just fix` is the only command that is allowed to modify files. Every check is read-only,
-and `just check` proves it by comparing the worktree before and after each recipe.
+Every check is read-only, and `just check` proves it by comparing the worktree before and
+after each recipe. `just fix` is the repair command to reach for, though not the only one that
+writes: `just format` and the lock recipes do too, and
+[Commands](../reference/commands.md) is the list.
 
 ## Keeping the workspace current
 

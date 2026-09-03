@@ -23,6 +23,7 @@
     "format": "prettier --write .",
     "test": "vitest run --config vite.config.ts",
     "coverage": "vitest run --config vite.config.ts --coverage",
+    "test:watch": "vitest --config vite.config.ts",
     "storybook": "storybook dev -p 6006 --no-open --no-version-updates",
     "storybook:build": "storybook build --output-dir storybook-static",
     "storybook:test": "node scripts/check_playwright_browsers.js && vitest run --config vitest.storybook.config.ts",

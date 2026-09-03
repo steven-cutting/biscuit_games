@@ -17,12 +17,17 @@ just frontend-static      # ESLint, Prettier check, svelte-check
 just storybook-test       # every story in Chromium, with axe over each
 ```
 
-To iterate on one file, call Vitest directly:
+To iterate on one file, watch it:
 
 ```console
-npx vitest tests/wordmark.test.ts
-npx vitest --watch tests/wordmark.test.ts
+just frontend-watch tests/wordmark.test.ts
+just frontend-watch                          # everything, still watching
 ```
+
+Do not reach for `npx vitest <file>` instead. Bare Vitest resolves `vitest.config.ts`, which
+names both projects, so the browser project loads and Chromium comes with it — a run that
+wanted one jsdom file. The recipe pins `vite.config.ts` the way `just frontend-unit` and
+`just frontend-coverage` already do; see [Testing](../reference/testing.md).
 
 There is one test file today, so the suite and that file are the same run. That stops
 being true the moment a second component lands, and the habit of naming the file is worth

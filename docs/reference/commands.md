@@ -30,13 +30,13 @@ Git keeps one `.git/hooks` directory and shares it across every worktree of the
 repository. The installed hook records an absolute path into the virtual environment of
 the worktree that installed it, and `just install-hooks` passes `--overwrite`, so
 installing from a secondary worktree silently replaces the hook every other worktree also
-commits through. Check first: if `.git` is a file rather than a directory, or if `git
-worktree list` prints more than one row, this is a secondary worktree and
-`just install-hooks` is the wrong command here. `just initialize` already knows: it
-compares the common directory against the git directory and skips the hook, saying so,
-rather than installing one from the wrong place. Run it freely; run `just install-hooks`
-by hand only from the primary checkout. Nothing else warns you, and the breakage
-surfaces in another worktree, later.
+commits through. Check first: this is a secondary worktree when
+`git rev-parse --git-common-dir` and `git rev-parse --git-dir` differ, and then
+`just install-hooks` is the wrong command here. Counting the rows of `git worktree list` is
+not that test — it prints every worktree whatever it is run from. `just initialize` already
+knows: it makes the same comparison and skips the hook, saying so, rather than installing one
+from the wrong place. Run it freely; run `just install-hooks` by hand only from the primary
+checkout. Nothing else warns you, and the breakage surfaces in another worktree, later.
 The full account is in [Develop locally](../how-to/develop-locally.md#do-not-install-the-hook-from-a-secondary-worktree).
 
 ## Dependencies
@@ -54,6 +54,7 @@ The full account is in [Develop locally](../how-to/develop-locally.md#do-not-ins
 | `just dev` | Vite development server with hot module replacement, on port 5173. |
 | `just preview` | Serve the built output in `build/`. Build first; there is nothing else to set. |
 | `just storybook` | The component workshop on port 6006, with hot module replacement. |
+| `just frontend-watch [path]` | Vitest in watch mode over one path, or over everything. The iteration loop; it never exits, so it is not a gate. Pins `vite.config.ts`, so the browser project stays out of it. |
 
 The hub is one route and one component, so `just storybook` is where most work happens and
 `just dev` is where you confirm the route still assembles. See
@@ -64,7 +65,14 @@ The hub is one route and one component, so `just storybook` is where most work h
 | Recipe | Purpose |
 | --- | --- |
 | `just format` | Ruff and Prettier, writing. |
-| `just fix` | The mutating hook set, then ESLint autofix, then `just lint`. The only command that modifies files. |
+| `just fix` | The mutating hook set, then ESLint autofix, then `just lint`. The aggregate repair command: reach for it rather than the individual writers. |
+
+`just fix` is the repair command, not the only one that writes. `just format`, `just lock`,
+`just lock-upgrade` and `just initialize` all modify tracked files too — the first three by
+design, the last as part of a first run. What is read-only is the **check** set: every recipe
+`just check` runs reports and never repairs, and `scripts/run_project_check.py` proves it per
+run by comparing the worktree before and after each one. That is the guarantee worth relying
+on, and it is the one the other pages cite.
 
 ## Check
 

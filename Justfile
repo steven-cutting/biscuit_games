@@ -69,6 +69,15 @@ preview:
 storybook:
     npm run storybook
 
+# The iteration loop. Here rather than in the check section because it never
+# exits; `just frontend-unit` is the recipe that answers. It pins `vite.config.ts`
+# for the same reason both other test recipes do — left to its own discovery
+# Vitest finds `vitest.config.ts`, which names the browser project too and would
+# pull Chromium into a run that wanted one jsdom file.
+# Watch one path, or everything: `just frontend-watch tests/wordmark.test.ts`.
+frontend-watch target="":
+    npm run test:watch -- ${1:+"$1"}
+
 # ----------------------------------------------------------------- format ---
 
 format:

@@ -18,6 +18,17 @@ npm ci --no-audit
 # that no lockfile accounts for.
 npm run storybook:browsers
 
+# On Linux those binaries also need system libraries, which
+# `just storybook-browsers-deps` installs through apt. It is named here rather
+# than run: `playwright install-deps` says of itself that it "will ask for sudo
+# permissions", and a first-run script that escalates without being asked is
+# what the authorization rule in AGENTS.md exists to prevent. CI runs the recipe
+# unconditionally; macOS has nothing to add.
+if [ "$(uname -s)" = 'Linux' ]; then
+    printf '%s\n' 'Linux: Chromium also needs system libraries.' >&2
+    printf '%s\n' 'Run just storybook-browsers-deps once; it asks for sudo.' >&2
+fi
+
 # The other one. The Allium checker for docs/specs/, pinned and checksummed in
 # the script, landing in the gitignored .tools/bin. `just check-specs` and
 # `just analyse-specs` run it, and both the hook gate and `just check` run those,

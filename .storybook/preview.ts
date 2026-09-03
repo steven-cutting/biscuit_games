@@ -72,7 +72,9 @@ function readAppearance(globals: Record<string, unknown>): Appearance {
  * freezes declarative motion so a reviewer sees the still frame. It stands in
  * for the device half of
  * `Appearance.animations_active`, and because it is a simulation it is not
- * evidence that the real preference is honoured; `tests/` holds that.
+ * evidence that the real preference is honoured. Nothing here is: no test in
+ * `tests/` reads `prefers-reduced-motion` and no rule in `src/app.css` answers
+ * it, so the still frame is for a reviewer's eye and for nothing else.
  */
 function applySimulatedReducedMotion(active: boolean): void {
   const existing = document.getElementById(REDUCED_MOTION_STYLE_ID);
@@ -124,10 +126,13 @@ function applyAppearance(appearance: Appearance): void {
   }
 
   /*
-   * `Appearance.animations_active`, on the same terms the route writes it: the
-   * setting and the device's reduced-motion preference taken together, and the
-   * device wins. Without this the attribute is never present in the workshop
-   * and every story renders the animation-off path, whatever the toolbar says.
+   * `Appearance.animations_active` in full: the setting and the device's
+   * reduced-motion preference taken together, and the device wins. The route
+   * does less. `src/app.html` writes `data-animations="on"` flat and consults
+   * no device preference, so the workshop is the more faithful of the two and a
+   * component seen here has been seen under a derivation the hub does not yet
+   * make. Without this the attribute is never present in the workshop and every
+   * story renders the animation-off path, whatever the toolbar says.
    */
   if (appearance.animations === 'on' && appearance.reducedMotion !== 'reduce') {
     root.setAttribute('data-animations', 'on');

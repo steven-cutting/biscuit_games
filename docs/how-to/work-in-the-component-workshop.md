@@ -96,7 +96,10 @@ element per state.
 <Story
   name="Lockup"
   play={async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByText(/biscuit/)).toHaveTextContent('biscuit games');
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText('b')).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByText(/biscuit/)).toHaveTextContent(/^biscuit games$/);
   }}
 />
 ```
@@ -129,11 +132,14 @@ Four rules on top of the format:
    `tests/` does.
 4. **Reach for a play function when the guarantee is about interaction.** A story that tabs
    to a control and activates it is executable evidence in a way a rendered picture is not.
-   The two on `Wordmark` are the worked examples of the smaller case: one asserts the
-   lockup reads "biscuit games" and not "b biscuit games", because the mark is
-   `aria-hidden`; the other asserts that pinning the dark theme reached
-   `document.documentElement`, which is the element every palette in `src/app.css` is keyed
-   on.
+   The two on `Wordmark` are the worked examples of the smaller case. The first takes two
+   assertions rather than one, because a text query matches an element's own text nodes:
+   `getByText(/biscuit/)` resolves to the span holding the words and never to the lockup
+   around it, so it would pass with the mark audible however tightly it is anchored. The
+   mark's silence is a separate claim and takes a separate assertion —
+   [Testing](../reference/testing.md) is the full account. The second asserts that pinning
+   the dark theme reached `document.documentElement`, which is the element every palette in
+   `src/app.css` is keyed on.
 
 A story that needs composition — a wrapper, a sibling, children of its own — either sets
 `asChild` and supplies children, which ignores args, or supplies a snippet named `template`,
@@ -144,10 +150,13 @@ which receives the args and the story context. The addon's own documentation cov
 The toolbar carries four globals. Theme and high contrast set `data-theme` and
 `data-high-contrast` on the preview's root element, which is what `src/app.css` keys on, so
 a story sees the tokens the application will. The animations setting and reduced motion are
-read together and write `data-animations` on the same terms a route would: the attribute is
-present only when the setting is on and the device is not asking for less. A story pins a
-value with a `globals` prop, which beats the toolbar and disables the matching control, as
-the wordmark's "Dark theme" story does.
+read together and write `data-animations` on the terms `Appearance.animations_active` sets:
+the attribute is present only when the setting is on and the device is not asking for less.
+The route does less than that — `src/app.html` writes the attribute flat and reads no device
+preference — so the workshop is the more faithful of the two, and this is one place a story
+is not showing you what the hub does today. A story pins a value with a `globals` prop, which
+beats the toolbar and disables the matching control, as the wordmark's "Dark theme" story
+does.
 
 Reduced motion is a simulation, labelled as one: it freezes declarative motion in the
 preview but cannot make the browser report the preference. Nothing in the hub animates yet

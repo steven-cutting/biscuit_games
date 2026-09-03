@@ -21,7 +21,7 @@ uv lock
 uv sync --frozen
 npm install --package-lock-only --ignore-scripts --no-audit
 npm ci --no-audit
-npm run storybook:browsers
+just storybook-browsers
 just install-allium
 ```
 

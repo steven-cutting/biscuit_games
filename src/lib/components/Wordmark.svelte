@@ -26,6 +26,14 @@
     gap: var(--s-4);
   }
 
+  /*
+   * The box is in pixels on purpose, against the usual rule. 20px, 12px and the
+   * 1px nudge each match a token by value — `--s-7`, `--s-5`, `--rule-w` — and
+   * none of them by meaning: two are the spacing scale and one is a rule weight,
+   * so naming them here would tie the brand mark's geometry to scales that move
+   * for unrelated reasons. The radii match no token at all. This is placeholder
+   * geometry for a placeholder glyph and it goes with the glyph.
+   */
   .mark {
     display: inline-flex;
     align-items: center;

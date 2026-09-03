@@ -14,10 +14,11 @@ a decision, it should be deleted rather than tolerated.
 
 ## Checks are read-only
 
-Every recipe under `just check` reports and never repairs. `just fix` is the only command
-allowed to modify files. `run_project_check.py` enforces this by snapshotting the
-worktree and comparing it after every recipe, so a check that rewrites a file fails the
-run rather than hiding drift.
+Every recipe under `just check` reports and never repairs. `run_project_check.py` enforces
+this by snapshotting the worktree and comparing it after every recipe, so a check that
+rewrites a file fails the run rather than hiding drift. Repair is `just fix`, which is the
+aggregate rather than the only writer — `just format` and the two lock recipes write as well;
+[Commands](../reference/commands.md) is the list.
 
 This is why the pre-commit configuration is split in two. `.pre-commit-config.yaml` is
 the gate and is what gets installed; `.pre-commit-fix.yaml` holds the mutating hooks and

@@ -86,9 +86,16 @@ same way it does for motion, so a reader who has already asked their system does
 find the setting and ask again. It never overwrites the reader's own answer: `high_contrast`
 stays exactly as they left it, and `high_contrast_active` is what anything rendering reads.
 What a reader cannot yet do is overrule the device, and `appearance.allium` carries that as an
-open question rather than a decision. There is no settings panel here to carry either half —
-the module excludes one deliberately, because a panel belongs to the product that owns it — so
-today the whole of this is a rule waiting for a control.
+open question rather than a decision.
+
+That is the rule. What holds here is less, in both halves. There is no settings panel to carry
+the reader's own answer, and the module excludes one deliberately, because a panel belongs to
+the product that owns it. And nothing here derives `high_contrast_active` from a live device
+preference either: `prefers-contrast: more` reaches no selector in `src/app.css`, which keys
+the high-contrast palette on `data-high-contrast='true'` and on nothing else. That second half
+needs no panel and no port — a media query answers it — so it is the smaller of the two debts
+and the one to pay first. Today a reader who asked their system for more contrast gets the
+standard palette.
 
 **Motion respects the operating system.** Animations run only when the animations setting is
 on *and* the operating system expresses no reduced-motion preference. The operating system
@@ -159,9 +166,14 @@ none, and the class is here so that the first one does not invent its own.
 **Every control is big enough to hit.** 44px, in both directions, down to the 320px viewport
 that is the narrowest supported width. Both figures are inherited — Poodl's
 `config.minimum_touch_target` and `config.narrowest_supported_width` — and `appearance.allium`
-declares neither. What spends them is in `src/app.css`: a `min-block-size` floor on buttons
-and text controls, and a 34rem shell rather than the design system's 480px, because a 480px
-shell caps a key in a ten-across row at about 40px on a screen with room for 44. Across is
+declares neither. That is a gap rather than a settled omission. A threshold every game inherits
+is shared behaviour, and the first invariant puts shared behaviour in `docs/specs/` rather than
+in a stylesheet; which module should state it is the open part, since `appearance.allium`'s
+scope is how a surface looks and a target size is how it is operated. It is the next
+specification question this repository owes an answer to. What spends the figures today is in
+`src/app.css`: a `min-block-size` floor on buttons and text controls, and a 34rem shell rather
+than the design system's 480px, because a 480px shell caps a key in a ten-across row at about
+40px on a screen with room for 44. Across is
 deliberately not declared, since a floor in that direction would be wrong for a dense row and
 would have to be fought back wherever it applied. A game that genuinely cannot meet the figure
 in both directions says so in its own specification and states what the width of the screen is
