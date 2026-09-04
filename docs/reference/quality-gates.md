@@ -58,8 +58,9 @@ changes one byte of the worktree fails before its own exit code is read. Gates 6
 the artefact rather than the application: nothing else in the run exercises the `exports` map,
 because the hub reaches its own components through `$lib` and its own stylesheet by relative
 path. What they cannot prove is that the package resolves once installed — that is
-`just package-smoke`, which needs the network and therefore sits outside the gate. Gate 9 needs
-a browser that no lockfile accounts for; see [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
+`just package-smoke`, which needs the network and therefore sits outside the gate;
+[Commands](commands.md) says where it does run instead. Gate 9 needs a browser that no lockfile
+accounts for; see [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
 
 ## What the hook gate contains
 
@@ -76,7 +77,7 @@ configuration, and it is the one installed as the pre-commit hook.
 | `markdownlint-cli2` | Markdown structure. Prettier does not touch Markdown, so they cannot disagree. |
 | `typos` | Spelling, excluding the lockfiles. |
 | `lychee` | Link targets, offline. |
-| `shellcheck` | `scripts/initialize.sh`. |
+| `shellcheck` | Every shell script under `scripts/`. |
 | `actionlint` | Every GitHub Actions workflow, its structure only — see below. |
 | `ripsecrets` | Credential material, with its output suppressed so a match is never logged. |
 | Builtin `check-*` | Large files, case conflicts, merge markers, JSON, TOML, YAML, private keys, shebangs. |

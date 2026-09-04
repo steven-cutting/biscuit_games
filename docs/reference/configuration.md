@@ -128,6 +128,10 @@ Exact versions, no ranges. Node and npm are additionally constrained by `engines
 recorded in `volta` in `package.json`; Python by `.python-version`. See
 [Maintain dependencies](../how-to/maintain-dependencies.md).
 
+`peerDependencies` and `engines` state ranges rather than pins, because neither is something
+this repository installs. [Published artefacts](published-artefacts.md) owns the Svelte peer
+range.
+
 Two dependencies are outside that scheme, because no lockfile can name a binary. The
 browser the story run drives is downloaded by Playwright into a cache outside the
 repository; its version follows the `playwright` pin and appears in neither lockfile. The

@@ -109,8 +109,8 @@ holds one module, `appearance.allium`, and both recipes must come back empty.
 | Recipe | Purpose |
 | --- | --- |
 | `just chromatic [branch]` | Build the workshop and publish it to Chromatic for visual review. Manual; needs the network and `CHROMATIC_PROJECT_TOKEN`. Never part of `just check`. The argument overrides the branch name, which only CI needs, because it checks a pull request out at a detached head. |
-| `just package-smoke` | Pack the library, install it into a throwaway Vite project and build that. Needs the network, so it sits outside `just check` — and it is the only check that proves the `exports` map resolves and the typefaces are found from inside a consumer's `node_modules`. |
-| `just package-version <tag>` | Assert a tag names the version `package.json` carries. The release workflow runs this same recipe. |
+| `just package-smoke` | Pack the library, install it into a throwaway Vite project and build that. Needs the network, so it sits outside `just check` — and it is the only check that proves the `exports` map resolves and the typefaces are found from inside a consumer's `node_modules`. The release workflow runs this same recipe. |
+| `just package-version <tag>` | Assert a tag names the version `package.json` carries and `CHANGELOG.md` has a heading for. The release workflow runs this same recipe. |
 | `just publish-package` | Publish the package to GitHub Packages. Over the network, and a separately authorized action; CI runs it from a tag. |
 | `just publish-package-dry-run` | Rehearse that publish against the real registry without creating a version. |
 

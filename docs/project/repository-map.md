@@ -83,7 +83,7 @@ wrong rather than merely early.
 - No `site-root/`, no staging script, no Pages workflow and no `BASE_PATH`. The hub *site*
   is published nowhere, and the domain root stays with Poodl; see
   [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). The package and the
-  workshop are published, and neither is the site — see
+  workshop are what leave this repository, and neither is the site — see
   [Published artefacts](../reference/published-artefacts.md).
 - No `tests/contrast.test.ts`. It has not been ported, so nothing in this repository
   recomputes a contrast ratio, and every figure quoted in `src/app.css` is an inherited

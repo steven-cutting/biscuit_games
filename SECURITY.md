@@ -11,8 +11,8 @@ behaviour is worth more than a description of it.
 
 ## Supported versions
 
-There are no released versions to support and no backports. This repository publishes
-nothing today; a fix lands on `main` and stands there.
+There are no released versions to support and no backports; a fix lands on `main` and stands
+there.
 
 ## What is in scope
 

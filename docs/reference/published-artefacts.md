@@ -8,14 +8,23 @@ requires: []
 
 # Published artefacts
 
-Two things leave this repository, and this page is the only place either is named. Anything
-needing one of these addresses links here rather than repeating it, because a URL written in
-two places is a URL that rots in one of them.
+Two things leave this repository, and this page is the only place either is *recorded*. A
+procedure may paste an address to stay runnable, and a decision or a handover item may name one
+where naming it is the point; nothing else states what these addresses are or what they promise,
+because a URL written in two places is a URL that rots in one of them.
 
 | Artefact | Address | Published by |
 | --- | --- | --- |
 | The package | `@steven-cutting/biscuit-games` on `npm.pkg.github.com` | A tag, through the release workflow |
 | The workshop | `https://main--6a99fd20afcb187c61d773f1.chromatic.com/` | A push to `main`, through `just chromatic` |
+
+The workshop is live. The package is not: no version has been released, and the work is still
+under `[Unreleased]` in `CHANGELOG.md`. So the registry coordinate above is where a first
+release lands rather than somewhere anything installs from today, and
+`just publish-package-dry-run` is how you rehearse against it without creating a version. What
+this page says about the package describes the artefact a release produces, and is true of it
+the moment one is cut. **Delete this paragraph as part of cutting the first release** — nothing
+else flips it, because this repository has no other release procedure to hang the step on.
 
 The Chromatic application id is `6a99fd20afcb187c61d773f1`, and the permalink has the form
 `https://<branch>--<appId>.chromatic.com/`, so a branch other than `main` has an address of the

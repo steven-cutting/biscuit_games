@@ -30,7 +30,13 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Raised from 20 when the specification gates and the consumer smoke test
+    # joined the job: the smoke test alone scaffolds a project and runs three npm
+    # installs, which is four to five minutes before anything else is counted. A
+    # timeout that fires here kills a run that may already have created the
+    # version, which is the one outcome `cancel-in-progress: false` exists to
+    # avoid, so the margin is deliberate rather than generous.
+    timeout-minutes: 35
     permissions:
       contents: read
       # The whole reason this job needs more than the workflow-level default.
@@ -60,7 +66,7 @@ jobs:
       # arrives through the environment rather than through an expression in the
       # command, because an expression is substituted as text before the shell
       # parses it and a tag name may legally contain a shell metacharacter.
-      - name: Refuse a tag that does not name the version
+      - name: Refuse a tag package.json and CHANGELOG.md do not both name
         env:
           TAG: ${{ github.ref_name }}
         run: just package-version "$TAG"
@@ -70,11 +76,28 @@ jobs:
       # the application, because a tag can be moved and a publish must answer for
       # the tree it is publishing. The two browser gates are not repeated: no story
       # regression can reach the tarball, and a publish should not wait on Chromium.
+      # The specification is repeated for the same reason the package gates are: it
+      # is one of the four things the tarball carries, and publint reads the manifest
+      # rather than the module, so nothing else here would notice an invalid one
+      # becoming a version nobody can replace. Its checker comes over the network
+      # into the gitignored .tools/bin, exactly as the `documents` job takes it — no
+      # lockfile can name a binary, so `just sync` above did not install it.
       - run: just lock-check
       - run: just frontend-static
       - run: just frontend-coverage
       - run: just package-build
       - run: just package-check
+      - run: just install-allium
+      - run: just check-specs
+      - run: just analyse-specs
+
+      # Not a repeat: `package-smoke` needs the network, so it sits outside
+      # `just check` and nothing on `main` has ever run it. It installs the tarball
+      # into a scaffolded consumer, which is the only place the `exports` map, the
+      # emitted types and the three `@font-face` URLs are resolved the way a game
+      # resolves them. It installs from a local tarball and so needs no credential,
+      # which is why it still sits above the line.
+      - run: just package-smoke
 
       # The registry is configured last and in a step of its own, so nothing above
       # this line ever runs with a credential it had no use for. setup-node writes

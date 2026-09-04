@@ -22,10 +22,21 @@ test -f "$tarball" || { printf 'npm pack produced no tarball\n' >&2; exit 1; }
 
 printf '==> scaffolding a consumer\n'
 cd "$workspace"
-npm create vite@latest consumer -- --template svelte-ts >/dev/null 2>&1
+# The scaffolder is installed and then run, rather than reached through `npm create`
+# or `npx`. Both of those prompt on stdin before fetching a package they do not
+# already have, `--yes` does not suppress that prompt, and a runner has no terminal
+# to answer it with: on a cold npx cache the publish hangs until the job times out.
+# `npm install` never asks. The version is pinned for the same reason everything else
+# here is, and `--no-interactive` keeps the scaffolder off TTY detection entirely.
+mkdir scaffold
+(cd scaffold && npm install --no-save --no-audit --no-fund create-vite@9.2.0 >/dev/null)
+./scaffold/node_modules/.bin/create-vite consumer \
+    --template svelte-ts --no-interactive --no-immediate >/dev/null
 cd consumer
-npm install >/dev/null 2>&1
-npm install "$tarball" >/dev/null 2>&1
+# Stdout is dropped and stderr is not: an install that fails for a reason outside
+# this repository has to say so rather than abort the release wordlessly.
+npm install >/dev/null
+npm install "$tarball" >/dev/null
 
 # A consumer takes the components through the package root and the tokens
 # through their own specifier: the barrel deliberately does not import the
@@ -60,8 +71,14 @@ grep -q '@font-face' "$css" || { printf 'the @font-face blocks did not ship\n' >
 grep -q '\.lockup' "$css" || { printf "the component's scoped styles were dropped\n" >&2; exit 1; }
 
 # One Svelte, deduped against the peer. Two rune runtimes in one bundle fail in
-# ways that are traced back here hours later.
-npm ls svelte >/dev/null 2>&1 || { printf 'the svelte peer did not dedupe\n' >&2; exit 1; }
+# ways that are traced back here hours later, and `npm ls svelte` alone will not say
+# so: it exits 0 for any tree npm calls valid, duplicates included. Count the copies
+# on disk instead. `--parseable` prints one path per physical install, collapsing
+# every deduped reference, so the consumer's own devDependency and this package's
+# peer resolving to the same directory is exactly one line. Zero — what a missing
+# peer prints — fails here too.
+copies=$(npm ls svelte --all --parseable 2>/dev/null | grep -c '/node_modules/svelte$' | tr -d ' ')
+[ "$copies" = 1 ] || { printf 'expected 1 svelte install in the consumer, found %s\n' "$copies" >&2; exit 1; }
 
 npx tsc --noEmit --skipLibCheck || { printf 'the emitted types did not resolve\n' >&2; exit 1; }
 

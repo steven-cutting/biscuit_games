@@ -55,7 +55,7 @@ it owns as prose, tokens and a specification rather than as code.
   publishes it, and the base path it is built against. Today that includes the domain
   root: it stays with Poodl, per
   [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). This repository
-  publishes a package and a workshop, not a site, and it has no site deployment procedure to
+  has a package and a workshop, not a site, and it has no site deployment procedure to
   describe.
 
 ## The test
@@ -84,9 +84,9 @@ Two ways, and the split is the point. A file travels as a package; a page travel
 citation. That is
 [decision 0013](../decisions/0013-shared-material-travels-as-a-package.md).
 
-The tokens stylesheet, the shared components, the typefaces and `appearance.allium` are
-published as `@steven-cutting/biscuit-games`. A game installs an exact version, and a change
-here reaches it as a version bump it can see, take or refuse.
+The tokens stylesheet, the shared components, the typefaces and `appearance.allium` travel in
+`@steven-cutting/biscuit-games`. A game installs an exact version, and a change here reaches
+it as a version bump it can see, take or refuse.
 [Published artefacts](../reference/published-artefacts.md) says what is in the package and
 what a major, a minor and a patch each mean.
 
@@ -112,7 +112,7 @@ number in a lockfile rather than a difference nobody can see.
   answer probably depends on whether a second game reads these pages as often as Poodl
   does.
 - **Who serves the domain root.** Decision 0012 leaves it with Poodl and leaves this
-  repository unpublished. When the hub does become the front door, the address, the
+  repository's site unpublished. When the hub does become the front door, the address, the
   redirects and the order of the two changes all have to be settled — see
   [Poodl handover](../operations/poodl-handover.md).
 - **Whether a game may ever fork a token.** Deliberately open. Today a game copies a token

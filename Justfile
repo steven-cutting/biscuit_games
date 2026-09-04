@@ -192,8 +192,11 @@ package-check:
 # @font-face URLs still find the typefaces from inside a consumer's
 # node_modules — which nothing else here can see, because the hub reaches its
 # own stylesheet by relative path and never through the package. Needs the
-# network, so it sits outside `just check` beside `check-links-online`. It works
-# in a temporary directory and touches nothing in this worktree.
+# network, so it sits outside `just check`. The release workflow runs this same
+# recipe before the registry is configured, so a broken export map cannot reach a
+# version: unlike `check-links-online`, which still runs nowhere automatically,
+# this one has a gate of its own. It works in a temporary directory and touches
+# nothing in this worktree.
 package-smoke:
     sh scripts/smoke_package.sh
 
@@ -223,8 +226,10 @@ publish-package:
 publish-package-dry-run:
     npm publish --dry-run
 
-# Asserts a release tag names the version package.json carries. The release
-# workflow runs this same recipe, so the guard a publish depends on is one you
-# can run yourself and it fails in the same words in both places.
+# Asserts a release tag names the version package.json carries and that
+# CHANGELOG.md has a heading for it, because a bump a consumer cannot read is a
+# bump nobody can judge. The release workflow runs this same recipe, so the guard
+# a publish depends on is one you can run yourself and it fails in the same words
+# in both places.
 package-version tag:
     uv run --frozen python scripts/check_release.py "$1"

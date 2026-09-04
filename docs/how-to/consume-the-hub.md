@@ -56,6 +56,10 @@ it does not work.
 npm install @steven-cutting/biscuit-games@0.1.0 --save-exact
 ```
 
+`0.1.0` is the version the first release will carry; until it is cut this command returns the
+same `404` described above, for an entirely different reason, and
+[Published artefacts](../reference/published-artefacts.md) says whether one has been.
+
 Exact, no range. That is this repository's fourth invariant and a game built from the same
 toolchain holds the same one. The version is what makes drift visible; a caret gives it
 straight back.
@@ -148,6 +152,10 @@ refs: {
 
 Set `title`, or Storybook derives one from the key and renders `Biscuit games` with a lowercase
 g. `expanded: false` because a game's own components belong at the top of its own sidebar.
+
+The URL is pasted here so the block runs as it stands, but it is not recorded here:
+[Published artefacts](../reference/published-artefacts.md) is where the workshop's address
+lives, and it is the page to read if this one has gone stale.
 
 The cost is that Storybook checks a ref's reachability from Node while it builds, so a game's
 Storybook build stops being offline. The story-test run is unaffected. If a game's gate being

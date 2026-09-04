@@ -86,11 +86,9 @@ why `just chromatic` fails rather than publishing when it is missing, and why a 
 has to set it up rather than finding it already working.
 
 **Carried out on 2026-09-03.** The project exists, `CHROMATIC_PROJECT_TOKEN` is set, and
-build 1 published and auto-accepted on `main`. The application id is
-`6a99fd20afcb187c61d773f1` and the branch permalink has the form
-`https://<branch>--<appId>.chromatic.com/`;
-[Configuration](../reference/configuration.md) records both, once, and everything else links
-there rather than repeating them.
+build 1 published and auto-accepted on `main`. The application id and the permalink it forms
+are addresses rather than reasoning, and
+[Published artefacts](../reference/published-artefacts.md) is the page that records them.
 
 **The absent-token guard stays, and is still the reason the workflow is shaped as it is.** A
 workflow that failed on an absent token would turn every push to `main` red over a build

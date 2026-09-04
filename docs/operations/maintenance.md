@@ -10,8 +10,8 @@ requires: []
 
 There is no service to operate. Nothing runs, nothing accumulates, and there is no
 on-call. There is no site deployment to watch either: the hub site is published nowhere,
-which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What is
-published is a package and a component workshop, and neither runs — one is installed and one
+which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What leaves this
+repository is a package and a component workshop, and neither runs — one is installed and one
 is read. What follows is upkeep of the repository, of the releases it cuts, and of the links
 that cross between it and Poodl.
 
@@ -53,8 +53,8 @@ run by hand. Three facts stack up behind that sentence:
   party is down is not a gate. [Quality gates](../reference/quality-gates.md) says the
   same thing from the other direction.
 
-Poodl's references to this repository are GitHub blob URLs, because nothing here is
-published and there is no site to link to. Nothing on either side goes red when a page
+Poodl's references to this repository are GitHub blob URLs, because this handbook is
+published nowhere and there is no site to link to. Nothing on either side goes red when a page
 here is renamed or moved. The rot is silent, and it lasts until somebody remembers this
 recipe — a month at best. That is the standing price of
 [decision 0002](../decisions/0002-shared-material-travels-by-citation.md): one

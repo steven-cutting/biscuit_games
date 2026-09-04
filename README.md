@@ -4,12 +4,12 @@ The hub for Biscuit Games: a small static site that says what the platform is an
 the games, and the source of truth for everything the games share — the design system, the
 shared components, the character, and every cross-cutting decision.
 
-**Status: bootstrapped, and published as a package.** The toolchain, the token vocabulary and
-one component are in place, and they ship as `@steven-cutting/biscuit-games` on GitHub
-Packages; see
+**Status: bootstrapped, and packaged.** The toolchain, the token vocabulary and one component
+are in place, and they are packaged as `@steven-cutting/biscuit-games` for GitHub Packages; see
 [decision 0013](docs/decisions/0013-shared-material-travels-as-a-package.md) and
-[Published artefacts](docs/reference/published-artefacts.md). The *site* still has no address
-of its own, because the platform's front door belongs to Poodl; see
+[Published artefacts](docs/reference/published-artefacts.md), which says what a release carries
+and whether one has been cut. The *site* still has no address of its own, because the
+platform's front door belongs to Poodl; see
 [decision 0012](docs/decisions/0012-the-domain-root-stays-with-poodl.md).
 
 ## The games
