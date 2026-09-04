@@ -26,8 +26,11 @@ cd "$workspace"
 # or `npx`. Both of those prompt on stdin before fetching a package they do not
 # already have, `--yes` does not suppress that prompt, and a runner has no terminal
 # to answer it with: on a cold npx cache the publish hangs until the job times out.
-# `npm install` never asks. The version is pinned for the same reason everything else
-# here is, and `--no-interactive` keeps the scaffolder off TTY detection entirely.
+# `npm install` never asks. `--no-interactive` keeps the scaffolder off TTY detection
+# entirely. The version is pinned for the same reason everything else here is, but it
+# is a version string in a script rather than a locked dependency: nothing installs
+# create-vite into this repository, so `just lock-check` cannot see this pin and
+# moving it is a deliberate edit here or nothing.
 mkdir scaffold
 (cd scaffold && npm install --no-save --no-audit --no-fund create-vite@9.2.0 >/dev/null)
 ./scaffold/node_modules/.bin/create-vite consumer \
