@@ -1,0 +1,96 @@
+name: Release
+
+# Publishes the package to GitHub Packages. It is a workflow of its own because it
+# answers to a trigger the gate has no use for, and because it is the one thing here
+# that writes an artefact anybody else installs.
+#
+# It holds no stored secret. `github.token` is minted for the run and discarded with
+# it, which is why "one workflow holds a secret, and it is the Chromatic visual
+# review" still reads true after this file exists. A permission is not a secret.
+
+on:
+  # A tag, and only a tag. GitHub Packages refuses to republish a version and
+  # restricts deleting one, so a publish must have exactly one cause and that cause
+  # must be a name in the history. A publish that failed is re-run from the Actions
+  # UI against the same tag rather than dispatched against whatever `main` happens
+  # to be — which is also why there is no `workflow_dispatch` here.
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Never cancel a publish. A cancelled run may already have created the version,
+  # and the next attempt would then fail on a version it cannot replace — the
+  # opposite of what cancelling was for.
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      # The whole reason this job needs more than the workflow-level default.
+      # GitHub Packages authenticates the publish with the run's own token, so
+      # nothing has to be stored on the repository for it.
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.11.18
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv python install 3.14
+      - run: uv tool install rust-just==1.51.0
+      - run: npm install --global npm@11.17.0
+      - run: just sync
+
+      # First, so a mismatch costs one step rather than a whole gate. The tag
+      # arrives through the environment rather than through an expression in the
+      # command, because an expression is substituted as text before the shell
+      # parses it and a tag name may legally contain a shell metacharacter.
+      - name: Refuse a tag that does not name the version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: just package-version "$TAG"
+
+      # The tagged commit already passed `frontend`, `documents` and `stories` on
+      # main. What is repeated is the subset that proves the artefact rather than
+      # the application, because a tag can be moved and a publish must answer for
+      # the tree it is publishing. The two browser gates are not repeated: no story
+      # regression can reach the tarball, and a publish should not wait on Chromium.
+      - run: just lock-check
+      - run: just frontend-static
+      - run: just frontend-coverage
+      - run: just package-build
+      - run: just package-check
+
+      # The registry is configured last and in a step of its own, so nothing above
+      # this line ever runs with a credential it had no use for. setup-node writes
+      # its .npmrc under RUNNER_TEMP and points NPM_CONFIG_USERCONFIG at it rather
+      # than into the checkout, so the worktree the gates just proved clean stays
+      # that way.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '26'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@steven-cutting'
+
+      # No --provenance: npm provenance is attested through the npmjs registry and
+      # Sigstore, which GitHub Packages does not support, so asking for it would
+      # fail the publish and imply a guarantee that is not there.
+      - name: Publish to GitHub Packages
+        run: just publish-package
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}

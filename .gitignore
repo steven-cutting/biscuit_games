@@ -33,6 +33,14 @@ coverage/
 storybook-static/
 *storybook.log
 
+# The packaged library, written by `just package-build`, and the tarball
+# `npm pack` leaves behind when it is run without --pack-destination. Both for
+# the same reason as storybook-static/ above: `just check` re-snapshots the
+# worktree after every recipe, so a generated file Git can see aborts the run
+# before the recipe's own exit code is read.
+dist/
+*.tgz
+
 # What `just chromatic` drops in the working directory when a publish goes
 # wrong. `build-storybook.log` is already caught above; these are the rest of
 # the set the CLI names, and the junit report is written wherever it is asked

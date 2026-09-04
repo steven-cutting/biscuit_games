@@ -21,6 +21,8 @@ RECIPES = (
     "frontend-static",
     "frontend-coverage",
     "frontend-build",
+    "package-build",
+    "package-check",
     "storybook-build",
     "storybook-test",
     "check-docs",

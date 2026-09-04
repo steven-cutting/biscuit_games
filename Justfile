@@ -162,6 +162,41 @@ check-clean baseline="":
 check:
     uv run --frozen python scripts/run_project_check.py run
 
+# ---------------------------------------------------------------- package ---
+
+# Compiles src/lib/ into the gitignored dist/: each component through the
+# preprocessor `svelte.config.js` names, with a .d.ts emitted beside it.
+# The stylesheet and the specification are not compiled and are published from
+# where they already live, which is why neither appears in the output and why
+# `src/app.css` never had to move to be shippable.
+package-build:
+    npm run package
+
+# Proves the package is consumable rather than merely built. publint reads the
+# manifest the way a registry and a bundler do — an `exports` target nothing
+# emits, a `files` entry that packs nothing, a condition in a position
+# TypeScript will not look at — and `--strict` makes a warning fail. It packs
+# into a temporary directory and leaves no tarball behind, which is what lets it
+# sit inside `just check` at all.
+#
+# Guarded rather than made to depend on `package-build`, so running it alone in
+# a clean checkout says what is missing instead of failing somewhere inside
+# publint.
+package-check:
+    test -d dist || { printf '%s\n' 'dist/ is missing; run just package-build first' >&2; exit 2; }
+    npm run package:lint
+
+# Packs the library and builds it inside a throwaway Vite project. It is the one
+# check that answers the question the package exists to answer: whether the
+# exports resolve, whether the stylesheet arrives, and whether the three
+# @font-face URLs still find the typefaces from inside a consumer's
+# node_modules — which nothing else here can see, because the hub reaches its
+# own stylesheet by relative path and never through the package. Needs the
+# network, so it sits outside `just check` beside `check-links-online`. It works
+# in a temporary directory and touches nothing in this worktree.
+package-smoke:
+    sh scripts/smoke_package.sh
+
 # ---------------------------------------------------------------- publish ---
 
 # Publishes the workshop to Chromatic for visual review, building it on the way.
@@ -170,3 +205,26 @@ check:
 # branch name when HEAD is detached, which is how CI reaches a pull request.
 chromatic branch="":
     npm run chromatic -- ${1:+--branch-name "$1"}
+
+# Publishes the package to GitHub Packages. `prepack` rebuilds dist/ on the way,
+# running the same `npm run package` that `just package-build` does, so a stale
+# build cannot be shipped. Needs the network and a token holding
+# `packages: write`, which the release workflow supplies as the run's own
+# GITHUB_TOKEN — minted per run and discarded with it, so this repository still
+# holds exactly one stored secret and it is Chromatic's. Outside `just check`,
+# for the same reason `just chromatic` is.
+publish-package:
+    npm publish
+
+# Rehearses the publish against the real registry — authentication, whether the
+# version is still free, and what the tarball holds — without creating a
+# version. GitHub Packages refuses to republish a version and restricts deleting
+# one, so a botched release is spent. This is how you find out first.
+publish-package-dry-run:
+    npm publish --dry-run
+
+# Asserts a release tag names the version package.json carries. The release
+# workflow runs this same recipe, so the guard a publish depends on is one you
+# can run yourself and it fails in the same words in both places.
+package-version tag:
+    uv run --frozen python scripts/check_release.py "$1"
