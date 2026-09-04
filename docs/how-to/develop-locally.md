@@ -100,7 +100,7 @@ just frontend-build
 just preview
 ```
 
-The build serves at `/`, and that is the whole of it. This repository publishes nothing:
+The build serves at `/`, and that is the whole of it. The hub site is published nowhere:
 there is no staging step and no base path to set, because the domain root still belongs to
 Poodl — see
 [The domain root stays with Poodl](../decisions/0012-the-domain-root-stays-with-poodl.md).

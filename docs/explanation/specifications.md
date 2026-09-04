@@ -24,9 +24,10 @@ own, and neither can read the other's mind.
 
 Prose cannot hold that. A paragraph in this handbook describing how appearance behaves
 reads, from the far side, as a description of how the hub happens to work — informative,
-and impossible to fail. Because nothing here is published or imported
-([decision 0002](../decisions/0002-shared-material-travels-by-citation.md)), the consumer
-is the only party that can prove its copy, and a proof needs an obligation stated
+and impossible to fail. Because Allium has no cross-repository import — and shipping the
+module inside the package
+([decision 0013](../decisions/0013-shared-material-travels-as-a-package.md)) does not give it
+one — the consumer is the only party that can prove its copy, and a proof needs an obligation stated
 precisely enough to be false. A named guarantee is that statement:
 
 > Animations run only when the animations setting is on and the device expresses no

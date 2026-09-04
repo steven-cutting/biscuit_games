@@ -6,6 +6,7 @@ exclude: >-
     ai_tmp/|
     build/|
     coverage/|
+    dist/|
     node_modules/|
     storybook-static/|
     uv\.lock$|

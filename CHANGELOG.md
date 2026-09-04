@@ -9,6 +9,56 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- A published package. `@steven-cutting/biscuit-games` on GitHub Packages carries the token
+  vocabulary, the shared components, the two committed typefaces and
+  `docs/specs/appearance.allium`. A game repository installs an exact version rather than
+  holding a copy, so drift becomes a version bump instead of a silent divergence.
+  `docs/reference/published-artefacts.md` is the interface and
+  `docs/how-to/consume-the-hub.md` is the procedure. Reading the registry needs a token
+  carrying `read:packages` — there is no anonymous install, even of a public package, and that
+  cost is real and lands on every contributor. See
+  [decision 0013](docs/decisions/0013-shared-material-travels-as-a-package.md), which
+  supersedes 0002.
+
+- A release process. `just package-build`, `just package-check`, `just package-smoke`,
+  `just package-version`, `just publish-package` and `just publish-package-dry-run`, plus
+  `.github/workflows/release.yml`, which publishes from a `v*` tag using the run's own token.
+  It refuses a tag that disagrees with `package.json` or that `CHANGELOG.md` does not name, and
+  it will not publish a specification that fails `check-specs` or `analyse-specs` or a tarball
+  that fails `package-smoke` in a scaffolded consumer. `CHANGELOG.md` becomes the document a
+  consumer reads to decide whether to take a bump.
+
+- Two gates. `package-build` proves `svelte-package` still emits the library, and
+  `package-check` runs `publint --strict` over the files `npm pack` would ship. `just check`
+  now runs fourteen gates rather than twelve. What neither can prove is that the package
+  resolves once installed; `just package-smoke` does that, and needs the network, so it sits
+  outside the gate.
+
+### Changed
+
+- Chromatic is live. `CHROMATIC_PROJECT_TOKEN` was set on 2026-09-03 and build 1 published and
+  auto-accepted on `main`. Six places still said no project existed; each has been corrected,
+  and the application id and permalink are recorded once in
+  `docs/reference/published-artefacts.md`. The workflow's absent-token guard stays, because it
+  is still the path a fork and a revoked secret take.
+
+- Invariant 4 now says what it always meant. `peerDependencies` carries a range rather than a
+  pin, because a peer states what a consumer may bring rather than what is installed here, and
+  an exact peer would fail a game on every Svelte patch it took before this repository moved.
+  `AGENTS.md`, `docs/how-to/maintain-dependencies.md` and
+  `docs/reference/configuration.md` say so; `docs/reference/published-artefacts.md` still owns
+  the range and what moving it costs.
+
+- Decision 0002 is superseded by 0013 and marked rather than deleted, which is the first
+  supersession in this repository and therefore the first statement of the convention —
+  `docs/decisions/README.md` now says how one is written.
+
+- `src/app.css` did **not** move, and that is the notable part. `svelte-package` emits
+  `src/lib/` and nothing else, so the obvious reading is that the stylesheet had to move to be
+  shippable. It did not: CSS needs no compilation, so `files` and `exports` publish it from
+  where it lives, the three `@font-face` URLs need no edit, and the file this repository calls
+  frozen stayed frozen. The alternative was eighty edits to prose that is currently true.
+
 - The repository itself, bootstrapped from Poodl at commit
   `c26cc4642afa6b1349db70a0f497203db3986599`. Biscuit Games is now the platform's source of
   truth: the aesthetic charter, the character, the token vocabulary, the design research and
@@ -40,10 +90,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Ten agent skills under `.agents/skills/`, with the thin `.claude/` and `.codex/` bridges.
   `word-list-change` did not come over, `svelte-change` became `component-change`, and
-  `token-change` and `consumer-impact` are new — the second exists because nothing published
-  and nothing imported means drift between this repository and a game is possible and
-  invisible, which is
-  [decision 0002](docs/decisions/0002-shared-material-travels-by-citation.md).
+  `token-change` and `consumer-impact` are new — the second was written when nothing was
+  published and nothing imported, so drift between this repository and a game was possible and
+  invisible, which was
+  [decision 0002](docs/decisions/0002-shared-material-travels-by-citation.md). Under
+  [0013](docs/decisions/0013-shared-material-travels-as-a-package.md) it sorts the halves that
+  decision created: what a version bump carries, and what still travels by citation and no
+  number describes.
 
 ### Deliberately not included
 

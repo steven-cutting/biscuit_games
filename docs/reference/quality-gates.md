@@ -18,15 +18,17 @@ one. A recipe that modifies a file fails the run, because checks are read-only.
 | 3 | `frontend-static` | ESLint, Prettier and `svelte-check --fail-on-warnings` are clean. |
 | 4 | `frontend-coverage` | Every test passes and coverage is at or above the floor. |
 | 5 | `frontend-build` | The site actually builds, with every route prerenderable. |
-| 6 | `storybook-build` | The workshop builds, documentation pages included. |
-| 7 | `storybook-test` | Every story renders in Chromium, passes axe, and its play function completes. |
-| 8 | `check-docs` | The documentation contract holds. |
-| 9 | `check-agents` | The agent contract holds. |
-| 10 | `check-specs` | Every specification reports an empty `diagnostics` array. |
-| 11 | `analyse-specs` | Every specification reports an empty `findings` array too. |
-| 12 | `check-clean` | The run changed nothing. |
+| 6 | `package-build` | `svelte-package` still emits the library, types included. |
+| 7 | `package-check` | The emitted package is consumable: `publint --strict` over the files `npm pack` would ship. |
+| 8 | `storybook-build` | The workshop builds, documentation pages included. |
+| 9 | `storybook-test` | Every story renders in Chromium, passes axe, and its play function completes. |
+| 10 | `check-docs` | The documentation contract holds. |
+| 11 | `check-agents` | The agent contract holds. |
+| 12 | `check-specs` | Every specification reports an empty `diagnostics` array. |
+| 13 | `analyse-specs` | Every specification reports an empty `findings` array too. |
+| 14 | `check-clean` | The run changed nothing. |
 
-Gates 10 and 11 have been in the aggregate from the first commit, which is what
+Gates 12 and 13 have been in the aggregate from the first commit, which is what
 [decision 0007](../decisions/0007-project-managed-allium-cli.md) says. They cost
 the gate something real: the pinned `allium` binary lives in the gitignored `.tools/bin/`,
 which is a per-worktree install, so a worktree that has never run `just initialize` now
@@ -50,9 +52,14 @@ One check is still deliberately missing from the table. `check-links-online` nee
 network, and a check that can fail because a third party is down is not a gate. It is
 listed in [Commands](commands.md).
 
-Storybook writes a cache and a static build, and Vitest's browser mode can write failure
-screenshots. All of them are ignored by Git, because a gate that changes one byte of the
-worktree fails before its own exit code is read. Gate 7 needs a browser that no lockfile
+Storybook writes a cache and a static build, `svelte-package` writes `dist/`, and Vitest's
+browser mode can write failure screenshots. All of them are ignored by Git, because a gate that
+changes one byte of the worktree fails before its own exit code is read. Gates 6 and 7 prove
+the artefact rather than the application: nothing else in the run exercises the `exports` map,
+because the hub reaches its own components through `$lib` and its own stylesheet by relative
+path. What they cannot prove is that the package resolves once installed — that is
+`just package-smoke`, which needs the network and therefore sits outside the gate;
+[Commands](commands.md) says where it does run instead. Gate 9 needs a browser that no lockfile
 accounts for; see [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
 
 ## What the hook gate contains
@@ -70,7 +77,7 @@ configuration, and it is the one installed as the pre-commit hook.
 | `markdownlint-cli2` | Markdown structure. Prettier does not touch Markdown, so they cannot disagree. |
 | `typos` | Spelling, excluding the lockfiles. |
 | `lychee` | Link targets, offline. |
-| `shellcheck` | `scripts/initialize.sh`. |
+| `shellcheck` | Every shell script under `scripts/`. |
 | `actionlint` | Every GitHub Actions workflow, its structure only — see below. |
 | `ripsecrets` | Credential material, with its output suppressed so a match is never logged. |
 | Builtin `check-*` | Large files, case conflicts, merge markers, JSON, TOML, YAML, private keys, shebangs. |
@@ -103,7 +110,8 @@ installs the browser, then runs `storybook-build` and `storybook-test`. Nothing 
 a command that does not exist in the `Justfile`. The workshop build the gate makes is
 proved and then discarded: that one is uploaded nowhere.
 
-No job here ships the site, because the site is published nowhere: this repository has no
+No job in `ci.yml` ships anything: the site is published nowhere, and the package and the
+workshop have workflows of their own. This repository has no
 Pages workflow and no address of its own; see
 [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
 
@@ -118,19 +126,18 @@ publishes for a commenter with write permission or better, and only for a branch
 repository; the checks and what they are for are in
 [the security model](../explanation/security-model.md).
 
-No Chromatic project exists for Biscuit Games yet, so `CHROMATIC_PROJECT_TOKEN` is a
-repository secret nobody has set. The workflow records whether the token is present and
-skips the publish when it is not, leaving a notice rather than a failure, so a push to
-`main` does not go red over a publish that cannot happen. Only the token's presence leaves
-that step, never its value. Setting the secret is the whole of turning visual review on.
+`CHROMATIC_PROJECT_TOKEN` is set and builds publish; the project and its permalink are in
+[Configuration](configuration.md). The workflow still records only whether the token is
+present and would skip the publish when it is not, leaving a notice rather than a failure, so
+a push to `main` cannot go red over a publish that cannot happen. Only the token's presence
+leaves that step, never its value.
 
 ## On `main`
 
 `main` is protected, and `frontend`, `documents` and `stories` must all pass before a
 branch merges into it. Those three names are the CI jobs, and they are the only required
 checks. Chromatic is not among them, and deliberately so — a visual change is a thing to
-look at, not a thing to fail on, so the job reports and passes; today it also skips itself
-for want of a token.
+look at, not a thing to fail on, so the job reports and passes.
 
 The branch is not required to be up to date with `main` first, and no review is required —
 neither earns its cost on a repository with one author. Force pushes and deletion are

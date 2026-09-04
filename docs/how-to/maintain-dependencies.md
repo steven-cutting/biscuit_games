@@ -13,6 +13,12 @@ Every dependency is pinned to an exact version, in `package.json` and in
 `linguist-generated`. Nothing updates them for you: there is no Dependabot or Renovate
 configuration here, and no scheduled job that opens a bump.
 
+The one dependency block that is not pinned is `peerDependencies`. A peer declares what a
+consumer may bring rather than what is installed here, so it constrains nothing in either
+lockfile, and an exact peer would fail a game's install on every Svelte patch it took before
+this repository moved. The range itself, and what narrowing or widening it costs a consumer,
+is [Published artefacts](../reference/published-artefacts.md).
+
 ## Check that the lockfiles still match
 
 ```console

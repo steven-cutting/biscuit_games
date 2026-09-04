@@ -9,9 +9,11 @@ requires: []
 # Maintenance
 
 There is no service to operate. Nothing runs, nothing accumulates, and there is no
-on-call. There is not even a deployment to watch: this repository is published nowhere,
-which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What
-follows is upkeep of the repository and of the links that cross between it and Poodl.
+on-call. There is no site deployment to watch either: the hub site is published nowhere,
+which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What leaves this
+repository is a package and a component workshop, and neither runs — one is installed and one
+is read. What follows is upkeep of the repository, of the releases it cuts, and of the links
+that cross between it and Poodl.
 
 ## Routine
 
@@ -51,8 +53,8 @@ run by hand. Three facts stack up behind that sentence:
   party is down is not a gate. [Quality gates](../reference/quality-gates.md) says the
   same thing from the other direction.
 
-Poodl's references to this repository are GitHub blob URLs, because nothing here is
-published and there is no site to link to. Nothing on either side goes red when a page
+Poodl's references to this repository are GitHub blob URLs, because this handbook is
+published nowhere and there is no site to link to. Nothing on either side goes red when a page
 here is renamed or moved. The rot is silent, and it lasts until somebody remembers this
 recipe — a month at best. That is the standing price of
 [decision 0002](../decisions/0002-shared-material-travels-by-citation.md): one
@@ -88,11 +90,13 @@ in it.
 
 There is one, and it belongs to the toolchain rather than to the site.
 `CHROMATIC_PROJECT_TOKEN` lives as a GitHub Actions secret and is read from the
-environment; it is written into no file here. No Chromatic project exists yet, so it is
-not set — the workflow reports its absence and skips the publish rather than going red.
+environment; it is written into no file here. It is set, and builds publish. The workflow
+still reports the token's absence and skips the publish rather than going red, which is what
+a fresh fork or a revoked secret would meet.
 
-There is no deployment credential to rotate. No workflow here holds `pages: write` or
-`id-token: write`, because there is no Pages workflow to hold them. See
+There is no deployment credential to rotate, and none to create: the release workflow
+publishes with the run's own `GITHUB_TOKEN` under `packages: write`, and no workflow here holds
+`pages: write` or `id-token: write`, because there is no Pages workflow to hold them. See
 [Security model](../explanation/security-model.md).
 
 ## Related pages

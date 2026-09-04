@@ -4,9 +4,12 @@ The hub for Biscuit Games: a small static site that says what the platform is an
 the games, and the source of truth for everything the games share — the design system, the
 shared components, the character, and every cross-cutting decision.
 
-**Status: bootstrapped, and not yet published.** The toolchain, the token vocabulary and one
-component are in place. The site has no address of its own yet, because the platform's front
-door still belongs to Poodl; see
+**Status: bootstrapped, and packaged.** The toolchain, the token vocabulary and one component
+are in place, and they are packaged as `@steven-cutting/biscuit-games` for GitHub Packages; see
+[decision 0013](docs/decisions/0013-shared-material-travels-as-a-package.md) and
+[Published artefacts](docs/reference/published-artefacts.md), which says what a release carries
+and whether one has been cut. The *site* still has no address of its own, because the
+platform's front door belongs to Poodl; see
 [decision 0012](docs/decisions/0012-the-domain-root-stays-with-poodl.md).
 
 ## The games
@@ -73,6 +76,8 @@ Engineering conventions and the agent working agreement are in [AGENTS.md](AGENT
 ## Boundaries
 
 A fact that every game shares is decided here, once. A fact about one game is decided in that
-game's own repository. Nothing here is published as a package: a game copies a value and cites
-the page it came from, and proves the copy with its own tests. See
-[decision 0002](docs/decisions/0002-shared-material-travels-by-citation.md).
+game's own repository. Files travel as a package — a game installs
+`@steven-cutting/biscuit-games` at an exact version rather than copying — and the handbook
+travels by citation, because no package carries a page path. See
+[decision 0013](docs/decisions/0013-shared-material-travels-as-a-package.md) and
+[Consume the hub from a game repository](docs/how-to/consume-the-hub.md).

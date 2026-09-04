@@ -128,9 +128,10 @@ later ones are often consequences. If a gate fails, do not work around it —
 
 Where the pre-commit hook is installed, it runs the read-only gate again. Where you skipped
 it because this is a secondary worktree, step 6 is the whole of your evidence, so run it
-before you commit rather than after. Nothing is pushed until you ask for it, and nothing here
-is published at all: the domain root still belongs to Poodl
-([decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md)), so a green gate is
+before you commit rather than after. Nothing is pushed until you ask for it, and nothing is
+published from your machine: a release happens from a tag, and the site has no address at all
+because the domain root still belongs to Poodl
+([decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md)). A green gate is
 where this loop ends.
 
 ## What you just touched

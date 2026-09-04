@@ -52,7 +52,8 @@ outbound links. Nothing else in Poodl points outward.
 
 The links are https URLs of the form
 `https://github.com/steven-cutting/biscuit_games/blob/main/docs/<path>` — repository blob
-URLs, because nothing here is published and there is no site to link to. That is
+URLs, because this handbook is published nowhere and there is no documentation site to link
+to — the package carries files, never pages. That is
 [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md), and it also means
 the URLs resolve only once this work reaches the default branch. Writing them before then
 is fine; expecting them to resolve is not.
@@ -166,6 +167,68 @@ someone with no reason to suspect a second file exists. It is why the `consumer-
 skill exists, and why a change to `docs/specs/` here is not finished until its consequence
 for Poodl is written into this ledger.
 
+## What the package lets Poodl delete
+
+`@steven-cutting/biscuit-games` is published, which is
+[decision 0013](../decisions/0013-shared-material-travels-as-a-package.md). It carries the
+tokens stylesheet, the shared components, the two typefaces and `docs/specs/appearance.allium`.
+Three of Poodl's copies can therefore stop being copies. None of this has happened either, and
+none of it is urgent: a copy that is correct today stays correct until something moves here.
+
+**The registry comes first, and it is not free.** GitHub Packages authenticates every npm
+request, including a read of a public package, so before any item below Poodl needs a committed
+`.npmrc` scoping `@steven-cutting` to `npm.pkg.github.com`, a token carrying `read:packages` on
+every contributor's machine, and the same token in every continuous integration job that
+installs. Poodl's own dependency page records that there is no `.npmrc` there today; there will
+have to be one, and it holds no token. A contributor without a token cannot install at all,
+which is a worse first run than the copy it replaces, and it is the honest price of the
+mechanism. Whether Poodl's own workflow token can stand in for a stored one depends on the
+package granting that repository read access — a setting on the package, testable only from
+Poodl, and worth trying before a secret is created.
+
+**`src/app.css`.** Poodl's copy is replaced by an import of
+`@steven-cutting/biscuit-games/app.css` at the root layout, and the file is deleted. Two things
+go with it: Poodl's `@font-face` blocks and its copies of the three woff2 files are no longer
+needed, because the package's stylesheet names them by relative URL and they resolve beside it.
+And `tests/contrast.test.ts` reads the stylesheet from disk, so it has to read it from
+`node_modules` instead. That test is the only thing in the platform that measures a contrast
+ratio, and losing it to a path change would be the worst possible outcome of this work. Move it
+before deleting the file, not after — and have it assert that the path it resolved contains
+`node_modules`, because a resolve that silently fell back to the old copy would stay green
+while proving nothing.
+
+**The `Appearance` surface in `docs/specs/settings.allium`.** This is the item to be careful
+with, because the package does not settle it. Allium has no cross-repository import, and
+shipping the module inside `node_modules` does not give it one: Poodl's surface still faces
+`game/Player`, still reads a `device` entity and still quotes
+`game/config.minimum_text_contrast`, while the module here is a root module with its own
+`given` block. Neither can reference the other, and no checker compares them.
+
+What the package changes is that the authoritative text is now on disk inside Poodl's own tree.
+So the item is a test, not a deletion: a check in Poodl's gate that reads the shipped module and
+asserts Poodl's copy still states the same six guarantee names —
+`SystemFollowsTheDeviceAsItChanges`, `ReducedMotionOverridesTheAnimationSetting`,
+`MoreContrastFromTheDeviceTurnsHighContrastOn`, `AppearanceNeverCarriesMeaningAlone`,
+`EveryCombinationMeetsTheLegibilityFloor` and `AnUnavailableControlIsExempt` — and, where the
+clauses are meant to agree, the same texts. That check would be the first thing in the
+platform's history to compare the two files, and it closes the gap the section above names as
+the one place this repository's authority can break with no gate seeing it. It is the single
+most valuable item on this page.
+
+**Shared components, when Poodl wants one.** Nothing is owed here yet. `Wordmark` is the only
+component published and Poodl has its own. The item exists so the direction is written down: a
+shape two games render arrives from the package rather than being copied a second time.
+
+**The version is the thing to record.** Whatever Poodl installs, it installs exactly — no
+caret, no tilde, matching its own pinning rule — and the page Poodl gains says which version its
+copies were retired at. A game sitting on an old release is behind rather than protected, and
+the only thing that will ever say so is Poodl's own gate after a bump.
+
+**And the thing that must not be done.** Poodl's `settings.allium` keeps its own `Appearance`
+surface. Deleting it in favour of the packaged module is not possible, for the reasons above.
+The package makes the two comparable, not merged. Anyone who reads this section as permission
+to delete one of them has read it backwards.
+
 ## What a cross-repository link costs
 
 Once a reference crosses a repository boundary it stops being a path and becomes an
@@ -191,10 +254,9 @@ to look for the anchor, and the online one verifies the page rather than the fra
 renamed heading here is invisible from both sides. And **treat a page path here as part of
 the interface**: renaming one is a consumer-visible change in the same class as renaming a
 token or a topic slug, and it belongs in this ledger before the rename lands, not after
-somebody notices. That obligation is
-[decision 0002](../decisions/0002-shared-material-travels-by-citation.md) working as
-intended — citation buys one authoritative copy at the price of links that no machine
-maintains.
+somebody notices. That obligation is the half of distribution
+[decision 0013](../decisions/0013-shared-material-travels-as-a-package.md) does not carry — a
+package buys one authoritative *file*, at the price of links that no machine maintains.
 
 ## Related pages
 
@@ -202,4 +264,6 @@ maintains.
 - [What the hub owns](../project/what-the-hub-owns.md)
 - [Decision 0001: Biscuit Games is the platform's source of truth](../decisions/0001-biscuit-games-is-the-source-of-truth.md)
 - [Decision 0002: Shared material travels by citation](../decisions/0002-shared-material-travels-by-citation.md)
+- [Decision 0013: Shared material travels as a package](../decisions/0013-shared-material-travels-as-a-package.md)
+- [Published artefacts](../reference/published-artefacts.md)
 - [Decision 0012: The domain root stays with Poodl](../decisions/0012-the-domain-root-stays-with-poodl.md)

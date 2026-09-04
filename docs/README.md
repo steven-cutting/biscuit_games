@@ -44,6 +44,7 @@ relate.
 - [Work in the component workshop](how-to/work-in-the-component-workshop.md)
 - [Port a design system component](how-to/port-a-design-system-component.md)
 - [Work with the specifications](how-to/work-with-the-specs.md)
+- [Consume the hub from a game repository](how-to/consume-the-hub.md)
 - [Maintain dependencies](how-to/maintain-dependencies.md)
 
 ## Understand
@@ -59,6 +60,7 @@ relate.
 
 - [Commands](reference/commands.md)
 - [Configuration](reference/configuration.md)
+- [Published artefacts](reference/published-artefacts.md)
 - [Testing](reference/testing.md)
 - [Quality gates](reference/quality-gates.md)
 - [Documentation contract](reference/documentation-contract.md)

@@ -83,6 +83,8 @@ on, and it is the one the other pages cite.
 | `just frontend-unit` | Vitest, once. |
 | `just frontend-coverage` | Vitest with the 90% floor over `src/lib/**` enforced. This is the one `just check` runs. |
 | `just frontend-build` | Production build into `build/`. `svelte.config.js` reads `BASE_PATH` into `paths.base` and nothing sets it here — see [Configuration](configuration.md). |
+| `just package-build` | Compile `src/lib/` into `dist/` with `svelte-package`, types included. Ignored by Git. |
+| `just package-check` | `publint --strict` over the files `npm pack` would ship. Proves the package is consumable, not merely built. |
 | `just storybook-build` | Build the workshop into `storybook-static/`. Ignored by Git; this build is discarded, and `just chromatic` is what publishes one. |
 | `just storybook-test` | Every story in real Chromium: axe over each render, play functions as interaction tests. |
 
@@ -107,9 +109,14 @@ holds one module, `appearance.allium`, and both recipes must come back empty.
 | Recipe | Purpose |
 | --- | --- |
 | `just chromatic [branch]` | Build the workshop and publish it to Chromatic for visual review. Manual; needs the network and `CHROMATIC_PROJECT_TOKEN`. Never part of `just check`. The argument overrides the branch name, which only CI needs, because it checks a pull request out at a detached head. |
+| `just package-smoke` | Pack the library, install it into a throwaway Vite project and build that. Needs the network, so it sits outside `just check` — and it is the only check that proves the `exports` map resolves and the typefaces are found from inside a consumer's `node_modules`. The release workflow runs this same recipe. |
+| `just package-version <tag>` | Assert a tag names the version `package.json` carries and `CHANGELOG.md` has a heading for. The release workflow runs this same recipe. |
+| `just publish-package` | Publish the package to GitHub Packages. Over the network, and a separately authorized action; CI runs it from a tag. |
+| `just publish-package-dry-run` | Rehearse that publish against the real registry without creating a version. |
 
-That is the only publishing recipe, and what it publishes is the workshop, not the site.
-This repository has no deployment: no Pages workflow, no staging step, no address. The
+What each publishes, and what a version promises, is in
+[Published artefacts](published-artefacts.md). The site is in none of them.
+The hub site has no deployment: no staging step and no address. The
 domain root belongs to Poodl — see
 [The domain root stays with Poodl](../decisions/0012-the-domain-root-stays-with-poodl.md).
 

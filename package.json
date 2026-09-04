@@ -1,7 +1,16 @@
 {
-  "name": "biscuit-games",
-  "private": true,
+  "name": "@steven-cutting/biscuit-games",
   "version": "0.1.0",
+  "description": "The Biscuit Games design system: the platform's design tokens, its two typefaces, its shared Svelte 5 components, and the Allium specification they answer to.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steven-cutting/biscuit_games.git"
+  },
+  "homepage": "https://github.com/steven-cutting/biscuit_games#readme",
+  "bugs": {
+    "url": "https://github.com/steven-cutting/biscuit_games/issues"
+  },
   "type": "module",
   "packageManager": "npm@11.17.0",
   "engines": {
@@ -11,6 +20,29 @@
   "volta": {
     "node": "26.5.1",
     "npm": "11.17.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "dist",
+    "!dist/assets",
+    "src/app.css",
+    "src/lib/assets/fonts",
+    "docs/specs",
+    "CHANGELOG.md"
+  ],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    },
+    "./app.css": "./src/app.css",
+    "./assets/fonts/*": "./src/lib/assets/fonts/*",
+    "./specs/appearance.allium": "./docs/specs/appearance.allium",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "prepare": "svelte-kit sync",
@@ -29,11 +61,13 @@
     "storybook:test": "node scripts/check_playwright_browsers.js && vitest run --config vitest.storybook.config.ts",
     "storybook:browsers": "playwright install chromium",
     "storybook:browsers:deps": "playwright install-deps chromium",
-    "chromatic": "chromatic"
+    "chromatic": "chromatic",
+    "package": "svelte-kit sync && svelte-package -o dist",
+    "package:lint": "publint --strict",
+    "prepack": "npm run package"
   },
-  "dependencies": {
-    "@sveltejs/kit": "2.70.2",
-    "svelte": "5.56.8"
+  "peerDependencies": {
+    "svelte": ">=5.56.8 <6"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -44,6 +78,8 @@
     "@storybook/svelte": "10.5.7",
     "@storybook/sveltekit": "10.5.7",
     "@sveltejs/adapter-static": "3.0.10",
+    "@sveltejs/kit": "2.70.2",
+    "@sveltejs/package": "2.5.8",
     "@sveltejs/vite-plugin-svelte": "7.3.0",
     "@testing-library/jest-dom": "7.0.0",
     "@testing-library/svelte": "5.4.2",
@@ -61,7 +97,9 @@
     "playwright": "1.62.1",
     "prettier": "3.9.6",
     "prettier-plugin-svelte": "4.1.1",
+    "publint": "0.3.24",
     "storybook": "10.5.7",
+    "svelte": "5.56.8",
     "svelte-check": "4.7.5",
     "typescript": "6.0.3",
     "typescript-eslint": "8.66.0",

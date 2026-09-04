@@ -24,7 +24,7 @@ and constants belong in source where they can be reviewed.
 ### The base path
 
 `BASE_PATH` is unset everywhere, which is a decision rather than an omission. This repository
-publishes nothing — there is no Pages workflow, no `site-root/` and no staging script, and
+publishes no site — there is no Pages workflow, no `site-root/` and no staging script, and
 the recipes `stage` and `stage-preview` do not exist here — because the domain root still
 belongs to Poodl. That is
 [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md), and
@@ -52,10 +52,14 @@ Two variables are read by tools rather than by the build, and neither reaches th
 | `STORYBOOK_DISABLE_TELEMETRY` | Storybook | Exported as `1` by the `Justfile`, because `just check` builds the workshop. It is the belt; `core.disableTelemetry` in `.storybook/main.ts` is the primary lever. |
 
 The token is the only secret this repository has, and it is deliberately not written into
-a file — see [Security model](../explanation/security-model.md). No Chromatic project
-exists yet, so the CI secret is unset. The workflow reads it, records a notice that it is
-missing and skips the publish, so a push to `main` does not go red over a publish nobody
-asked for.
+a file — see [Security model](../explanation/security-model.md). It is set, and builds
+publish. The workflow still reads only whether it is present, records a notice when it is
+missing and skips the publish, so a push to `main` cannot go red over a publish nobody asked
+for — the path a fresh fork or a revoked secret takes.
+
+The project it publishes to, its application id and its permalink are recorded once in
+[Published artefacts](published-artefacts.md), which owns every address that leaves this
+repository.
 
 ## Configuration files
 
@@ -123,6 +127,10 @@ theme and high contrast, and in this repository it is met by reading.
 Exact versions, no ranges. Node and npm are additionally constrained by `engines` and
 recorded in `volta` in `package.json`; Python by `.python-version`. See
 [Maintain dependencies](../how-to/maintain-dependencies.md).
+
+`peerDependencies` and `engines` state ranges rather than pins, because neither is something
+this repository installs. [Published artefacts](published-artefacts.md) owns the Svelte peer
+range.
 
 Two dependencies are outside that scheme, because no lockfile can name a binary. The
 browser the story run drives is downloaded by Playwright into a cache outside the

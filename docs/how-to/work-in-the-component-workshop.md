@@ -213,10 +213,10 @@ run. The workflow also has to be on `main` before the comment does anything at a
 
 An accepted request always replies, and the reply says which of three things happened: the
 build was published, or `CHROMATIC_PROJECT_TOKEN` is not set so nothing was, or the run
-ended before it reached the publish step. The second is the state today, because no
-Chromatic project exists yet — so a 🚀 followed by *no build was published* is the expected
-answer rather than a fault. The reply is the only report there is: an `issue_comment` run
-appears in no checks list.
+ended before it reached the publish step. The first is the expected answer, because the
+token is set and the project is live; a 🚀 followed by *no build was published* is a fault to
+chase rather than a state to expect. The reply is the only report there is: an
+`issue_comment` run appears in no checks list.
 
 **From a laptop**, with the project token exported:
 

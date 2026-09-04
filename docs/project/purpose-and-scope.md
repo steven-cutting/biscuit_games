@@ -54,17 +54,18 @@ this repository and a game actually falls is drawn in
 - **It hosts no game code.** A game's rules, its state and its screens stay in the game's
   own repository. The hub links to a game; it never contains one, and the games do not
   become one application by sharing a home for their vocabulary.
-- **It has no address.** Nothing in this repository is published. There is no deployment
+- **The site has no address.** The hub site is published nowhere. There is no deployment
   workflow, and the domain root the platform will eventually want still belongs to Poodl.
   The cost is plain: a visitor cannot reach the hub today, and the front door exists only
-  on a developer's machine.
+  on a developer's machine. What does leave this repository is named in
+  [Published artefacts](../reference/published-artefacts.md).
   See [Decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
 - **It collects nothing.** No accounts, no analytics, no telemetry, nothing stored and
   nothing sent. See [Security model](../explanation/security-model.md).
-- **It distributes nothing as a package.** There is no npm package to install and no
-  shared runtime to import. Shared material travels by citation: a game copies what it
-  needs and names the source, and this repository stays the copy that decides.
-  See [Decision 0002](../decisions/0002-shared-material-travels-by-citation.md).
+- **It runs no game code for anybody.** The package carries tokens, components, typefaces
+  and one specification module. It carries no rules, no state and no data, so installing it
+  gives a game a look rather than a behaviour.
+  See [Decision 0013](../decisions/0013-shared-material-travels-as-a-package.md).
 
 ## Who it is for
 

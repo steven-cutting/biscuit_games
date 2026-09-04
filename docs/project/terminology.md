@@ -20,7 +20,7 @@ behaviour.
 | Platform | Biscuit Games: the games, the design system they share, and the decisions they hold in common. A family, not something you play. |
 | Game | One playable thing on the platform. Poodl, the word game, is the only one today; Pawjong, the tile game, is intended and not yet built. |
 | Game repository | Where a game's code, specifications, word lists and handbook live. Each game keeps its own. This repository is not one of them and holds no gameplay at all. |
-| Hub | The static site this repository builds: one route that says what Biscuit Games is and links out to each game. It is the front door, and nothing of it is published yet. |
+| Hub | The static site this repository builds: one route that says what Biscuit Games is and links out to each game. It is the front door, and the site itself is published nowhere. |
 | Shared surface | Material this repository is authoritative for on every game's behalf — a token, a shared component, a specification surface, a decision record. Changing one changes every game, which is why what counts is enumerated in [What the hub owns](what-the-hub-owns.md) rather than assumed. Narrower than it sounds: the Allium `surface` below is one boundary in one module. |
 | Token | A named value in `src/app.css`: a colour, a space, a type step, a duration, a font face. Components name tokens. They do not write the values. |
 | Primitive | A shared component with no game in it. `Wordmark` is the only one that exists here; the rest are ported one at a time, and only once a second consumer asks for the same shape. |

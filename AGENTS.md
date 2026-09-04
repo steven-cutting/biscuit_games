@@ -48,7 +48,12 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
    a global would work.
 4. **Every dependency is pinned to an exact version.** No `^`, no `~`, in
    `package.json` or `pyproject.toml`. Lockfiles are committed and
-   `just lock-check` proves they match.
+   `just lock-check` proves they match. `peerDependencies` is the one dependency
+   block that carries a range instead, because a peer says what a consumer may
+   bring rather than what is installed here, and an exact one would fail a game
+   on every Svelte patch it took before this repository moved.
+   [Published artefacts](docs/reference/published-artefacts.md) owns the range and
+   what narrowing or widening it costs.
 5. **The static build has no server.** `@sveltejs/adapter-static` with full
    prerendering. Nothing may assume a request, a session or an origin it can
    talk to.
@@ -114,7 +119,11 @@ Details belong to their owning pages: [Testing](docs/reference/testing.md),
 6. If the change touches a token, a shared component or `docs/specs/`, work out
    what it costs a consumer before handing back. Use the `consumer-impact` skill,
    and record anything needing another repository in
-   [the Poodl handover](docs/operations/poodl-handover.md).
+   [the Poodl handover](docs/operations/poodl-handover.md). Those surfaces are the
+   ones a release publishes, so the same change owes a version level and a
+   `CHANGELOG.md` entry —
+   [Published artefacts](docs/reference/published-artefacts.md) decides which.
+   Tagging and publishing are separately authorized actions.
 7. Run the narrowest recipe that covers the change, then `just check` before
    handing back.
 8. Read the whole diff before reporting.
@@ -142,9 +151,14 @@ carry a stated reason.
   blocks precisely so unresolved product decisions are visible; do not silently
   resolve one.
 
-This repository intentionally generates no license file, and publishes nothing:
-there is no deployment workflow, because the domain root still belongs to Poodl.
-One workflow holds a secret, and it is the Chromatic visual review.
+This repository intentionally generates no license file, so the package it
+publishes is `UNLICENSED`. It has two artefacts and no more: the
+`@steven-cutting/biscuit-games` package, which a release publishes to GitHub
+Packages, and the component workshop, which is published to Chromatic. The
+*site* is published nowhere — there is no deployment workflow for it, because
+the domain root still belongs to Poodl. One workflow
+holds a secret, and it is still the Chromatic visual review; the release
+workflow holds `packages: write`, which is a permission rather than a secret.
 
 ## Documentation and durable context
 
@@ -183,8 +197,10 @@ Deliberate deviations from Poodl, each recorded in
 
 - The application is a skeleton — `src/app.css`, one route, and `Wordmark` with
   its test and its story — while the toolchain came over whole.
-- Nothing is published. No Pages workflow, no `site-root/`, no staging script,
-  and no `BASE_PATH` set anywhere: the domain root stays with Poodl for now.
+- The site is published nowhere. No Pages workflow, no `site-root/`, no staging
+  script, and no `BASE_PATH` set anywhere: the domain root stays with Poodl for
+  now. The workshop is published, the package is ready to publish, and the site
+  is neither.
 - One Allium module rather than five. `docs/specs/appearance.allium` carries the
   shared surface lifted from Poodl's `settings.allium`, and imports nothing, so
   the device preferences are stated as named givens rather than behind an

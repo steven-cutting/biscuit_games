@@ -7,8 +7,8 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     // `eslint .` walks the filesystem and does not read .gitignore, so the
-    // workshop's build output has to be named here as well as there.
-    ignores: ['.svelte-kit/', 'build/', 'coverage/', 'node_modules/', 'storybook-static/']
+    // generated build outputs have to be named here as well as there.
+    ignores: ['.svelte-kit/', 'build/', 'coverage/', 'dist/', 'node_modules/', 'storybook-static/']
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,

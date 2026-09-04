@@ -8,6 +8,16 @@ requires: []
 
 # Decision 0002: Shared material travels by citation
 
+> **Superseded on 2026-09-03 by
+> [Decision 0013](0013-shared-material-travels-as-a-package.md).** Shared material now travels
+> as `@steven-cutting/biscuit-games`, a published package, and a game installs a version rather
+> than holding a copy. Everything below stands as written: it is the account of why copying was
+> right while there was one component, one specification module and one consumer, and of what it
+> cost, which is what makes the successor legible. The topic slug
+> `decision_shared_material_distribution` stays here, because a slug is what a cross-repository
+> reference names. The documentary obligation this record describes is not superseded — no
+> package carries a page path, and 0013 says so.
+
 ## Context
 
 [Decision 0001](0001-biscuit-games-is-the-source-of-truth.md) settled ownership: the tokens,

@@ -118,7 +118,7 @@ static directory that is not there as an error rather than as an empty one.
 
 `static/` holds `.nojekyll` and nothing else, and Git does not track directories — so
 deleting that one file deletes the directory with it. It is an easy file to delete: it
-reads as a GitHub Pages artefact, and this repository publishes nothing
+reads as a GitHub Pages artefact, and this repository publishes no site
 ([decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md)). Restore it with
 `git restore static/.nojekyll`, and see [Repository map](../project/repository-map.md).
 
