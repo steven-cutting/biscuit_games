@@ -198,11 +198,11 @@ jobs:
       - run: npm install --global npm@11.17.0
       - run: just sync
 
-      # No Chromatic project exists yet, so the token is a repository secret that
-      # has not been set. Until it is, a push to `main` must not go red over a
-      # publish nobody asked for. The secret is read here and in the publish
-      # itself and nowhere else, and only its presence leaves this step. A
-      # job-level `if:` cannot read `secrets`, which is why the guard sits on
+      # The token is set and builds publish. The guard stays anyway: a fork has
+      # no secret, and a revoked one would otherwise turn every push to `main`
+      # red over a publish nobody asked for. The secret is read here and in the
+      # publish itself and nowhere else, and only its presence leaves this step.
+      # A job-level `if:` cannot read `secrets`, which is why the guard sits on
       # the steps.
       - name: Note whether a Chromatic token is configured
         id: token

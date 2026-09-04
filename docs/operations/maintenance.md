@@ -88,8 +88,9 @@ in it.
 
 There is one, and it belongs to the toolchain rather than to the site.
 `CHROMATIC_PROJECT_TOKEN` lives as a GitHub Actions secret and is read from the
-environment; it is written into no file here. No Chromatic project exists yet, so it is
-not set — the workflow reports its absence and skips the publish rather than going red.
+environment; it is written into no file here. It is set, and builds publish. The workflow
+still reports the token's absence and skips the publish rather than going red, which is what
+a fresh fork or a revoked secret would meet.
 
 There is no deployment credential to rotate. No workflow here holds `pages: write` or
 `id-token: write`, because there is no Pages workflow to hold them. See

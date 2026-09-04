@@ -118,19 +118,17 @@ publishes for a commenter with write permission or better, and only for a branch
 repository; the checks and what they are for are in
 [the security model](../explanation/security-model.md).
 
-No Chromatic project exists for Biscuit Games yet, so `CHROMATIC_PROJECT_TOKEN` is a
-repository secret nobody has set. The workflow records whether the token is present and
-skips the publish when it is not, leaving a notice rather than a failure, so a push to
-`main` does not go red over a publish that cannot happen. Only the token's presence leaves
-that step, never its value. Setting the secret is the whole of turning visual review on.
+`CHROMATIC_PROJECT_TOKEN` is set and builds publish. The workflow still records only whether
+the token is present and would skip the publish when it is not, leaving a notice rather than a
+failure, so a push to `main` cannot go red over a publish that cannot happen. Only the token's
+presence leaves that step, never its value.
 
 ## On `main`
 
 `main` is protected, and `frontend`, `documents` and `stories` must all pass before a
 branch merges into it. Those three names are the CI jobs, and they are the only required
 checks. Chromatic is not among them, and deliberately so — a visual change is a thing to
-look at, not a thing to fail on, so the job reports and passes; today it also skips itself
-for want of a token.
+look at, not a thing to fail on, so the job reports and passes.
 
 The branch is not required to be up to date with `main` first, and no review is required —
 neither earns its cost on a repository with one author. Force pushes and deletion are

@@ -28,9 +28,9 @@ Very little, and that is the point.
   the build or the bundle. The `ripsecrets` gate exists to keep it that way. The
   repository has exactly one secret and it belongs to the toolchain, not to the site: a
   Chromatic project token, held as a GitHub Actions secret and read from the environment,
-  written into no file here. No Chromatic project exists yet, so the secret is not set;
-  the workflow reports its absence and skips the publish rather than going red over a
-  publish nobody asked for.
+  written into no file here. It is set, and builds publish. The workflow still reports the
+  token's absence and skips the publish rather than going red over a publish nobody asked
+  for, which is the path a fresh fork or a revoked secret takes.
 
 There is no visitor data here to lose and no procedure for handling any, because there is
 none to handle. What this repository holds that matters is the toolchain's one secret and

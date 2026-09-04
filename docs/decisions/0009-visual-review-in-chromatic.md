@@ -85,15 +85,21 @@ Actions secret and is read from the environment. It is written into no file here
 why `just chromatic` fails rather than publishing when it is missing, and why a contributor
 has to set it up rather than finding it already working.
 
-**No Chromatic project exists yet, so the secret is not set and nothing has ever been
-published.** A workflow that failed on an absent token would turn every push to `main` red
-over a build nobody asked for, so it does not: the job records whether the token is present
-— only its presence leaves the step, never its value — and skips the publish with a notice
-when it is absent. A job-level condition cannot read `secrets`, which is why the guard sits
-on the steps rather than on the job. Everything below this paragraph is therefore a
-description of what happens once someone creates the project and sets the secret, and that
-is a later, deliberate step rather than an oversight. It is the whole of turning visual
-review on, and it is not urgent while the workshop holds one component.
+**Carried out on 2026-09-03.** The project exists, `CHROMATIC_PROJECT_TOKEN` is set, and
+build 1 published and auto-accepted on `main`. The application id is
+`6a99fd20afcb187c61d773f1` and the branch permalink has the form
+`https://<branch>--<appId>.chromatic.com/`;
+[Configuration](../reference/configuration.md) records both, once, and everything else links
+there rather than repeating them.
+
+**The absent-token guard stays, and is still the reason the workflow is shaped as it is.** A
+workflow that failed on an absent token would turn every push to `main` red over a build
+nobody asked for, so it does not: the job records whether the token is present — only its
+presence leaves the step, never its value — and skips the publish with a notice when it is
+absent. A job-level condition cannot read `secrets`, which is why the guard sits on the steps
+rather than on the job. That path is no longer the state of this repository, but it is still
+the state of a fresh fork and of any checkout whose secret is ever revoked, and a guard that
+is only correct while it is being exercised is not a guard.
 
 **A regression that reaches `main` is accepted silently.** That is the direct cost of
 auto-accepting there. The review gate is the pull request comment and there is no other, so

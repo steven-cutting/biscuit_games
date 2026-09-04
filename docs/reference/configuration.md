@@ -52,10 +52,10 @@ Two variables are read by tools rather than by the build, and neither reaches th
 | `STORYBOOK_DISABLE_TELEMETRY` | Storybook | Exported as `1` by the `Justfile`, because `just check` builds the workshop. It is the belt; `core.disableTelemetry` in `.storybook/main.ts` is the primary lever. |
 
 The token is the only secret this repository has, and it is deliberately not written into
-a file — see [Security model](../explanation/security-model.md). No Chromatic project
-exists yet, so the CI secret is unset. The workflow reads it, records a notice that it is
-missing and skips the publish, so a push to `main` does not go red over a publish nobody
-asked for.
+a file — see [Security model](../explanation/security-model.md). It is set, and builds
+publish. The workflow still reads only whether it is present, records a notice when it is
+missing and skips the publish, so a push to `main` cannot go red over a publish nobody asked
+for — the path a fresh fork or a revoked secret takes.
 
 ## Configuration files
 
