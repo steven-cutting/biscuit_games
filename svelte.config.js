@@ -6,9 +6,10 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
  * build output is a directory of files a host can serve as-is.
  *
  * `paths.base` reads BASE_PATH and nothing sets it. That is deliberate rather
- * than unfinished: this repository publishes nothing, because the domain root
- * still belongs to Poodl. See decision 0012. The hook stays so that adopting an
- * address later is a workflow change rather than a config change.
+ * than unfinished: the hub site is published nowhere, because the domain root
+ * still belongs to Poodl. See decision 0012. The package this repository does
+ * publish carries no route and never reads this value. The hook stays so that
+ * adopting an address later is a workflow change rather than a config change.
  */
 
 /** @type {import('@sveltejs/kit').Config} */

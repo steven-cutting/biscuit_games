@@ -9,9 +9,11 @@ requires: []
 # Maintenance
 
 There is no service to operate. Nothing runs, nothing accumulates, and there is no
-on-call. There is not even a deployment to watch: this repository is published nowhere,
-which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What
-follows is upkeep of the repository and of the links that cross between it and Poodl.
+on-call. There is no site deployment to watch either: the hub site is published nowhere,
+which is [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). What is
+published is a package and a component workshop, and neither runs — one is installed and one
+is read. What follows is upkeep of the repository, of the releases it cuts, and of the links
+that cross between it and Poodl.
 
 ## Routine
 
@@ -92,8 +94,9 @@ environment; it is written into no file here. It is set, and builds publish. The
 still reports the token's absence and skips the publish rather than going red, which is what
 a fresh fork or a revoked secret would meet.
 
-There is no deployment credential to rotate. No workflow here holds `pages: write` or
-`id-token: write`, because there is no Pages workflow to hold them. See
+There is no deployment credential to rotate, and none to create: the release workflow
+publishes with the run's own `GITHUB_TOKEN` under `packages: write`, and no workflow here holds
+`pages: write` or `id-token: write`, because there is no Pages workflow to hold them. See
 [Security model](../explanation/security-model.md).
 
 ## Related pages

@@ -85,7 +85,7 @@ just preview
 ```
 
 Both assume the site root, so the preview sits where the build expects to be served from,
-and nothing is published from this repository at all — see
+and the hub site is published nowhere — see
 [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
 
 If something works under `just dev` but not under `just preview`, suspect prerendering:

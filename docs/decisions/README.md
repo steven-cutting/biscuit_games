@@ -25,7 +25,7 @@ unresolved ones are recorded there as `open question` blocks — see
 | Number | Decision |
 | --- | --- |
 | [0001](0001-biscuit-games-is-the-source-of-truth.md) | Biscuit Games is the platform's source of truth |
-| [0002](0002-shared-material-travels-by-citation.md) | Shared material travels by citation |
+| [0002](0002-shared-material-travels-by-citation.md) | Shared material travels by citation — superseded by [0013](0013-shared-material-travels-as-a-package.md) |
 | [0003](0003-static-site-no-backend.md) | A static site with no backend |
 | [0004](0004-specs-are-the-source-of-truth.md) | Specifications decide shared behaviour |
 | [0005](0005-ports-and-fakes.md) | Side effects behind ports |
@@ -36,6 +36,7 @@ unresolved ones are recorded there as `open question` blocks — see
 | [0010](0010-biscuit-games-design-system.md) | The Biscuit Games design system |
 | [0011](0011-skeleton-not-a-second-application.md) | A skeleton, not a second application |
 | [0012](0012-the-domain-root-stays-with-poodl.md) | The domain root stays with Poodl |
+| [0013](0013-shared-material-travels-as-a-package.md) | Shared material travels as a package |
 
 ## The numbering
 
@@ -50,6 +51,19 @@ because the topic is what a cross-repository reference names.
 Copy the shape of an existing entry: context, the decision, the consequences including
 the ones that hurt, and what would reopen it. Add the file, add a manifest entry, add a
 row above. A decision nobody can find is not recorded.
+
+Superseding one is that work plus a mark. The successor is a new numbered entry with a topic
+slug of its own. The old entry keeps its number, its file, its topic slug and every word of its
+reasoning, and gains a dated blockquote directly under its level-one heading saying what
+replaced it and when; its row above gains the same sentence after an em dash. Nothing is
+deleted and nothing is rewritten, because the reasoning is what makes the successor legible.
+
+Three verbs, and they mean different things. A record is **superseded by** a successor that
+replaces its answer, **narrowed by** one that changes part of its letter and none of its
+reasoning, and **carried out on** a date when what it planned actually happened — the third is
+not a supersession at all, and its mark sits beside the paragraph that stopped being true
+rather than at the top. A slug never moves, whichever verb applies, because a slug is what a
+cross-repository reference names.
 
 ## Related pages
 

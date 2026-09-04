@@ -213,15 +213,17 @@ lockfiles do not govern; the provenance comment in `app.css` (package, version, 
 sha256) is what stands in for a lockfile there. That comment is now a two-repository fact:
 Poodl holds the same three files, and a re-extraction has to agree with both.
 
-**The system reaches surfaces no gate here renders.** Nothing is published from this
-repository — [decision 0012](0012-the-domain-root-stays-with-poodl.md) leaves the domain
-root with Poodl — and the landing page at that root wears this same stylesheet and serves
-these same font files. So a token renamed here can leave a rule over there resolving to
-nothing, with no gate on either side saying so, and moving a font path moves something in
-Poodl's staging step too. Because shared material travels by citation rather than by a
-package ([decision 0002](0002-shared-material-travels-by-citation.md)), the same is true of
-every copy any game takes: renaming a token is a cross-repository change, and the
-`consumer-impact` skill is the only thing that will look.
+**The system reaches surfaces no gate here renders.** The hub site is published nowhere —
+[decision 0012](0012-the-domain-root-stays-with-poodl.md) leaves the domain root with Poodl
+— and the landing page at that root wears this same stylesheet and serves these same font
+files. So a token renamed here can leave a rule over there resolving to nothing, with no gate
+on either side saying so, and moving a font path moves something in Poodl's staging step too.
+The stylesheet now also ships as a package
+([decision 0013](0013-shared-material-travels-as-a-package.md)), which makes a rename a major
+version a consumer can see — but only for the copies a release retires, and Poodl's copies are
+retired by a change in Poodl rather than by one here. Until then renaming a token is still a
+cross-repository change, and the `consumer-impact` skill is still the only thing that will
+look.
 
 **The claim that games are the same instrument with a different attachment is still a
 claim.** The play primitives that would prove it — board, tile, key, keyboard — live in

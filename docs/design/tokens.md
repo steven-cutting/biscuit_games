@@ -14,11 +14,13 @@ thing worth having. [Decision 0010](../decisions/0010-biscuit-games-design-syste
 records how it was chosen; [Design direction](direction.md) is the reasoning behind the
 look it carries; this page is the reference for what is actually in it.
 
-Nothing here is published as a package and nothing imports it. A game repository copies
-the file and cites this one, which is what
-[decision 0002](../decisions/0002-shared-material-travels-by-citation.md) means by
-travelling by citation. That makes a rename here a change in every repository that took a
-copy, and no gate anywhere can tell you so.
+This file is published, as `@steven-cutting/biscuit-games/app.css`. A game repository
+imports it at an exact version rather than copying it, which is
+[decision 0013](../decisions/0013-shared-material-travels-as-a-package.md). A rename here is
+therefore a major version somebody can see rather than a rule silently resolving to nothing —
+but only for a consumer that takes the bump, so
+[Published artefacts](../reference/published-artefacts.md) states what each level of change
+means before you make one.
 
 The hub itself spends about twenty of these tokens, between `src/routes/+page.svelte`,
 `src/lib/components/Wordmark.svelte` and the element rules at the foot of `src/app.css`.
@@ -230,7 +232,7 @@ is a licensing defect, not a cleanup.
 Each face declares `font-display: swap` and the same `unicode-range` the fontsource
 latin-standard build ships. The `src` URLs are relative, so they resolve through Vite's
 graph and the files are hashed into the build and follow whatever base path the build was
-given without knowing it. This repository sets no base path and publishes nothing
+given without knowing it. This repository sets no base path and publishes no site
 ([decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md)). Poodl's landing
 page at the domain root wears this same stylesheet and serves these same font files — the
 duplication 0012 records — so moving one of these paths moves something over there too.

@@ -103,9 +103,11 @@ No game either. Rules, boards, word lists and scores belong to the repository th
 them; the hub links to a game and never contains one. Where that boundary falls is drawn in
 [What the hub owns](../project/what-the-hub-owns.md).
 
-And no deployment. There is no Pages workflow, no `site-root/` and no staging script here,
-and the recipes `stage` and `stage-preview` do not exist. What is served at the platform's
-address is Poodl's, and stays Poodl's until decision 0012 is reopened.
+And no site deployment. There is no Pages workflow, no `site-root/` and no staging script
+here, and the recipes `stage` and `stage-preview` do not exist. What is served at the
+platform's address is Poodl's, and stays Poodl's until decision 0012 is reopened. What does
+leave is the package and the workshop, and neither is the site — see
+[Published artefacts](../reference/published-artefacts.md).
 
 ## Related pages
 

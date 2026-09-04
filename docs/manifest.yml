@@ -21,6 +21,7 @@
     {"path": "how-to/work-in-the-component-workshop.md", "title": "Work in the component workshop", "kind": "how-to", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["component_workshop"], "requires": []},
     {"path": "how-to/port-a-design-system-component.md", "title": "Port a design system component", "kind": "how-to", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["design_system_porting"], "requires": []},
     {"path": "how-to/work-with-the-specs.md", "title": "Work with the specifications", "kind": "how-to", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["specification_workflow"], "requires": []},
+    {"path": "how-to/consume-the-hub.md", "title": "Consume the hub from a game repository", "kind": "how-to", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["package_consumption"], "requires": []},
     {"path": "how-to/maintain-dependencies.md", "title": "Maintain dependencies", "kind": "how-to", "audience": ["maintainer", "agent"], "canonical_for": ["dependency_maintenance"], "requires": []},
 
     {"path": "explanation/architecture.md", "title": "Architecture", "kind": "explanation", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["system_architecture"], "requires": []},
@@ -34,6 +35,7 @@
     {"path": "reference/configuration.md", "title": "Configuration", "kind": "reference", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["configuration_reference"], "requires": []},
     {"path": "reference/testing.md", "title": "Testing", "kind": "reference", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["testing_reference"], "requires": []},
     {"path": "reference/quality-gates.md", "title": "Quality gates", "kind": "reference", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["quality_gate_reference"], "requires": []},
+    {"path": "reference/published-artefacts.md", "title": "Published artefacts", "kind": "reference", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["package_interface", "published_addresses"], "requires": []},
     {"path": "reference/documentation-contract.md", "title": "Documentation contract", "kind": "reference", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["documentation_contract"], "requires": []},
     {"path": "reference/agent-contract.md", "title": "Agent contract", "kind": "reference", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["agent_contract"], "requires": []},
 
@@ -53,6 +55,7 @@
     {"path": "decisions/0009-visual-review-in-chromatic.md", "title": "Decision 0009: Visual review in Chromatic", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_visual_review"], "requires": []},
     {"path": "decisions/0010-biscuit-games-design-system.md", "title": "Decision 0010: The Biscuit Games design system", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_design_system"], "requires": []},
     {"path": "decisions/0011-skeleton-not-a-second-application.md", "title": "Decision 0011: A skeleton, not a second application", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_hub_skeleton"], "requires": []},
-    {"path": "decisions/0012-the-domain-root-stays-with-poodl.md", "title": "Decision 0012: The domain root stays with Poodl", "kind": "decision", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["decision_deferred_domain"], "requires": []}
+    {"path": "decisions/0012-the-domain-root-stays-with-poodl.md", "title": "Decision 0012: The domain root stays with Poodl", "kind": "decision", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["decision_deferred_domain"], "requires": []},
+    {"path": "decisions/0013-shared-material-travels-as-a-package.md", "title": "Decision 0013: Shared material travels as a package", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_shared_material_package"], "requires": []}
   ]
 }

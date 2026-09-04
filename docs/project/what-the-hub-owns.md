@@ -55,7 +55,8 @@ it owns as prose, tokens and a specification rather than as code.
   publishes it, and the base path it is built against. Today that includes the domain
   root: it stays with Poodl, per
   [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). This repository
-  publishes nothing and has no deployment procedure to describe.
+  publishes a package and a workshop, not a site, and it has no site deployment procedure to
+  describe.
 
 ## The test
 
@@ -79,28 +80,37 @@ nothing until the second consumer exists.
 
 ## How a fact reaches a game
 
-By citation, not by a package. That is
-[decision 0002](../decisions/0002-shared-material-travels-by-citation.md), and it is the
-whole distribution mechanism: nothing here is published to a registry, nothing here is
-vendored into a game, and no game builds against this repository. A game copies the value
-it needs, cites the page it came from, and proves the copy with its own tests.
+Two ways, and the split is the point. A file travels as a package; a page travels as a
+citation. That is
+[decision 0013](../decisions/0013-shared-material-travels-as-a-package.md).
 
-The costs are real and worth stating plainly. Copies drift silently, and the citation is
-the only thread back to the original. This repository cannot fail a game's build, so
-nothing here can force a game to notice that a token moved. And a figure quoted in this
+The tokens stylesheet, the shared components, the typefaces and `appearance.allium` are
+published as `@steven-cutting/biscuit-games`. A game installs an exact version, and a change
+here reaches it as a version bump it can see, take or refuse.
+[Published artefacts](../reference/published-artefacts.md) says what is in the package and
+what a major, a minor and a patch each mean.
+
+Everything else is still a citation. A page path, a heading anchor, a `canonical_for` topic
+slug and the prose of a `@guarantee` cross the boundary as text a reader follows, and no
+package carries them. This handbook is published to no registry and vendored into no game.
+
+The costs are real and worth stating plainly. The registry authenticates every read, so a
+contributor without a token cannot install at all. A game's build can now fail because of
+something that happened here, which it could not before. And a figure quoted in this
 handbook is an inherited claim rather than a measurement — `tests/contrast.test.ts` has not
-been ported, so nothing in this repository recomputes a contrast ratio. A game that copies
+been ported, so nothing in this repository recomputes a contrast ratio. A game that renders
 a colour proves it where the test actually runs.
 
-What the arrangement buys is independence: a game can be built, released and rewritten
-without waiting on the hub, and the hub can be rewritten without breaking a game today.
+What the arrangement buys is a name for drift. A stylesheet that has moved on is a version
+number in a lockfile rather than a difference nobody can see.
 
 ## What is not settled
 
-- **Whether shared components ever become a package.** There is exactly one component
-  here, and one consumer for the look it carries. A package would buy deduplication and
-  cost a release process, version skew and a build-time dependency in every game. Not yet
-  decided, and not decidable with one game.
+- **Whether the handbook ever travels with the package.** The files ship; the pages do not.
+  A page path is still a citation nothing resolves, and shipping Markdown into
+  `node_modules` would trade a rotting link for a stale copy. Not yet decided, and the
+  answer probably depends on whether a second game reads these pages as often as Poodl
+  does.
 - **Who serves the domain root.** Decision 0012 leaves it with Poodl and leaves this
   repository unpublished. When the hub does become the front door, the address, the
   redirects and the order of the two changes all have to be settled — see

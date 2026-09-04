@@ -41,7 +41,7 @@ application they guard. That is the intended shape; see
 ├── .agents/skills/      Canonical agent procedures, ten of them
 ├── .claude/skills/      A bridge per skill, each deferring to .agents/
 ├── .codex/skills/       The same bridge, for a different reader
-├── .github/workflows/   The same checks in CI, and the Chromatic publish
+├── .github/workflows/   The same checks in CI, the Chromatic publish and the package release
 └── .storybook/          The component workshop, served and built locally
 ```
 
@@ -80,9 +80,11 @@ wrong rather than merely early.
   arrives, not a description of existing code; see
   [decision 0005](../decisions/0005-ports-and-fakes.md).
 - No `src/lib/data/`. Word lists belong to the game that plays them.
-- No `site-root/`, no staging script, no Pages workflow and no `BASE_PATH`. Nothing here
-  is published, and the domain root stays with Poodl; see
-  [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
+- No `site-root/`, no staging script, no Pages workflow and no `BASE_PATH`. The hub *site*
+  is published nowhere, and the domain root stays with Poodl; see
+  [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md). The package and the
+  workshop are published, and neither is the site — see
+  [Published artefacts](../reference/published-artefacts.md).
 - No `tests/contrast.test.ts`. It has not been ported, so nothing in this repository
   recomputes a contrast ratio, and every figure quoted in `src/app.css` is an inherited
   claim rather than a measurement.

@@ -24,7 +24,7 @@ and constants belong in source where they can be reviewed.
 ### The base path
 
 `BASE_PATH` is unset everywhere, which is a decision rather than an omission. This repository
-publishes nothing — there is no Pages workflow, no `site-root/` and no staging script, and
+publishes no site — there is no Pages workflow, no `site-root/` and no staging script, and
 the recipes `stage` and `stage-preview` do not exist here — because the domain root still
 belongs to Poodl. That is
 [decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md), and
@@ -56,6 +56,10 @@ a file — see [Security model](../explanation/security-model.md). It is set, an
 publish. The workflow still reads only whether it is present, records a notice when it is
 missing and skips the publish, so a push to `main` cannot go red over a publish nobody asked
 for — the path a fresh fork or a revoked secret takes.
+
+The project it publishes to, its application id and its permalink are recorded once in
+[Published artefacts](published-artefacts.md), which owns every address that leaves this
+repository.
 
 ## Configuration files
 
