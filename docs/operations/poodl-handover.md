@@ -247,6 +247,28 @@ Three of the contracts changed on the way, and Poodl's call sites change with th
   route's no-argument call is unaffected; the tests that pass `media.matchMedia` pass
   `{ matchMedia: media.matchMedia }` instead.
 
+One behaviour changed too, and it is a repair rather than a contract, so no call site moves
+with it. `Modal`'s focus trap now works out which of a panel's controls the keyboard really
+stops on instead of trusting `querySelectorAll` to say. Poodl's `src/lib/components/Modal.svelte`
+carries the enumeration this one came from, and a selector is not the sequential focus order:
+it matches every radio of a group where the keyboard stops on one, it matches a control the
+layout does not draw or a disabled `fieldset` has turned off, and it misses a disclosure's
+`<summary>` altogether. Any of those standing last means the wrap never fires and Tab leaves a
+panel that has declared `aria-modal="true"` over the page behind — where Escape no longer
+closes it either, because the handler is on the panel. That is `settings.allium`'s
+`@guarantee FullyKeyboardOperable` broken over the very panel it governs, latent rather than
+absent: Poodl's `SettingsPanel` ends in checkboxes rather than in its theme radios, so the
+last match there is a real stop today, and any panel ending in an exclusive choice wakes it.
+Taking the package retires the copy and the defect together. Until then the repair is Poodl's
+to make and this repository's only to record.
+
+And notice where that guarantee lives. The shell is decided here and `FullyKeyboardOperable`
+is stated there, so the only written contract for a shared component's keyboard behaviour
+sits in a game's specification while `docs/specs/appearance.allium` says nothing about focus,
+keyboards or dialogs at all. That is the inversion invariant 1 exists to prevent, and it is
+why the defect was found by review rather than by a gate. Closing it is a specification
+change and a product decision, not a repair to make in passing.
+
 And five heading anchors this repository renamed with the port, each a link Poodl may hold:
 `testing.md`'s "The contrast test is not ported" and "What a ported contrast test will hit"
 are now one section, "The contrast test"; `tokens.md`'s "Nothing here recomputes a ratio"

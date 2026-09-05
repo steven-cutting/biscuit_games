@@ -172,8 +172,9 @@ it on the way out. That last one is easy to leave out and invisible until someon
 closing destroys the element focus is on, the browser falls back to the document body, and the
 reader who tabbed to a control and pressed Escape resumes from the top of the page. `Modal`
 is that dialog and carries the whole of that: focus into the panel on arrival, Escape to
-`onclose`, Tab cycling over the panel's focusable descendants, and focus handed back to the
-opener on the way out if it is still in the document. `tests/shells.test.ts` holds each.
+`onclose`, Tab cycling over the stops the panel's contents really make rather than everything
+a selector matches, and focus handed back to the opener on the way out if it is still in the
+document. `tests/shells.test.ts` holds each.
 What the shell cannot do is catch a child that removes the control the reader just used — a
 removed element fires no `focusout` — so a child that swaps a control carries focus across
 its own swap, which is what `Button`'s bindable `element` is for.

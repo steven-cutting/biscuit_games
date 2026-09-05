@@ -133,6 +133,44 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   decision created: what a version bump carries, and what still travels by citation and no
   number describes.
 
+### Fixed
+
+Three defects the automated reviewers on pull request 3 found in the ported primitives, none
+of which any gate here could see. Nothing is released, so no version moves and no consumer
+took any of them; the entries are here because the components above are the artefact.
+
+- `Modal`'s focus trap works out which of a panel's controls the keyboard really stops on
+  rather than trusting `querySelectorAll` to say. A CSS selector is not the sequential focus
+  order: it matches every radio of a group where the keyboard stops on one, it matches a
+  control the layout does not draw, one a disabled `fieldset` has turned off, one carrying
+  `tabindex="-1"`, and an `input[type="hidden"]`, none of which the keyboard visits; and it
+  misses a disclosure's `<summary>` and an editable region, which it does. A match of the
+  first kind standing last meant the wrap never fired and the Tab that should have returned to
+  Close carried focus out to the page the dialog had declared `aria-modal` over — where Escape
+  no longer closes it either, because the handler is on the panel; one of the second kind was
+  simply unreachable. Three contracts were generalised on the way over; this is the first
+  place the ported *behaviour* parts from Poodl at
+  `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`, whose copy carries the same defect;
+  [the Poodl handover](docs/operations/poodl-handover.md) records what that costs Poodl.
+- `HeaderBar` keys its actions by position rather than by label. A label is the name a reader
+  hears and nothing in the contract asks two of them to differ, so keying on it took the whole
+  header down on a repeated name and threw away the focused control whenever a toggle was
+  renamed by the press that operated it — which is the ordinary shape of a chrome action.
+- The 4px lift in `Modal`'s arrival carries the comment the coincident-literal rule asks for.
+  It matches `--s-2` by value and not by meaning, and the component now says so, the way
+  `Button`'s 48px and `HeaderBar`'s 56px already did.
+
+Two gaps in the evidence rather than in the code, found by the same review:
+
+- `tests/contrast.test.ts` measures text on `--surface` — the ground a `Modal` panels itself
+  in — and the pressed ring on the four grounds beyond the two a game's keys sit on. Neither
+  can fail under the palette as it stands; they are here because this file's method is to
+  enumerate the pairs the stylesheet paints rather than to reason about which of them a
+  tighter pair already implies.
+- `Button`'s bindable `element` has a test. It is the library's only bindable prop and the
+  handle `Modal` says a child carries focus across its own swap by, and deleting the binding
+  left the whole suite green.
+
 ### Deliberately not included
 
 - Any deployment. There is no Pages workflow, no `site-root/`, no staging script and no

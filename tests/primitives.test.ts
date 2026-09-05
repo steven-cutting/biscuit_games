@@ -9,6 +9,7 @@ import Icon from '../src/lib/components/Icon.svelte';
 import IconButton from '../src/lib/components/IconButton.svelte';
 import { ICONS } from '../src/lib/components/icons';
 import type { IconName } from '../src/lib/components/icons';
+import ButtonHost from './ButtonHost.svelte';
 
 /** A snippet for `Button`'s children, the way a caller writes text inside it. */
 function says(text: string) {
@@ -166,6 +167,20 @@ describe('Button', () => {
       userEvent.click(screen.getByRole('button', { name: 'Continue' }))
     ).resolves.toBeUndefined();
   });
+
+  /*
+   * The bindable element is the caller's handle on the control that was
+   * rendered, and it is the handle a child carries focus across its own swap
+   * by — `Modal` says why nothing outside the child can catch that. The binding
+   * is written in `ButtonHost`, because a binding is template syntax and this
+   * file has none.
+   */
+  it('hands the caller the control it rendered', () => {
+    const received = vi.fn<(element: HTMLButtonElement | undefined) => void>();
+    render(ButtonHost, { children: says('Continue'), received });
+
+    expect(received.mock.calls.at(-1)?.[0]).toBe(screen.getByRole('button', { name: 'Continue' }));
+  });
 });
 
 /*
@@ -217,6 +232,48 @@ describe('HeaderBar', () => {
       'dialog'
     );
     expect(screen.getByRole('button', { name: 'About' })).not.toHaveAttribute('aria-haspopup');
+  });
+
+  /*
+   * A chrome action is often a toggle, and a toggle is renamed by the press
+   * that operates it. The control has to survive that rename, or the keyboard
+   * loses its place every time the sound is muted.
+   */
+  it('keeps focus on an action that the press renames', async () => {
+    const onmute = vi.fn();
+    const { rerender } = render(HeaderBar, {
+      actions: [
+        { icon: 'settings', label: 'Mute', onclick: onmute },
+        { icon: 'info', label: 'About', onclick: vi.fn() }
+      ]
+    });
+
+    screen.getByRole('button', { name: 'Mute' }).focus();
+
+    await rerender({
+      actions: [
+        { icon: 'settings', label: 'Unmute', onclick: onmute },
+        { icon: 'info', label: 'About', onclick: vi.fn() }
+      ]
+    });
+
+    expect(screen.getByRole('button', { name: 'Unmute' })).toHaveFocus();
+  });
+
+  /*
+   * Two actions under one name is a poor name rather than a broken list, and
+   * nothing in the contract forbids it, so the component renders what it was
+   * given instead of refusing the whole header.
+   */
+  it('renders the list it is given, even where two actions share a name', () => {
+    render(HeaderBar, {
+      actions: [
+        { icon: 'settings', label: 'Settings', onclick: vi.fn() },
+        { icon: 'menu', label: 'Settings', onclick: vi.fn() }
+      ]
+    });
+
+    expect(screen.getAllByRole('button', { name: 'Settings' })).toHaveLength(2);
   });
 
   /*

@@ -12,6 +12,14 @@ function content(html: string) {
   return createRawSnippet(() => ({ render: () => `<div>${html}</div>` }));
 }
 
+/** A control on the page the dialog covers, which the keyboard must never reach. */
+function behindTheDialog(): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.textContent = 'Behind the dialog';
+  document.body.append(button);
+  return button;
+}
+
 /*
  * The live region: what has to be said and not shown. Every sentence a product
  * puts here is already on its screen in another form.
@@ -229,6 +237,237 @@ describe('Modal', () => {
     await userEvent.tab();
 
     expect(close).toHaveFocus();
+  });
+
+  /*
+   * A group of radios is one stop and not one per radio: the keyboard visits
+   * the checked member and passes over the rest. The selector matches every
+   * one of them, so an unchecked radio last in the markup would stand where the
+   * wrap looks for the end of the panel, and the Tab that should have returned
+   * to Close would leave the dialog instead.
+   */
+  it('wraps from the radio the keyboard stops on rather than the last one written', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<input type="radio" name="theme" aria-label="Light" checked />' +
+          '<input type="radio" name="theme" aria-label="Dark" />'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(screen.getByRole('radio', { name: 'Light' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  /*
+   * And it follows the choice rather than the markup: `checked` is read as the
+   * property, because the attribute says what the panel arrived with and the
+   * reader has since chosen otherwise.
+   */
+  it('follows the choice the reader has just made', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<input type="radio" name="theme" aria-label="Light" checked />' +
+          '<input type="radio" name="theme" aria-label="Dark" />'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+    const dark = screen.getByRole('radio', { name: 'Dark' });
+
+    await userEvent.click(dark);
+
+    expect(dark).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  // With nothing chosen yet the keyboard stops on the first of the group.
+  it('takes the first radio of a group nothing is chosen in', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<input type="radio" name="theme" aria-label="Light" />' +
+          '<input type="radio" name="theme" aria-label="Dark" />'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(screen.getByRole('radio', { name: 'Light' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  // Radios with no name are no group, so each of them keeps its own stop.
+  it('leaves a radio that belongs to no group as a stop of its own', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<input type="radio" aria-label="One" /><input type="radio" aria-label="Two" />'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(screen.getByRole('radio', { name: 'One' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(screen.getByRole('radio', { name: 'Two' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  /*
+   * A panel that styles a control away keeps it in the markup, and the selector
+   * goes on matching it. Both ways of taking it off the screen are here because
+   * the two are asked differently: `display` of an ancestor, `visibility` of the
+   * control itself.
+   */
+  it('passes over a control the layout does not draw', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<button type="button">A control</button>' +
+          '<div style="display: none"><button type="button">Not drawn</button></div>' +
+          '<span style="visibility: hidden"><button type="button">Not shown</button></span>'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(screen.getByRole('button', { name: 'A control' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  // A disabled fieldset disables what it holds without marking any of it, which
+  // is why the selector asks `:disabled` rather than for the attribute.
+  it('passes over a control a disabled fieldset has turned off', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<button type="button">A control</button>' +
+          '<fieldset disabled><button type="button">Not available</button></fieldset>'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(screen.getByRole('button', { name: 'A control' })).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  /*
+   * A list of controls is not the tab order in the other direction either. A
+   * disclosure's summary and an editable region are stops the browser makes out
+   * of ordinary content, and a panel whose content is only those has to cycle
+   * over them rather than hand the reader to the page it has declared hidden.
+   */
+  it('counts the stops a browser makes that a list of controls misses', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Well done',
+      children: content(
+        '<details><summary>More</summary><p>The detail.</p></details>' +
+          '<div contenteditable="true">Notes</div>'
+      )
+    });
+    const summary = screen.getByText('More');
+
+    await userEvent.tab();
+
+    expect(summary).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(screen.getByText('Notes')).toHaveFocus();
+
+    await userEvent.tab();
+
+    expect(summary).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
+  });
+
+  /*
+   * And the mirror: the last element inside is not the last stop. A hidden
+   * input is in the markup and out of the tab order, an `<object>` with nothing
+   * behind it cannot take focus, and `tabindex="-1"` says outright that the
+   * keyboard does not come here — so a wrap that landed on any of the three
+   * would move nothing and the Tab would leave the panel instead.
+   */
+  it('wraps from the last stop a reader can reach, past what the browser cannot focus', async () => {
+    const outside = behindTheDialog();
+    render(Modal, {
+      title: 'Settings',
+      onclose: vi.fn(),
+      children: content(
+        '<button type="button">A control</button>' +
+          '<input type="hidden" name="round" value="3" />' +
+          '<a href="#somewhere" tabindex="-1">Not a stop</a>' +
+          '<object></object>'
+      )
+    });
+    const close = screen.getByRole('button', { name: 'Close' });
+
+    screen.getByRole('button', { name: 'A control' }).focus();
+    await userEvent.tab();
+
+    expect(close).toHaveFocus();
+    expect(outside).not.toHaveFocus();
+    outside.remove();
   });
 
   /*

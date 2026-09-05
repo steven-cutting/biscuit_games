@@ -17,9 +17,11 @@
    * `word` is state readable as text rather than signalled only by which
    * control looks selected; its `label` adds what pressing it does; `popup`
    * says what opens. It is optional because the hub has no state to put there.
-   * The actions are named controls, an `IconButton` each, in the order given,
-   * and the divider between the chip and the actions is drawn only when there
-   * is something on both sides of it.
+   * The actions are named controls, an `IconButton` each, in the order given.
+   * A label is the name a reader hears, and nothing here asks the labels to
+   * differ from one another; a caller who repeats one has named two controls
+   * badly and still gets both. The divider between the chip and the actions is
+   * drawn only when there is something on both sides of it.
    *
    * Below ~26rem the lockup gives up its words and the divider goes: 44px
    * targets, a chip and the mark have to share a phone's width, and the
@@ -63,7 +65,19 @@
         <span class="divider" aria-hidden="true"></span>
       {/if}
     {/if}
-    {#each actions as action (action.label)}
+    <!--
+      Keyed by position, because a label is not an identity. The actions are
+      rendered in the order given and an `IconButton` holds nothing across a
+      change, so the position is as much as a key here can honestly say. The
+      label would say more than it knows: a toggle is renamed by the press that
+      operates it, and keying on the name would throw away the control the
+      keyboard was on, while two actions that happen to share a name would take
+      the whole header down rather than render badly. The cost is that removing
+      an action shifts the ones after it up a position, so the keyboard loses a
+      control among them where a label would have carried it along — a renamed
+      toggle is the ordinary shape in chrome and a shrinking row is not.
+    -->
+    {#each actions as action, i (i)}
       <IconButton
         icon={action.icon}
         label={action.label}

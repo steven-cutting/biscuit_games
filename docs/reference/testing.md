@@ -33,6 +33,7 @@ why the tokens earn the exception here.
 | --- | --- |
 | `*.test.ts` | Vitest in jsdom. Everything in `tests/`. |
 | `*.stories.svelte` | Vitest in Chromium, driven by Storybook. Everything in `stories/`. |
+| `*.svelte` in `tests/` | None. A caller a test imports so it can write a binding in the shape a consumer writes it, matched by no glob and collected by nothing. `ButtonHost.svelte` is the only one. |
 | `*.spec.ts` | Playwright directly. Reserved. Playwright itself is installed — it supplies the browser the story run drives — but no suite of this kind exists. |
 
 Files are named for what they cover rather than mirroring a source path.
@@ -40,9 +41,12 @@ Files are named for what they cover rather than mirroring a source path.
 guarantee across a stylesheet, and `tests/wordmark.test.ts` happens to coincide with its
 source; the rule is the first of those.
 
-One file in `tests/` is not a test. `setup.ts` holds the single import that registers the
-jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.ts`. The
-`include` glob is `tests/**/*.test.ts`, so it is loaded and never collected.
+Two files in `tests/` are not tests. `setup.ts` holds the single import that registers the
+jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.ts`.
+`ButtonHost.svelte` is a caller: it writes `bind:element` on a `Button` and hands back what
+the binding delivered, because `bind:` is template syntax that a `.test.ts` has none of, and
+a component is the shape the consumer carrying focus across a swap actually writes. The
+`include` glob is `tests/**/*.test.ts`, so both are loaded and neither is collected.
 `stories/fixtures.ts` is the same arrangement on the story side: the two figures the plays
 measure a control against, imported by the stories that need them and never a story.
 
@@ -93,7 +97,7 @@ addon's test mode to error; the addon's own default only reports. Play functions
 same pass, which is where a guarantee about interaction becomes executable rather than
 described.
 
-Thirty-seven stories across nine files. `Wordmark`'s **Dark theme** is the one every other
+Thirty-eight stories across nine files. `Wordmark`'s **Dark theme** is the one every other
 dark pin rests on: it asserts that `data-theme` reached `document.documentElement`, which is
 the element every palette in `src/app.css` is keyed on — an attribute written onto a wrapper
 instead would satisfy no selector in that file. The plays that carry a guarantee about
@@ -114,6 +118,17 @@ jsdom holds presence and the resolved cascade — the component suites and the c
 Chromium holds anything only a layout engine can produce — a control's box against the 44px
 fixture, and whether the header scrolls sideways at 320px. The contrast test below is split
 on exactly this line.
+
+`Modal`'s focus trap is the one place the split does not help, and it is worth knowing why.
+Neither suite presses Tab: both drive `@testing-library/user-event`, which computes the next
+stop in JavaScript and calls `focus()`, so the oracle is the same library in Chromium as in
+jsdom and the browser's own tab order is never consulted. Where the two agree —
+which radio of a group the keyboard stops on, which controls the layout draws, a control a
+disabled `fieldset` has turned off, a disclosure's summary — `tests/shells.test.ts` settles
+it. Where they part, nothing here can measure the difference: `user-event` scopes a radio
+group by name alone, so two forms holding a group of the same name are two groups to a
+browser and one to it. `Modal.svelte` follows the browser and says so, and the claim rests on
+the HTML specification rather than on a gate.
 
 ## Coverage
 
@@ -143,8 +158,8 @@ should be deleted rather than covered; see
 | --- | --- |
 | `wordmark.test.ts` | That `Wordmark` renders, and that its accessible text is exactly the lockup: the mark is `aria-hidden`, so "biscuit games" is the whole of it. |
 | `icons.test.ts` | That the map and the directory agree, that every value is SVG markup restroked to 1.5 in `currentColor`, and that the ISC text is beside the files. |
-| `primitives.test.ts` | `Icon`, `IconButton`, `Button` and `HeaderBar`: role, name, press, disabled, `aria-haspopup`, `aria-current`, the sized icon, the brand snippet, the chip and the actions. |
-| `shells.test.ts` | `Announcer`, `Notice` and `Modal`: the two live regions and their repeat-by-sequence, dismissal, and the dialog's focus, Escape and Tab contract in both directions. |
+| `primitives.test.ts` | `Icon`, `IconButton`, `Button` and `HeaderBar`: role, name, press, disabled, `aria-haspopup`, `aria-current`, the sized icon, the element `Button` hands back to a caller that binds it, the brand snippet, the chip, and the actions across a rename and a repeated name. |
+| `shells.test.ts` | `Announcer`, `Notice` and `Modal`: the two live regions and their repeat-by-sequence, dismissal, and the dialog's focus, Escape and Tab contract in both directions, over the stops the keyboard really makes — a group of radios, a control the layout does not draw, one a disabled `fieldset` has turned off, and a disclosure's summary. |
 | `contrast.test.ts` | Every pair the stylesheet declares against the two floors, in all four combinations; the palette's shape; the two dark blocks and the two high-contrast sets held equal. |
 | `preferences.test.ts` | The port: the three queries, change subscription and its end, the fake, and the absent-`matchMedia` fallback reached by argument and by default. |
 | `appearance.test.ts` | The three derivations, clause by clause. |

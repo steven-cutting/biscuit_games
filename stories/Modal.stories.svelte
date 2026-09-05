@@ -13,7 +13,11 @@
     'No governing surface of its own: every panel a product builds on it owes the keyboard the',
     'same three things, and this is where they are made true once. It takes focus when it opens,',
     'closes on Escape, and cycles Tab inside itself rather than letting the keyboard wander out to',
-    'the page behind. The play functions below are the evidence for each of those.',
+    'the page behind — over the stops the keyboard really makes, which are not the ones a selector',
+    'matches: a group of radios is one stop between them, a control the layout does not draw is',
+    'none at all, and a disclosure’s summary is one that no list of form controls names.',
+    '`Modal.svelte` says which cases a selector still cannot settle. The play functions below are',
+    'the evidence for the three promises.',
     '',
     'Not a native `<dialog>`: jsdom implements neither `showModal` nor `close`, so a component',
     'built on one could not be tested where the rest of the suite runs, and an untestable',
@@ -94,6 +98,44 @@
   {#snippet template(args)}
     <Modal {...args}>
       <button type="button">A control</button>
+    </Modal>
+  {/snippet}
+</Story>
+
+<!--
+  The stops the keyboard really makes, which are not the ones the selector
+  matches: a group of radios is one stop between them, and the control the panel
+  has styled away is no stop at all, so the order here is Close, Light, and back
+  to Close. This is the settings shape the shell exists for, rendered where axe
+  can see it: the panel a game builds on a choice with three answers.
+-->
+<Story
+  name="Cycles past the stops the keyboard skips"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const close = canvas.getByRole('button', { name: 'Close' });
+
+    await userEvent.tab();
+    await expect(close).toHaveFocus();
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('radio', { name: 'Light' })).toHaveFocus();
+
+    await userEvent.tab();
+    await expect(close).toHaveFocus();
+  }}
+>
+  {#snippet template(args)}
+    <Modal {...args}>
+      <fieldset>
+        <legend>Theme</legend>
+        <p><label><input type="radio" name="theme" value="light" checked /> Light</label></p>
+        <p><label><input type="radio" name="theme" value="dark" /> Dark</label></p>
+        <p><label><input type="radio" name="theme" value="system" /> Follow the device</label></p>
+      </fieldset>
+      <div style="display: none">
+        <button type="button">Not drawn</button>
+      </div>
     </Modal>
   {/snippet}
 </Story>

@@ -159,8 +159,10 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
        * a test about controls. `--text` on `--background` is every sentence on
        * the page; `--text-2` is secondary copy, the note under a control;
        * `--text-3` is tertiary text. All of it is text a reader reads rather
-       * than decoration, on the page and on the raised surfaces a dialog and a
-       * `Notice` sit on, so it all answers to the same bar.
+       * than decoration, and it is read on three grounds rather than one: the
+       * page, the `--surface` a `Modal` panels itself in, and the
+       * `--surface-raised` a `Notice` sits on and a game's scored key is. All
+       * three answer to the same bar.
        */
       it('paints legible text on the page and its surfaces', () => {
         for (const ink of ['--text', '--text-2', '--text-3'] as const) {
@@ -168,10 +170,10 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
             MINIMUM_TEXT_CONTRAST
           );
         }
-        for (const ink of ['--text', '--text-2'] as const) {
-          expect(ratio(token(ink), token('--surface-raised'))).toBeGreaterThanOrEqual(
-            MINIMUM_TEXT_CONTRAST
-          );
+        for (const ground of ['--surface', '--surface-raised'] as const) {
+          for (const ink of ['--text', '--text-2'] as const) {
+            expect(ratio(token(ink), token(ground))).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST);
+          }
         }
       });
 
@@ -299,11 +301,33 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
         );
       });
 
-      // The pressed ring replaces the platform's tap flash, so it is a state
-      // indicator and answers to the non-text bar like any other. Two grounds,
-      // because every control a game draws sits on one of the two.
+      /*
+       * The pressed ring replaces the platform's tap flash, so it is a state
+       * indicator and answers to the non-text bar like any other. The grounds
+       * are written out rather than reasoned about, because the ring is drawn
+       * in two tones at once and which of them the eye catches is a fact about
+       * where the ground sits between them — so a ground is covered by having
+       * been listed here and by nothing else.
+       *
+       * A control carrying no fill of its own shows what is behind it: the
+       * page, a game's scored key, or the `--surface` a `Modal` panels itself
+       * in. A control carrying one shows the fill: `--text` under a primary
+       * `Button` at rest, `--text-2` under a hovered one, `--surface-hover`
+       * under a hovered secondary, ghost, `IconButton` or `HeaderBar` chip.
+       * The hover grounds are no corner case, because a pointer holds `:hover`
+       * through the press it makes. `app.css` names three of these beside the
+       * rule and quotes its figure for the two a game's keys sit on; this list
+       * is where the rest of them get one.
+       */
       it('acknowledges a touch on every ground a control sits on', () => {
-        for (const ground of ['--key-untried-bg', '--key-scored-bg'] as const) {
+        for (const ground of [
+          '--key-untried-bg',
+          '--key-scored-bg',
+          '--surface',
+          '--surface-hover',
+          '--text',
+          '--text-2'
+        ] as const) {
           expect(ringEdge(token(ground))).toBeGreaterThanOrEqual(MINIMUM_BOUNDARY_CONTRAST);
         }
       });

@@ -23,6 +23,12 @@
    * the way out is the first thing the keyboard meets. A caller that supplies
    * no `onclose` gets no control that pretends otherwise, and no Escape.
    *
+   * The cycling works out which of a caller's controls the keyboard really stops
+   * on rather than trusting a selector to say, because the two differ: a radio
+   * group is one stop and not one per radio, and a control the layout does not
+   * draw is no stop at all. A match of either kind standing last is a Tab that
+   * leaves the dialog.
+   *
    * `footer` is where a caller's actions go — rule-separated from the body, so
    * a dialog reads as content and then commitment. Optional, because most
    * panels have no action row.
@@ -37,6 +43,9 @@
    * effect of the kind invariant 3 puts behind one — storage, a clock, the
    * device's preferences — and jsdom implements focus, so the tests drive the
    * real thing rather than a fake. Decision 0014 records the call.
+   * `getComputedStyle` is read the same way and on the same grounds: it asks
+   * this document what it is drawing, and jsdom resolves the cascade, so the
+   * tests drive that too.
    */
   let {
     title,
@@ -47,14 +56,123 @@
 
   const titleId = $props.id();
 
+  /*
+   * A selector is not the sequential focus order, and the trap needs the order:
+   * it wraps only when focus is on the panel's first stop or its last, so a
+   * match the keyboard never visits standing at either end means the wrap never
+   * fires and the Tab it was there to catch walks out to the page the dialog
+   * has declared hidden. What `querySelectorAll` returns is therefore a first
+   * pass, narrowed by `tabbable` below rather than trusted.
+   *
+   * `:disabled` rather than `[disabled]` is the part of that the selector can
+   * do for itself: the pseudo-class holds for a control inside a disabled
+   * `fieldset` as well as one carrying the attribute, and the keyboard reaches
+   * neither.
+   *
+   * Three of these are not form controls and are stops all the same. A
+   * disclosure's own summary and an editable region are ordinary content the
+   * browser puts in the tab order; a hidden input is the mirror of both, a
+   * control the markup has and the tab order does not, which is why `input`
+   * asks not to be one.
+   *
+   * Two families are left out on purpose. `iframe`, `object`, `embed` and
+   * `area[href]` are stops only when something else is true of them — a nested
+   * document, a loaded plugin, an image map some image uses — so matching one
+   * would put at the end of the list something `focus()` cannot move to, which
+   * is the failure the hidden input used to be. And `audio[controls]` and
+   * `video[controls]` are stops a browser makes unconditionally, yet nothing
+   * that runs here reaches one: user-event walks a list of its own and media is
+   * not on it, in the workshop's Chromium as much as in jsdom. They wait for a
+   * dialog that needs a player, and for whatever would prove it.
+   *
+   * One case stays wrong. A `<details>` the caller wrote no `<summary>` for is
+   * a stop nothing here can match, its summary being the browser's rather than
+   * the document's.
+   */
   const FOCUSABLE = [
     'a[href]',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
+    'button:not(:disabled)',
+    'input:not(:disabled):not([type="hidden"])',
+    'select:not(:disabled)',
+    'textarea:not(:disabled)',
+    'details > summary:first-of-type',
+    '[contenteditable]:not([contenteditable="false"])',
     '[tabindex]:not([tabindex="-1"])'
   ].join(', ');
+
+  function isRadio(stop: HTMLElement): stop is HTMLInputElement {
+    return stop instanceof HTMLInputElement && stop.type === 'radio';
+  }
+
+  /*
+   * The radios of one group are a single stop between them: the keyboard visits
+   * the checked member, or the first of them when none is checked, and passes
+   * over the rest. A group is the radios sharing a form owner and a name, which
+   * is why the name is asked for first — radios with no name are not a group,
+   * each is a stop of its own, and collapsing them would strand every one after
+   * the first.
+   *
+   * `checked` is the property rather than the attribute because the attribute
+   * says what the markup arrived with, and this has to answer for the choice
+   * the reader has just made.
+   *
+   * The form owner is half of what makes a group because the HTML specification
+   * says so, and no gate here can hold that half: both suites drive
+   * `@testing-library/user-event`, which computes the next stop itself rather
+   * than pressing Tab, and scopes a group by name alone. Two forms holding a
+   * group of one name are two groups to a browser and one to it, so the rule
+   * below follows the specification and `docs/reference/testing.md` records that
+   * nothing measures the difference.
+   */
+  function isTheGroupsStop(radio: HTMLInputElement, stops: HTMLElement[]): boolean {
+    if (radio.name === '') {
+      return true;
+    }
+
+    const group = stops.filter(
+      (stop): stop is HTMLInputElement =>
+        isRadio(stop) && stop.name === radio.name && stop.form === radio.form
+    );
+
+    return radio === (group.find((member) => member.checked) ?? group.at(0));
+  }
+
+  /*
+   * Nothing the layout does not draw is a stop, and neither is anything inside
+   * something it does not draw. `display` is not inherited, so an undrawn
+   * ancestor has to be walked to; `visibility` is, so a control's own computed
+   * value already answers for its ancestors and for the child that sets itself
+   * visible again inside a hidden one.
+   */
+  function isRendered(stop: HTMLElement): boolean {
+    if (getComputedStyle(stop).visibility === 'hidden') {
+      return false;
+    }
+
+    for (let node: Element | null = stop; node !== null; node = node.parentElement) {
+      if (getComputedStyle(node).display === 'none') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /*
+   * What the selector matched, less everything the keyboard will not stop on.
+   *
+   * `tabindex="-1"` is asked about here rather than in the list above because
+   * it takes a control out of the tab order whatever the control is, and the
+   * list would have to repeat the exclusion against every entry to say so.
+   */
+  function tabbable(stops: HTMLElement[]): HTMLElement[] {
+    return stops.filter(
+      (stop) =>
+        stop.getAttribute('tabindex') !== '-1' &&
+        (!isRadio(stop) || isTheGroupsStop(stop, stops)) &&
+        isRendered(stop)
+    );
+  }
 
   /*
    * Focus goes in on arrival and comes back on the way out. Without the second
@@ -93,7 +211,7 @@
     // The handler is on the panel, so the panel is what the event reports as
     // its target — no bound variable, and no arm for one being unset.
     const panel = event.currentTarget;
-    const stops = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    const stops = tabbable([...panel.querySelectorAll<HTMLElement>(FOCUSABLE)]);
     const first = stops.at(0);
     const last = stops.at(-1);
 
@@ -173,6 +291,11 @@
    * written to `data-animations` by whatever hosts the page. The gate is the
    * attribute rather than a zeroed duration, because a 0ms animation still
    * fires its events and can flash its from-frame.
+   *
+   * The 4px lift is a literal on purpose. It matches `--s-2` by value and not
+   * by meaning: that is the spacing scale, and the distance a panel travels to
+   * arrive is not a gap. Naming the token here would move the arrival when the
+   * scale moved for a reason of its own.
    */
   :global(:root[data-animations='on']) .panel {
     animation: enter var(--dur-3) var(--ease) both;
