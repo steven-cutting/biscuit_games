@@ -216,6 +216,29 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
       });
 
       /*
+       * The two grounds the platform's own controls brought with them, which no
+       * pair above reaches. `Button`'s primary fills with the page's ink and
+       * letters it in `--text-inverse` — `--text` at rest, `--text-2` while it
+       * is hovered — and every hovered control on the page, `Button`'s
+       * secondary and ghost and `IconButton`, puts `--text` on
+       * `--surface-hover`. A hover state is text a reader reads, so it answers
+       * to the text bar like any other, and it is the one state no story is
+       * rendered in: axe sees a control at rest, so this is the only thing that
+       * looks at a hover ground at all.
+       */
+      it('paints legible text on the platform controls', () => {
+        for (const fill of ['--text', '--text-2'] as const) {
+          expect(ratio(token('--text-inverse'), token(fill))).toBeGreaterThanOrEqual(
+            MINIMUM_TEXT_CONTRAST
+          );
+        }
+
+        expect(ratio(token('--text'), token('--surface-hover'))).toBeGreaterThanOrEqual(
+          MINIMUM_TEXT_CONTRAST
+        );
+      });
+
+      /*
        * A control whose boundary is not its own fill hugs the page, so
        * `--key-untried-rule` answers for it — for `Button`'s secondary and for
        * `HeaderBar`'s chip here, and for every control a game draws as a
