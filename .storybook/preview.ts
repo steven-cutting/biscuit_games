@@ -21,10 +21,12 @@ import '../src/app.css';
  * selectors match, so the writes go to the document root and nowhere else.
  *
  * This is Storybook infrastructure standing in for the host document, not the
- * application expressing a preference, so it needs no port. When the Appearance
- * surface is built it must read the device through a new
- * `src/lib/ports/preferences.ts` fed from these same globals — see
- * `docs/explanation/layering.md`.
+ * application expressing a preference, so it needs no port. The port exists —
+ * `src/lib/ports/preferences.ts` reads the device, and
+ * `src/lib/domain/appearance.ts` makes the three derivations from what it
+ * reads — but nothing on the hub's route calls either yet, and the workshop
+ * writes the attributes those derivations would produce straight from the
+ * toolbar. See `docs/explanation/layering.md`.
  */
 
 const THEMES = ['system', 'light', 'dark'] as const;
@@ -72,9 +74,11 @@ function readAppearance(globals: Record<string, unknown>): Appearance {
  * freezes declarative motion so a reviewer sees the still frame. It stands in
  * for the device half of
  * `Appearance.animations_active`, and because it is a simulation it is not
- * evidence that the real preference is honoured. Nothing here is: no test in
- * `tests/` reads `prefers-reduced-motion` and no rule in `src/app.css` answers
- * it, so the still frame is for a reviewer's eye and for nothing else.
+ * evidence that the real preference is honoured. Nothing here is: no rule in
+ * `src/app.css` answers `prefers-reduced-motion`, and the port that reads it,
+ * `src/lib/ports/preferences.ts`, is proved against a fake in `tests/` and
+ * wired to nothing on the route, so the still frame is for a reviewer's eye
+ * and for nothing else.
  */
 function applySimulatedReducedMotion(active: boolean): void {
   const existing = document.getElementById(REDUCED_MOTION_STYLE_ID);
@@ -130,9 +134,11 @@ function applyAppearance(appearance: Appearance): void {
    * reduced-motion preference taken together, and the device wins. The route
    * does less. `src/app.html` writes `data-animations="on"` flat and consults
    * no device preference, so the workshop is the more faithful of the two and a
-   * component seen here has been seen under a derivation the hub does not yet
-   * make. Without this the attribute is never present in the workshop and every
-   * story renders the animation-off path, whatever the toolbar says.
+   * component seen here has been seen under a derivation the route does not yet
+   * make — `animationsActive` in `src/lib/domain/appearance.ts` makes it, and
+   * nothing on the route calls it. Without this the attribute is never present
+   * in the workshop and every story renders the animation-off path, whatever
+   * the toolbar says.
    */
   if (appearance.animations === 'on' && appearance.reducedMotion !== 'reduce') {
     root.setAttribute('data-animations', 'on');

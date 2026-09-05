@@ -56,6 +56,7 @@
     {"path": "decisions/0010-biscuit-games-design-system.md", "title": "Decision 0010: The Biscuit Games design system", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_design_system"], "requires": []},
     {"path": "decisions/0011-skeleton-not-a-second-application.md", "title": "Decision 0011: A skeleton, not a second application", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_hub_skeleton"], "requires": []},
     {"path": "decisions/0012-the-domain-root-stays-with-poodl.md", "title": "Decision 0012: The domain root stays with Poodl", "kind": "decision", "audience": ["contributor", "maintainer", "operator", "agent"], "canonical_for": ["decision_deferred_domain"], "requires": []},
-    {"path": "decisions/0013-shared-material-travels-as-a-package.md", "title": "Decision 0013: Shared material travels as a package", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_shared_material_package"], "requires": []}
+    {"path": "decisions/0013-shared-material-travels-as-a-package.md", "title": "Decision 0013: Shared material travels as a package", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_shared_material_package"], "requires": []},
+    {"path": "decisions/0014-the-hub-holds-the-design-system.md", "title": "Decision 0014: The hub holds the design system", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_hub_holds_the_system"], "requires": []}
   ]
 }

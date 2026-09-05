@@ -10,6 +10,12 @@ requires: []
 
 *Ported from Poodl's decision 0010 at `c26cc4642afa6b1349db70a0f497203db3986599`, and restated for the platform. Poodl's own record stands where it is.*
 
+> **Narrowed on 2026-09-04 by
+> [Decision 0014](0014-the-hub-holds-the-design-system.md).** The icons, the platform
+> primitives, the contrast test and the preferences port are here now, ported from Poodl.
+> What this record decided about the tokens, the typefaces, the deviations and their
+> provenance stands unchanged, and the ledger of deviations below is still the ledger.
+
 ## Context
 
 [Design direction](../design/direction.md) decided how Biscuit Games looks — dark is home,
@@ -44,7 +50,8 @@ one at a time, as a consumer appears — the rest recorded in
 - **Tokens.** `src/app.css` holds the raw palette (pure neutrals, the biscuit ramp, the
   result hues chosen dark-first), the semantic vocabulary (`--surface*`, `--rule*`,
   `--text*`, `--result-*`, the key grounds), and the type, space, form and motion scales.
-  The result and key groups are a game surface's and nothing here draws one; they stay
+  The result and key groups are a game surface's and nothing here draws a mark or a key —
+  though `--key-untried-rule` is the boundary of two platform controls — and they stay
   because a hub copy missing half the system would make a game's copy the superset.
   [Design tokens](../design/tokens.md) is the reference page for the file. The legacy
   names the pinned element rules depend on — `--background`, `--text`, `--focus` — survive,
@@ -52,35 +59,39 @@ one at a time, as a consumer appears — the rest recorded in
   family is spent in exactly one place, and it is the design system's own: `::selection`
   paints `--brand-warm-ink` on `--brand-warm`. A token measured and never rendered is a
   figure that cannot regress where anyone would see it, which is why the pair is spent
-  somewhere a reader meets it — in Poodl a gate asserts that rule exists, and here nothing
-  does.
+  somewhere a reader meets it — and `tests/contrast.test.ts` asserts that rule exists,
+  here as in Poodl.
 - **Fonts.** Bricolage Grotesque for display and the board, Instrument Sans for the
   interface: committed latin-subset variable woff2 files under `src/lib/assets/fonts/`,
   extracted from the pinned fontsource 5.3.0 packages (provenance, URLs and checksums in
   the `app.css` header), with the OFL texts beside them. Both faces carry the `tnum`
   feature `--figures-tabular` names — verified from the files themselves when they were
   committed in Poodl, not from the foundry page, and the same files by checksum.
-- **Icons.** The restroked Lucide set, under the ISC licence, is the system's and stays in
-  the design project. Its implementation is Poodl's: there is no `src/lib/assets/icons/`
-  here, no `icons.ts` and no `Icon` component, because nothing in the hub draws an icon.
-  The first one that does brings the directory, the licence text and the arrangement that
-  inlines an SVG through a `?raw` import with it; the porting guide holds that recipe.
-- **Primitives.** `Wordmark` is the only component ported here. The brand mark is folded
-  into it rather than being a component of its own, because nothing else consumes one.
-  Every other primitive the system draws exists as a design-project reference and, for
-  most of them, as a Poodl implementation; the ledger in the porting guide names each one
-  and what blocks it.
+- **Icons.** The restroked Lucide set, under the ISC licence, is the system's. When this
+  was decided its implementation was Poodl's — there was no `src/lib/assets/icons/` here,
+  no `icons.ts` and no `Icon` component — and
+  [decision 0014](0014-the-hub-holds-the-design-system.md) brought all three across: the
+  directory, the ISC text and the arrangement that inlines an SVG through a `?raw` import.
+  The porting guide holds the recipe for adding one.
+- **Primitives.** `Wordmark` was the only component ported with this decision; the
+  platform primitives followed under decision 0014, from Poodl's implementations. The brand
+  mark is folded into `Wordmark` rather than being a component of its own, because nothing
+  else consumes one. The ledger in the porting guide names every primitive the system
+  draws, which of them are here, and what blocks the rest.
 - **Mascot and favicon deferred.** No `MascotSlot`, and no placeholder where one would go:
   the direction page rations Biscuit hard, and a reserved hollow slot is a second break.
   `app.html` keeps its empty data-URI icon until the reduced icon-mark exists, since the
   typographic placeholder in `Wordmark` is a header lockup and not an icon. The porting
   guide records where she eventually mounts.
 
-What is not ported is most of it, and the gap is the point rather than an oversight:
-[decision 0011](0011-skeleton-not-a-second-application.md) keeps `src/` a skeleton, so the
-system's only full implementation is in a game. `tests/contrast.test.ts` has not been
-ported either. **No figure anywhere in this repository — in this record, in the ledgers
-below, or in the comments of `src/app.css` — is recomputed by any gate here.**
+What is not ported is the play surface, and that is a boundary rather than an oversight: a
+board, a tile, a key and a result mark mean something only inside the game that renders
+them, so they stay there, and the porting guide's ledger says which rows those are.
+Everything else came across under
+[decision 0014](0014-the-hub-holds-the-design-system.md), `tests/contrast.test.ts` with it,
+so every figure in this record, in the ledgers below and in the comments of `src/app.css`
+is recomputed here on every run — every figure but the separations between a game's own
+states, which `appearance.allium` assigns to the game and only Poodl's gate holds.
 
 ## Deviations from the design system as shipped
 
@@ -89,7 +100,8 @@ called its hues proposals; these are the corrections verification forced. Every 
 this section and the next was measured in Poodl at
 `c26cc4642afa6b1349db70a0f497203db3986599`, against the floors this repository now states
 as `appearance.allium`'s `minimum_text_contrast` (4.5) and `minimum_boundary_contrast`
-(3.0). Read each one as provenance. Nothing here recomputes any of them.
+(3.0). Read each one as provenance for a figure `tests/contrast.test.ts` now measures here,
+minus the separations between a game's own states, which the game measures for itself.
 
 These are the platform-level judgements — they hold for any surface wearing the system.
 
@@ -125,9 +137,9 @@ These are the platform-level judgements — they hold for any surface wearing th
   one. The exemption is only from the figures. A dimmed control still reports its state to
   the accessibility tree and still keeps every non-colour indication its live form carried.
   See [Accessibility](../explanation/accessibility.md) for the model and for the half of it
-  that is not a ratio. Nothing in this repository renders a disabled control yet, and the
-  two inks are the ones a contrast test would never have measured anyway, so they are the
-  likeliest tokens to drift again unnoticed.
+  that is not a ratio. `Button` and `IconButton` render a disabled control here now, and
+  the two inks are the ones the contrast test deliberately never measures, so they are
+  still the likeliest tokens to drift unnoticed.
 - **A control with no drawn edge owes no edge contrast.** `ghost` is `transparent` on
   transparent in the design system too, and the boundary clause used to read as though it
   owed 3.0 anyway. `EveryCombinationMeetsTheLegibilityFloor` now says a control is
@@ -153,7 +165,11 @@ values that live in Poodl's `game.allium` rather than here:
 `minimum_state_separation` and `minimum_mark_separation`. They moved tokens that are in
 `src/app.css`, so they are recorded here as the system's history — how the palette came to
 hold the values it holds — and not as this repository's own measurements. Nothing here
-renders any of these surfaces, and nothing here checks any of these numbers.
+renders any of these surfaces. Several of the numbers are nonetheless checked here, because
+the pair behind them is the palette's rather than the board's: a letter on the scored
+ground, a control's boundary against the page. What is checked nowhere here is a separation
+between two of a game's own states, which is where `minimum_state_separation` and
+`minimum_mark_separation` live and why they stay Poodl's.
 
 - **The dark absent letter is `#8e8e8e`, not neutral-7.** `#767676` measures 3.75 on the
   scored ground against a 4.5 floor. The replacement sits in the only window that clears
@@ -188,30 +204,32 @@ renders any of these surfaces, and nothing here checks any of these numbers.
 
 ## Consequences
 
-**The repository that owns the system renders almost none of it.** `Wordmark` and the
-front door spend about twenty tokens between them; the result hues, the key grounds, the
-light-only fills and every primitive above are carried and never drawn. So the design
-review this decision would most want is thin: [Chromatic](0009-visual-review-in-chromatic.md)
-diffs one component in two states, axe never sees a high-contrast palette because the
-workshop run never switches the global on, and everything else is checked by reading. That
-is the cost [decision 0011](0011-skeleton-not-a-second-application.md) accepts, stated in
-the place a designer will look for it.
+**The repository that owns the system renders it in the workshop, and on its own page
+almost not at all.** The platform primitives and the token sheet spend most of the semantic
+vocabulary; the result hues, the key grounds and the light-only fills are carried and drawn
+only on the token sheet, because a mark and a key are a game's. The design review this
+decision would most want is real now: [Chromatic](0009-visual-review-in-chromatic.md) diffs
+thirty-seven stories, the story files pin dark and dark high contrast where the look
+inverts, and the contrast test measures what axe cannot attribute. That is
+[decision 0014](0014-the-hub-holds-the-design-system.md), stated in the place a designer
+will look for it.
 
-**No gate here recomputes a ratio, and that is the single most important fact on this
-page.** `tests/contrast.test.ts` stayed in Poodl. Every figure in both ledgers, and every
-figure in the comments of `src/app.css`, is an inherited claim measured there at
-`c26cc4642afa6b1349db70a0f497203db3986599`. Two things follow. `src/app.css` is frozen for
-anything larger than a single considered change — a repaint, a ramp swap, a new semantic
-name across four palette blocks cannot be shown correct here — and a single change carries
-its own arithmetic, computed by hand against `appearance.allium`'s floors and recorded
-beside the token. Porting the contrast test is a smaller job than any of the changes it
-unblocks; [Design tokens](../design/tokens.md) states the procedure that stands until it
-lands.
+**A gate here recomputes every ratio, and that is the single most important fact on this
+page.** `tests/contrast.test.ts` stayed in Poodl when this was decided and came across
+under [decision 0014](0014-the-hub-holds-the-design-system.md). Every figure in both
+ledgers and every figure in the comments of `src/app.css` was measured in Poodl at
+`c26cc4642afa6b1349db70a0f497203db3986599` and is measured here on every run, minus the
+separations between a game's own states, which `appearance.allium` leaves to the game.
+`src/app.css` is no longer frozen — a repaint, a ramp swap, a new semantic name across four
+palette blocks is shown correct or incorrect by the gate — and a change that introduces a
+pair adds it to the test rather than computing it by hand;
+[Design tokens](../design/tokens.md) states the procedure.
 
-The committed fonts are about 240KB of repository weight and the one asset class the
-lockfiles do not govern; the provenance comment in `app.css` (package, version, tarball
-sha256) is what stands in for a lockfile there. That comment is now a two-repository fact:
-Poodl holds the same three files, and a re-extraction has to agree with both.
+The committed fonts are about 240KB of repository weight and, with the icons that followed,
+one of the two asset classes the lockfiles do not govern; the provenance comment in
+`app.css` (package, version, tarball sha256) is what stands in for a lockfile there. That
+comment is now a two-repository fact: Poodl holds the same three files, and a re-extraction
+has to agree with both.
 
 **The system reaches surfaces no gate here renders.** The hub site is published nowhere —
 [decision 0012](0012-the-domain-root-stays-with-poodl.md) leaves the domain root with Poodl
@@ -234,6 +252,10 @@ exists would be a guess with a test around it.
 
 `tests/contrast.test.ts` being ported, which is the cheapest of these and turns every
 figure above from an inherited claim into a measurement, unfreezing `src/app.css` with it.
+
+**Carried out on 2026-09-04.** [Decision 0014](0014-the-hub-holds-the-design-system.md)
+ported the test, minus the block that measured Poodl's own state separations. Every figure
+above is a measurement, and `src/app.css` is no longer frozen.
 
 The mascot arriving, which brings `MascotSlot` and the favicon in from the porting guide.
 

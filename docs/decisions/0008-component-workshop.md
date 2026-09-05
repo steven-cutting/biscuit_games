@@ -19,8 +19,10 @@ path to every operation, and four combinations of theme and high contrast to sat
 much carries over unchanged. The assumption underneath it does not, because it was that
 the application would eventually render every component itself.
 
-Here the application will not. The hub has one route and one component, which is
-[Decision 0011](0011-skeleton-not-a-second-application.md) rather than an omission, and
+Here the application will not. The hub has one route, and it mounts none of the platform
+primitives it holds — the site is the part of
+[Decision 0011](0011-skeleton-not-a-second-application.md) that
+[Decision 0014](0014-the-hub-holds-the-design-system.md) left standing — and
 the components this repository owns are the design system's — built as much for the games
 to consume as for the front door to show. A component the hub never renders has
 nowhere in the hub to be seen. The workshop is therefore not a layer over an application;
@@ -64,16 +66,16 @@ either — that is
 ## Consequences
 
 Every state of a component becomes a thing you can open, in either palette, and the
-accessibility check for it runs without anyone remembering to ask for it. Today that is one
-component and two stories. The arrangement is here before the components are, on the same
-reasoning as the rest of the gate.
+accessibility check for it runs without anyone remembering to ask for it. Today that is
+eight components, the token sheet and thirty-seven stories. The arrangement was here before
+the components were, on the same reasoning as the rest of the gate.
 
 The three defects below were found in Poodl, at the commit named above, against a palette
 this repository does not carry: `--mark-text`, `--mark-absent` and `--key-text` are its
 tokens, not these, and [Decision 0010](0010-biscuit-games-design-system.md) has since
 replaced the palette they belonged to. They are kept whole anyway, because what they teach
-is about the tool and not about a word game, and because nothing here has learned any of it
-a second time.
+is about the tool and not about a word game, and a lesson is worth more than the palette it
+was learned on.
 
 **It found a real defect on the first run, and the palette changed.** Measured against a
 white `--mark-text`: correct `#538d4e` is 3.97 to 1, present `#b59f3b` is 2.63 to 1,
@@ -112,8 +114,8 @@ Every key shows one letter. So does every tile. Both of the palette repairs abov
 found on `WelcomeScreen` and its siblings, which share the mark tokens but carry words; the
 keyboard and the board were never in scope for the rule at all. In Poodl that is checkable
 in about a minute: put an unreadable `--key-text` in `app.css` and every other component's
-stories fail while `Keyboard`'s stay green. Here the two blind spots meet in the only
-component there is. The wordmark's mark is a ruled square holding the single letter `b`,
+stories fail while `Keyboard`'s stay green. Here the two blind spots meet in the lockup.
+The wordmark's mark is a ruled square holding the single letter `b`,
 and it is `aria-hidden` as well, so axe declines to judge it twice over — which is why
 [Work in the component workshop](../how-to/work-in-the-component-workshop.md) tells you to
 measure by hand when a guarantee rests on something the tool does not report.
@@ -124,18 +126,20 @@ and it holds without qualification. And a figure recorded in prose beside a colo
 drift from the colour. In Poodl the second one was answered: `tests/contrast.test.ts`
 computes the figures over all four combinations of theme and high contrast, from the
 stylesheet on disk, so no number in a comment or a decision record is load-bearing there.
-That test was not ported. Nothing in this repository recomputes a contrast ratio, so every
-figure in this record, every figure in `src/app.css`'s comments and every figure the
-handbook quotes is an inherited claim rather than a measurement. The lesson came across and
-its remedy did not, which leaves this repository worse placed than Poodl rather than level
-with it. [Design tokens](../design/tokens.md) owns what follows from that and says which
-numbers are provenance.
+That test did not come with the workshop; it came later, under
+[Decision 0014](0014-the-hub-holds-the-design-system.md), so every figure in
+`src/app.css`'s comments is measured here on every run, and the figures in this record —
+Poodl's, from Poodl's palette — stay what they were: provenance for a lesson. The lesson
+and its remedy are both here now. [Design tokens](../design/tokens.md) owns what follows
+from that.
 
-What the stories are evidence of here is correspondingly narrow. `Wordmark`'s "Dark theme"
-story pins the dark palette and asserts that the pin reached `document.documentElement`,
-which is the element every palette in `src/app.css` is keyed on. That is evidence the
-toolbar's contract holds and that the combination renders and is looked at. It is not
-evidence about any ratio, and no story here should be read as if it were.
+What the stories are evidence of is correspondingly narrow, and the count does not change
+that. `Wordmark`'s "Dark theme" story pins the dark palette and asserts that the pin reached
+`document.documentElement`, which is the element every palette in `src/app.css` is keyed
+on, and every dark pin in the other story files rests on the same line. That is evidence
+the toolbar's contract holds and that the combination renders and is looked at. It is not
+evidence about any ratio — the contrast test is — and no story here should be read as if it
+were.
 
 The dependency surface grows sharply in a repository that pins every version by hand. Each
 direct package is pinned exactly, as invariant 4 requires, but the transitive tree under
@@ -157,7 +161,7 @@ produce at all.
 Component behaviour is expressed in two places: an assertion in `tests/` and a fixture in
 `stories/`. They can disagree, and when they do neither is the arbiter — the specification
 is. Each story cites the surface and the `@guarantee` clauses it stands for by name.
-`appearance.allium` is the only module here, so most components will cite it for their
+`appearance.allium` is the only module here, so most components cite it for their
 theme and contrast states and for nothing else; where nothing governs — `Wordmark` is brand
 rather than behaviour — the story says so and names
 [Design direction](../design/direction.md) as the authority it does answer to. Either way a
@@ -179,12 +183,12 @@ this repository pins.
 
 Poodl's third reopener was the ten surfaces getting built and the workshop costing more to
 keep than it returns — a tool for building, deletable once the building is finished. That
-one does not run in the same form here. The workshop cannot finish its job while the hub
-owns a design system it does not render, and a nearly empty `src/lib/components/` is an
-argument for the workshop rather than against it. What would end it is a replacement:
-somewhere else that shows a component in every palette with an accessibility check over it.
-Deleting it without one takes the only view of a component with it, and takes visual review
-along with it too.
+one does not run in the same form here. The workshop cannot finish its job while the hub's
+own route mounts none of the design system it holds, and a `src/lib/components/` no page
+renders is an argument for the workshop rather than against it. What would end it is a
+replacement: somewhere else that shows a component in every palette with an accessibility
+check over it. Deleting it without one takes the only view of a component with it, and takes
+visual review along with it too.
 
 ## Related pages
 

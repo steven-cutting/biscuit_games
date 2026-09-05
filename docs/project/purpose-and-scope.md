@@ -30,8 +30,11 @@ game, is intended and not yet built.
   not invent its own; it inherits this one.
 - **The Biscuit character.** Her look, her registers and her voice are settled here, once,
   rather than drifting apart in each game that uses her.
-- **Shared components.** One today: `Wordmark`, with its test and its story. A component
-  earns a place here by being wanted in more than one game, not by being written well.
+- **Shared components.** The platform primitives — `Wordmark`, `Icon`, `IconButton`,
+  `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` — each with its test and its
+  story. A component earns a place here by being a shape every game would render
+  unchanged, not by being written well; see
+  [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md).
 - **The shared specification.** `docs/specs/` holds one Allium module,
   `appearance.allium`, which decides how theme, contrast and motion behave across the
   platform.
@@ -47,9 +50,9 @@ this repository and a game actually falls is drawn in
 ## What it deliberately does not do
 
 - **It is not a game.** Nothing here is playable. There are no word lists, no board, no
-  scoring, no statistics, no sharing and no settings panel. The front end is a deliberate
-  skeleton — one route, one component — because the design system it owns is the thing
-  worth having.
+  scoring, no statistics, no sharing and no settings panel. The front end is one route,
+  and it mounts none of the components it holds: the design system is the thing worth
+  having, and the workshop is where it is seen.
   See [Decision 0011](../decisions/0011-skeleton-not-a-second-application.md).
 - **It hosts no game code.** A game's rules, its state and its screens stay in the game's
   own repository. The hub links to a game; it never contains one, and the games do not
@@ -62,9 +65,10 @@ this repository and a game actually falls is drawn in
   See [Decision 0012](../decisions/0012-the-domain-root-stays-with-poodl.md).
 - **It collects nothing.** No accounts, no analytics, no telemetry, nothing stored and
   nothing sent. See [Security model](../explanation/security-model.md).
-- **It runs no game code for anybody.** The package carries tokens, components, typefaces
-  and one specification module. It carries no rules, no state and no data, so installing it
-  gives a game a look rather than a behaviour.
+- **It runs no game code for anybody.** The package carries tokens, components, icons,
+  typefaces, one specification module, and the port and derivations that module states. It
+  carries no game rules, no state and no data, so installing it gives a game a look and the
+  appearance behaviour every game shares, never a game.
   See [Decision 0013](../decisions/0013-shared-material-travels-as-a-package.md).
 
 ## Who it is for

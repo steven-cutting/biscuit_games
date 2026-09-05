@@ -33,8 +33,9 @@ host serves without being configured.
 Prerendering has one consequence worth stating plainly: **module-scope work runs once, at
 build time, in Node.** Anything that must differ per visitor — reading a stored preference,
 asking the device a question, looking at the clock — has to happen in the browser after
-hydration, not while the page is being generated. Nothing here does any of it, which is the
-state section below.
+hydration, not while the page is being generated. The one thing here that asks the device
+a question is the preferences port, and it answers for the device's absence at build time
+itself — the side-effects section below.
 
 The build is portable across base paths. SvelteKit emits relative asset URLs, and
 `paths.base` is read from `BASE_PATH` at build time. Nothing sets `BASE_PATH` in this
@@ -47,22 +48,27 @@ records it.
 
 ```text
 routes/           assembles the page, and is the only place a store would be built
-  └── components/ renders and handles interaction
+  ├── components/ renders and handles interaction
+  ├── domain/     derives appearance from settings and device; pure
+  └── ports/      reads the device's preferences, behind an interface with a fake
 ```
 
-Two layers, and one file in each that matters. `+layout.svelte` imports `src/app.css`,
-which is what puts every route inside the same palette — see
-[Design tokens](../design/tokens.md) — and renders its children. `+page.svelte` composes
-`Wordmark` with a sentence about the platform and the list of games. That is the whole
-application.
+Four layers, and on the route one file in each of the top two that matters.
+`+layout.svelte` imports `src/app.css`, which is what puts every route inside the same
+palette — see [Design tokens](../design/tokens.md) — and renders its children.
+`+page.svelte` composes `Wordmark` with a sentence about the platform and the list of games,
+and that is the whole page. The six platform primitives, the icon set, the derivations and
+the port are held for the games and shown in the workshop; the route calls none of them
+yet.
 
-There is no `src/lib/app/`, no `src/lib/domain/` and no `src/lib/ports/`. The hub holds no
-rules, decides nothing at runtime and touches no browser global, so those directories have
-nothing to hold. They are unbuilt rather than removed: the direction of the full stack
-still governs anything that lands here, and it is described in
-[Layering and dependency direction](layering.md). A skeleton is the intended shape rather
-than an unfinished one, for the reasons in
-[Decision 0011](../decisions/0011-skeleton-not-a-second-application.md).
+There is no `src/lib/app/`. The hub holds no rules to reduce and no state that outlives a
+render, so that directory has nothing to hold. `src/lib/domain/` and `src/lib/ports/` do
+exist — the three appearance derivations, and the port that reads the device — and nothing
+on the route calls either yet; the direction of the full stack governs all of it, and it is
+described in [Layering and dependency direction](layering.md). One route is the intended
+shape of the site rather than an unfinished one, for the reasons in
+[Decision 0011](../decisions/0011-skeleton-not-a-second-application.md) that
+[Decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) left standing.
 
 ## State
 
@@ -75,23 +81,26 @@ The one piece of state the site has is stated rather than held. `src/app.html` c
 from `appearance.allium`, written into the markup so the prerendered page paints the
 platform default with no store to hydrate first. It never changes afterwards: the hub ships
 no settings control, so the `system` branch of the Appearance surface's `dark_active` is
-unreachable here today. See [Specifications](specifications.md).
+unreachable on the page today — `darkActive` in `src/lib/domain/appearance.ts` implements
+it, and its test reaches it, but nothing on the route calls it. See
+[Specifications](specifications.md).
 
 ## Side effects
 
-Nothing reaches outside the page. No storage, no clock, no randomness, no clipboard, no
-network call, and no read of a device preference in code. `src/lib/ports/` does not exist,
-because a directory of interfaces for effects nothing has yet would be machinery guarding
-nothing.
+One thing reaches outside the page: `src/lib/ports/preferences.ts` reads the device's
+colour-scheme, reduced-motion and more-contrast preferences through `matchMedia`, and
+watches them. No storage, no clock, no randomness, no clipboard and no network call, so
+that is the whole of `src/lib/ports/`.
 
 The rule that governs the first effect to arrive is in force regardless. It sits behind a
 port: an interface in the application's vocabulary, a real adapter taking its platform
 object as a defaulted argument rather than reading a global, and an in-memory fake that
 tests inject. The reasoning is in
-[Decision 0005](../decisions/0005-ports-and-fakes.md). The likeliest first one is the
-device's colour-scheme and reduced-motion preferences, the moment the hub honours the
-`system` theme instead of stating a default — but it is not built, and describing it as
-though it were would be the kind of claim this handbook exists to avoid.
+[Decision 0005](../decisions/0005-ports-and-fakes.md). The preferences port is that shape
+exactly, with one refinement the record carries a mark for: the adapter takes the host
+object rather than the `matchMedia` function, so a test reaches the absent-`matchMedia` arm
+by passing `{}` and stubs nothing. The route does not call it yet; it will the moment the
+hub honours the `system` theme instead of stating a default.
 
 ## What is not here
 

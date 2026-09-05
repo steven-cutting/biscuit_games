@@ -9,7 +9,7 @@ The `@guarantee` clauses in `docs/specs/appearance.allium` are the acceptance cr
 
 1. Read `AGENTS.md` and `docs/explanation/accessibility.md`, then read the guarantees on the `Appearance` surface.
 2. Check the legibility floor in all four combinations of theme and high contrast, not the one the change was looked at in. Text on an operable control reaches `minimum_text_contrast` against what is behind it; a control that draws a boundary reaches `minimum_boundary_contrast` against the page; a control that draws none is identified by its own words.
-3. Know what no gate here recomputes. `tests/contrast.test.ts` has not been ported, so a ratio in this repository is a claim, not a measurement. Compute it by hand and say so in the review.
+3. Know what the gate measures. `tests/contrast.test.ts` recomputes every pair the stylesheet declares in all four combinations, so a pair a change introduces is a finding until it is in that test; a game's own state separations are measured in the game, and a figure quoted without a test behind it is a claim.
 4. Check the colour obligation. Every state a component expresses carries a shape, a word, or both alongside the colour, and has an accessible name.
 5. Check the unavailable case. A control the reader cannot operate is exempt from the figures and from nothing else: it still reports its state to the accessibility tree and keeps every non-colour indication its live form carried.
 6. Check keyboard operation. Every control is reachable and invocable from the keyboard alone, with visible focus, and is a comfortable target at the narrowest supported width.

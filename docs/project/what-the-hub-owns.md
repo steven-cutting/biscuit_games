@@ -34,11 +34,12 @@ game — cites it rather than restating it, and a page that restates it is the b
 | Platform decisions | [Architecture decisions](../decisions/README.md) |
 | The design research | [Design resource index](../design/resource-index.md) and [Mobile and game design research](../design/research-report.md) |
 
-The site itself is deliberately small. `src/` is a skeleton — one route, one component,
-one stylesheet — because this repository is the source of truth first and a hub site
-second; that is [decision 0011](../decisions/0011-skeleton-not-a-second-application.md).
-Owning a subject is not the same as implementing it, and most of what this repository owns
-it owns as prose, tokens and a specification rather than as code.
+The site itself is deliberately small: one route, which is the part of
+[decision 0011](../decisions/0011-skeleton-not-a-second-application.md) that stands. What
+this repository owns it holds as code where the subject is code — the stylesheet, the
+platform primitives, the port, the contrast test — and as prose and a specification where
+it is not. [Decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) is why the
+components live here rather than in the first game that rendered them.
 
 ## What lives in a game repository
 
@@ -75,8 +76,11 @@ it changes what the platform promises.
 
 That direction of travel is not free either. A fact kept here has to survive being read by
 a repository nobody has written yet, which makes it slower and more expensive to change
-than the same fact kept in one game. Promoting something early costs exactly that, and buys
-nothing until the second consumer exists.
+than the same fact kept in one game. That cost is paid deliberately for a platform-shaped
+thing: a shape a second game would render unchanged is built here first, whether or not the
+second game exists, because a system whose only implementation is in one game is the
+arrangement decision 0001 exists to end. It is not paid for a game's own shape — promoting
+one of those early buys a false agreement the second game will have to break.
 
 ## How a fact reaches a game
 
@@ -84,9 +88,9 @@ Two ways, and the split is the point. A file travels as a package; a page travel
 citation. That is
 [decision 0013](../decisions/0013-shared-material-travels-as-a-package.md).
 
-The tokens stylesheet, the shared components, the typefaces and `appearance.allium` travel in
-`@steven-cutting/biscuit-games`. A game installs an exact version, and a change here reaches
-it as a version bump it can see, take or refuse.
+The tokens stylesheet, the shared components, the icons, the typefaces, the preferences port
+and `appearance.allium` travel in `@steven-cutting/biscuit-games`. A game installs an exact
+version, and a change here reaches it as a version bump it can see, take or refuse.
 [Published artefacts](../reference/published-artefacts.md) says what is in the package and
 what a major, a minor and a patch each mean.
 
@@ -96,10 +100,10 @@ package carries them. This handbook is published to no registry and vendored int
 
 The costs are real and worth stating plainly. The registry authenticates every read, so a
 contributor without a token cannot install at all. A game's build can now fail because of
-something that happened here, which it could not before. And a figure quoted in this
-handbook is an inherited claim rather than a measurement — `tests/contrast.test.ts` has not
-been ported, so nothing in this repository recomputes a contrast ratio. A game that renders
-a colour proves it where the test actually runs.
+something that happened here, which it could not before. And a figure this handbook quotes
+is measured here by `tests/contrast.test.ts` against the palette a game installs — but only
+the palette. A game's own components introduce pairs this repository never renders, and the
+game proves those where they run.
 
 What the arrangement buys is a name for drift. A stylesheet that has moved on is a version
 number in a lockfile rather than a difference nobody can see.

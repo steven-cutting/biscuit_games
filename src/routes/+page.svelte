@@ -2,8 +2,11 @@
   import Wordmark from '$lib/components/Wordmark.svelte';
 
   /*
-   * The front door. One page, deliberately: the hub is a skeleton while the
-   * design system it owns is the thing worth having. See decision 0011.
+   * The front door. One page, deliberately: the hub says what Biscuit Games is
+   * and links to the games, and the design system it holds is seen in the
+   * workshop rather than here. Decision 0011 is the one-route shape; decision
+   * 0014 is why the components live here now, and why this page does not yet
+   * mount them.
    *
    * Every selector below names an element rather than a class, because
    * `svelte-check --fail-on-warnings` turns an unused selector into a failed

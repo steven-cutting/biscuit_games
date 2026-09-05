@@ -56,9 +56,12 @@ remains.
 
 Prerendering has teeth. Module-scope work runs once, at build time, in Node — so anything
 per-visitor must happen in the browser after hydration, and a route that cannot be
-rendered at build time fails the build rather than shipping. With one route and no state,
-nothing here tests that rule; the first contributor to add a preference or a device query
-will meet it, and should expect to.
+rendered at build time fails the build rather than shipping. The first device query has
+arrived — `src/lib/ports/preferences.ts` asks `matchMedia`, which Node does not have — and
+it meets the rule by taking its host as a defaulted argument and answering for an absent
+`matchMedia` itself, so a prerender that reached it would get a device that asked for
+nothing rather than a crash. Nothing on the route calls it yet; the first contributor to
+wire it, or to add a stored preference, meets the rule for real and should expect to.
 
 ## What would reopen this
 

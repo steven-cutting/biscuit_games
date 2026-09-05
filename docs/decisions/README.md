@@ -34,9 +34,10 @@ unresolved ones are recorded there as `open question` blocks — see
 | [0008](0008-component-workshop.md) | A component workshop |
 | [0009](0009-visual-review-in-chromatic.md) | Visual review in Chromatic |
 | [0010](0010-biscuit-games-design-system.md) | The Biscuit Games design system |
-| [0011](0011-skeleton-not-a-second-application.md) | A skeleton, not a second application |
+| [0011](0011-skeleton-not-a-second-application.md) | A skeleton, not a second application — superseded by [0014](0014-the-hub-holds-the-design-system.md) |
 | [0012](0012-the-domain-root-stays-with-poodl.md) | The domain root stays with Poodl |
 | [0013](0013-shared-material-travels-as-a-package.md) | Shared material travels as a package |
+| [0014](0014-the-hub-holds-the-design-system.md) | The hub holds the design system |
 
 ## The numbering
 

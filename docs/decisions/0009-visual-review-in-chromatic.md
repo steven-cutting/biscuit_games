@@ -22,16 +22,18 @@ preference, so the automated pass could not reach it. That is the shape of the p
 answers a question about rules, and a rendered pixel answers a question about whether the
 thing looks right. The second question has no local answer that survives being forgotten.
 
-Those defects and those figures are Poodl's, and they are inherited rather than reproduced.
-Nothing in this repository recomputes a contrast ratio: `tests/contrast.test.ts` was not
-ported, and the tokens it measured were. So the evidence for the argument lives in the
-other repository while the argument itself applies here, which is exactly the position
-[Decision 0002](0002-shared-material-travels-by-citation.md) describes.
+Those defects are Poodl's. The figures are now measured here as well: `tests/contrast.test.ts`
+came across with the tokens it measures, under
+[Decision 0014](0014-the-hub-holds-the-design-system.md), so the evidence for the argument
+lives on both sides of the boundary rather than only in the other repository — the position
+[Decision 0002](0002-shared-material-travels-by-citation.md) described when this was
+decided.
 
 The volume argument is inherited too, and points the other way for now. Poodl's workshop
 holds a hundred and five stories across nineteen components, which is more than anyone
-re-opens by hand after a change to a stylesheet. This one holds `Wordmark` and nothing
-else. The reason to wire visual review up while the workshop is one component is that this
+re-opens by hand after a change to a stylesheet. This one held `Wordmark` and nothing
+else when the wiring was decided; it holds thirty-seven stories across nine files now. The
+reason to wire visual review up while the workshop was one component was that this
 repository is where the design system is decided and where other repositories read it from
 — a token that moves here moves in games that were not looked at when it moved.
 
@@ -161,7 +163,9 @@ is no legitimate way for that name to arrive, and the check costs a line.
 TurboSnap (`--only-changed`) is not enabled. It would cut the snapshot count sharply, but
 it depends on the builder's dependency graph and adds a way for the comparison to be wrong
 rather than merely slow. It is the obvious thing to reach for when the count starts to
-matter, which is further away here than it was in Poodl.
+matter. The count has since grown from two to thirty-seven with the port
+[Decision 0014](0014-the-hub-holds-the-design-system.md) records, which notes the question
+without answering it.
 
 ## What would reopen this
 

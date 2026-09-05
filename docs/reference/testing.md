@@ -24,27 +24,31 @@ see. Both recipes pass `--config` themselves, so neither depends on that discove
 ## Layout
 
 Tests live in `tests/`, never colocated with `src/`. Stories live in `stories/`, also at
-the repository root, one file per component — here with no exception at all. Poodl carried
-one, `Foundations.stories.svelte`, which documented the design tokens rather than a
-component; it is not carried here, because in this repository the tokens are the point
-rather than a deviation from it. [Work in the component workshop](../how-to/work-in-the-component-workshop.md)
-records that reasoning and what such a story would have to show.
+the repository root, one file per component, with one stated exception:
+`stories/Foundations.stories.svelte` documents the design tokens rather than a component,
+and [Work in the component workshop](../how-to/work-in-the-component-workshop.md) records
+why the tokens earn the exception here.
 
 | Suffix | Runner |
 | --- | --- |
 | `*.test.ts` | Vitest in jsdom. Everything in `tests/`. |
 | `*.stories.svelte` | Vitest in Chromium, driven by Storybook. Everything in `stories/`. |
+| `*.svelte` in `tests/` | None. A caller a test imports so it can write a binding in the shape a consumer writes it, matched by no glob and collected by nothing. `ButtonHost.svelte` is the only one. |
 | `*.spec.ts` | Playwright directly. Reserved. Playwright itself is installed — it supplies the browser the story run drives — but no suite of this kind exists. |
 
-Files are named for what they cover rather than mirroring a source path. With one component
-the two coincide — `tests/wordmark.test.ts` covers `src/lib/components/Wordmark.svelte` —
-but the rule is the first of those, so a suite that covers one contract across several
-source files is named for the contract.
+Files are named for what they cover rather than mirroring a source path.
+`tests/primitives.test.ts` covers four components, `tests/contrast.test.ts` covers one
+guarantee across a stylesheet, and `tests/wordmark.test.ts` happens to coincide with its
+source; the rule is the first of those.
 
-One file in `tests/` is not a test. `setup.ts` holds the single import that registers the
-jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.ts`. The
-`include` glob is `tests/**/*.test.ts`, so it is loaded and never collected — the same
-arrangement a shared fixture file would land in when one is needed.
+Two files in `tests/` are not tests. `setup.ts` holds the single import that registers the
+jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.ts`.
+`ButtonHost.svelte` is a caller: it writes `bind:element` on a `Button` and hands back what
+the binding delivered, because `bind:` is template syntax that a `.test.ts` has none of, and
+a component is the shape the consumer carrying focus across a swap actually writes. The
+`include` glob is `tests/**/*.test.ts`, so both are loaded and neither is collected.
+`stories/fixtures.ts` is the same arrangement on the story side: the two figures the plays
+measure a control against, imported by the stories that need them and never a story.
 
 ## Conventions
 
@@ -53,7 +57,7 @@ fails because a name is missing has found a real defect: it is the same informat
 screen reader uses. The front door's one link is `screen.getByRole('link', { name: 'Poodl' })`
 to whichever test reaches for it first; no route test exists yet.
 
-Text that is not a control is the stated exception, and the single test here is it. A
+Text that is not a control is the stated exception, and the wordmark's test is it. A
 wordmark has no role, so it is found by its text — and it takes two assertions, not one:
 
 ```ts
@@ -69,17 +73,19 @@ around it — which means it finds them whether or not the mark beside them is h
 Anchoring does not repair that. The mark's silence is a separate claim and takes a separate
 assertion, and without it deleting `aria-hidden` leaves the suite green.
 
-**Inject fakes; never stub a global.** There is no `src/lib/ports/` here and no side effect
-to put in one. When the first arrives it arrives behind a port that exports an in-memory
-fake alongside the real adapter, with the platform object taken as a defaulted argument.
-That is [Decision 0005](../decisions/0005-ports-and-fakes.md), a standing rule for what
-lands next rather than a description of existing code. The ban on stubbing a global applies
-now: it is not a jsdom workaround, because the story run is a real browser where a global
-would work, which is exactly why stubbing one stays forbidden.
+**Inject fakes; never stub a global.** `src/lib/ports/preferences.ts` is the first port:
+an interface, a real adapter that takes its host object as a defaulted argument, and an
+in-memory fake. `tests/preferences.test.ts` reaches every arm of the adapter by passing a
+fake `matchMedia`, an empty host and nothing at all, and stubs no global. That is
+[Decision 0005](../decisions/0005-ports-and-fakes.md) carried out. The ban is not a jsdom
+workaround: the story run is a real browser where a global would work, which is exactly why
+stubbing one stays forbidden. `Modal` reads `document.activeElement` directly, and
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) says why that is focus
+management on the component's own document rather than a side effect the rule reaches.
 
 **Callbacks are asserted through the props.** Components take callbacks as props, so a
-test passes `vi.fn()` and asserts on the call. `Wordmark` takes no props, so nothing
-exercises this yet.
+test passes `vi.fn()` and asserts on the call: every control's `onclick`, `Modal`'s
+`onclose`, `Notice`'s `ondismiss`, the chip's and the actions' in `HeaderBar`.
 
 **A new component lands with its test and its story in the same change.**
 
@@ -91,11 +97,13 @@ addon's test mode to error; the addon's own default only reports. Play functions
 same pass, which is where a guarantee about interaction becomes executable rather than
 described.
 
-Two stories are what that comes to today, both on `Wordmark`. **Lockup** holds the
-accessible text in a real browser, the same claim the unit test makes in jsdom. **Dark
-theme** pins the theme global and asserts that `data-theme` reached
-`document.documentElement`, which is the element every palette in `src/app.css` is keyed
-on — an attribute written onto a wrapper instead would satisfy no selector in that file.
+Thirty-eight stories across nine files. `Wordmark`'s **Dark theme** is the one every other
+dark pin rests on: it asserts that `data-theme` reached `document.documentElement`, which is
+the element every palette in `src/app.css` is keyed on — an attribute written onto a wrapper
+instead would satisfy no selector in that file. The plays that carry a guarantee about
+interaction are `Modal`'s focus trap, `Notice`'s keyboard dismissal, `HeaderBar`'s tab order
+and its layout at the narrowest supported width, and the target sizes `Button` and
+`IconButton` measure.
 
 Stories are fixtures, not assertions. The evidence and the coverage floor stay in `tests/`.
 And axe is not exhaustive: it skips what it cannot attribute, including anything behind
@@ -106,20 +114,31 @@ contrast rule never inspects it, and it holds a single character, which axe down
 [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
 
 The split between the two suites is by what each runner can see rather than by subject.
-jsdom holds presence and the resolved cascade; Chromium holds anything only a layout engine
-can produce — a width, a height, whether something scrolls sideways at 320px. No figure of
-that kind is taken anywhere yet, because one lockup composes nothing. The rule is stated
-ahead of the need because the first component with geometry will want it, and because the
-contrast test below is split on exactly this line.
+jsdom holds presence and the resolved cascade — the component suites and the contrast test;
+Chromium holds anything only a layout engine can produce — a control's box against the 44px
+fixture, and whether the header scrolls sideways at 320px. The contrast test below is split
+on exactly this line.
+
+`Modal`'s focus trap is the one place the split does not help, and it is worth knowing why.
+Neither suite presses Tab: both drive `@testing-library/user-event`, which computes the next
+stop in JavaScript and calls `focus()`, so the oracle is the same library in Chromium as in
+jsdom and the browser's own tab order is never consulted. Where the two agree —
+which radio of a group the keyboard stops on, which controls the layout draws, a control a
+disabled `fieldset` has turned off, a disclosure's summary — `tests/shells.test.ts` settles
+it. Where they part, nothing here can measure the difference: `user-event` scopes a radio
+group by name alone, so two forms holding a group of the same name are two groups to a
+browser and one to it. `Modal.svelte` follows the browser and says so, and the claim rests on
+the HTML specification rather than on a gate.
 
 ## Coverage
 
 v8 provider, measured over `src/lib/**`, with a 90% floor on branches, functions, lines
-and statements. Below the floor the run fails. That glob matches exactly one file today,
-`src/lib/components/Wordmark.svelte`, which makes the arithmetic unusually sharp: a second
-file landing under `src/lib/` without a test is reported at zero and takes the whole figure
-to roughly half, however completely everything else is covered.
-[Test and debug](../how-to/test-and-debug.md) works that case through.
+and statements. Below the floor the run fails. That glob matches every component, the icon
+map, the barrel, the port, the domain and `config.ts`; a file landing under `src/lib/`
+without a test is reported at zero and drags the figure down, and
+[Test and debug](../how-to/test-and-debug.md) works that case through. One arm is dead by
+construction and accepted: `Icon`'s `size` interpolation compiles to a nullish fallback no
+default can reach, and it is the one branch the glob leaves uncovered.
 
 Only the jsdom suite is measured. Vitest 4 has no per-project coverage option and the v8
 provider merges every project that ran into one report before it checks the thresholds, so
@@ -138,47 +157,43 @@ should be deleted rather than covered; see
 | Suite | Covers |
 | --- | --- |
 | `wordmark.test.ts` | That `Wordmark` renders, and that its accessible text is exactly the lockup: the mark is `aria-hidden`, so "biscuit games" is the whole of it. |
+| `icons.test.ts` | That the map and the directory agree, that every value is SVG markup restroked to 1.5 in `currentColor`, and that the ISC text is beside the files. |
+| `primitives.test.ts` | `Icon`, `IconButton`, `Button` and `HeaderBar`: role, name, press, disabled, `aria-haspopup`, `aria-current`, the sized icon, the element `Button` hands back to a caller that binds it, the brand snippet, the chip, and the actions across a rename and a repeated name. |
+| `shells.test.ts` | `Announcer`, `Notice` and `Modal`: the two live regions and their repeat-by-sequence, dismissal, and the dialog's focus, Escape and Tab contract in both directions, over the stops the keyboard really makes — a group of radios, a control the layout does not draw, one a disabled `fieldset` has turned off, and a disclosure's summary. |
+| `contrast.test.ts` | Every pair the stylesheet declares against the two floors, in all four combinations; the palette's shape; the two dark blocks and the two high-contrast sets held equal. |
+| `preferences.test.ts` | The port: the three queries, change subscription and its end, the fake, and the absent-`matchMedia` fallback reached by argument and by default. |
+| `appearance.test.ts` | The three derivations, clause by clause. |
+| `package-surface.test.ts` | Every runtime export by name, a render through the barrel, and the type exports held at compile time. |
 
-One row is the honest length of that table, and it is more useful as a measure of what is
-absent than of what is held. Everything else this repository owns — the token vocabulary,
-the design system, the appearance specification — is asserted by no test here.
+## The contrast test
 
-## The contrast test is not ported
+`tests/contrast.test.ts` reads `src/app.css` from disk, drives all four combinations of
+theme and high contrast through the root attributes, and recomputes every pair the palette
+declares against the floors `docs/specs/appearance.allium` states —
+`minimum_text_contrast = 4.5` and `minimum_boundary_contrast = 3.0`, read from
+`src/lib/config.ts`. It came from Poodl by
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), minus the block that
+measured Poodl's own state separations, which the specification leaves to the game. The
+figures in the stylesheet's comments are what it measures.
 
-`tests/contrast.test.ts` has not been ported, and porting it is the most valuable single
-thing that could be added to this repository. Nothing here recomputes a contrast ratio.
-Poodl's version read `src/app.css` from disk, drove all four combinations of theme and
-high contrast through the root attributes, and recomputed every pair the palette actually
-paints. This repository carries the whole token vocabulary in the same file, result and key
-colours included, and the figures written into its comments are Poodl's measurements
-travelling as claims — the file's own header says so. The floors are stated in
-`docs/specs/appearance.allium` as `minimum_text_contrast = 4.5` and
-`minimum_boundary_contrast = 3.0`, and no gate here reads either number.
+Three things about it are worth knowing before editing it.
 
-What axe covers instead is narrower than it looks. It judges the two words of the lockup,
-in the appearance each story selects: the default one and the dark one. No story pins high
-contrast, so two of the four combinations `EveryCombinationMeetsTheLegibilityFloor` names
-are rendered by nothing. A colour in `src/app.css` can therefore be changed to something
-illegible and `just check` will pass.
+The import. A stylesheet has to be read from disk with `node:fs` rather than imported.
+`?raw` is the idiom for pulling a file in as text, but a `.css` file is claimed by Vite's
+stylesheet pipeline first and comes back as the empty string — a test that injected that
+would assert against an empty cascade and pass on every property at once. The failure mode
+is a green test rather than a red one.
 
-## What a ported contrast test will hit
-
-The first trap is the import. A stylesheet has to be read from disk with `node:fs` rather
-than imported. `?raw` is the idiom for pulling a file in as text, but a `.css` file is
-claimed by Vite's stylesheet pipeline first and comes back as the empty string — a test
-that injected that would assert against an empty cascade and pass on every property at
-once. It is worth knowing about because the failure mode is a green test rather than a red
-one.
-
-The second is what jsdom can and cannot see, and it is the whole reason evidence of this
-kind ends up split across both suites. jsdom resolves custom properties, `touch-action`,
-`user-select` and the logical size floors, so the cascade is real and a colour computation
-can be taken there at all. It has no layout engine, so `getBoundingClientRect()` returns
-zeros and no figure that depends on layout can be taken there — every one of those belongs
-in a story, measured in Chromium. And it answers no media query, so the dark palette is
-reachable only by attribute: `src/app.css` declares that palette a second time under
-`prefers-color-scheme: dark`, and the only way a jsdom test covers both routes is to read
-the two blocks as text and hold them equal. That duplication is here, unmeasured.
+What jsdom can and cannot see, which is the reason evidence of this kind is split across
+both suites. jsdom resolves custom properties, `touch-action`, `user-select` and the
+logical size floors, so the cascade is real and a colour computation can be taken there —
+with one wrinkle the test's `token()` helper walks: jsdom reports `var(--background)`
+rather than substituting it. It has no layout engine, so `getBoundingClientRect()` returns
+zeros and every figure that depends on layout belongs in a story, measured in Chromium. And
+it answers no media query, so the dark palette is reachable only by attribute: `src/app.css`
+declares that palette a second time under `prefers-color-scheme: dark`, and the test covers
+both routes by reading the two blocks as text and holding them equal, and the two
+high-contrast blocks to the same set of names.
 
 Its CSS parser also drops `-webkit-tap-highlight-color` and `-webkit-touch-callout`, both
 declared in `src/app.css`, so they resolve to nothing whether or not they were declared. A
@@ -186,6 +201,14 @@ story can recover the first from Chromium. The second cannot be recovered by eit
 because desktop Chromium does not report it and the platform it is written for is iOS
 Safari, which leaves it to a check on a real phone; see
 [Accessibility](../explanation/accessibility.md).
+
+Axe is the other half, and narrower than it looks: it judges one rendered story in the
+appearance its globals select, so a palette is covered when a story pins it and never
+automatically. Every story file that draws something pins dark, and dark high contrast where
+the look inverts; `Announcer`'s does not, because a visually hidden live region looks the
+same in every palette and pinning one would prove nothing. A
+colour changed to something illegible fails the contrast test in every combination before
+any story is rendered.
 
 ## Related pages
 

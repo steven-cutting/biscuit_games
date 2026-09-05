@@ -35,8 +35,10 @@ config file, with a comment saying why. Nothing here has needed that yet.
 `eslint.config.js` turns no rule off or down on the project's own account: it adopts the
 recommended sets whole, and every per-file block in it scopes a parser or the type
 program rather than excusing a rule, each with its reason written beside it. Poodl
-carries two such exceptions and neither was ported, because an exception is an argument
-about a particular body of code and this repository has not yet made one. The first
+carries two such exceptions and neither was ported: an exception is an argument about a
+particular body of code, and the platform primitives came across without needing either —
+the one place Poodl's template-expression override would have fired, a pixel width in a
+story, is written as a string instead. The first
 exception added here carries its reason in `eslint.config.js`, where the rule lives.
 
 ## Unreachable is not untested
@@ -47,14 +49,17 @@ while building Poodl rather than covered by contrived tests — a bounds check a
 modulo, a null fallback after an exhaustive assignment, and a defensive default that no
 caller could trigger. The rule came over with the toolchain: `Wordmark.svelte` refuses a
 prop for a game name in its own docblock, on the grounds that a prop nothing here uses
-would be a branch with nothing to cover it.
+would be a branch with nothing to cover it, and `HeaderBar` takes a game's lockup as a
+snippet for the same reason rather than as a name with a branch behind it. `Modal`'s
+focus handoff is an attachment rather than a bound element for the same reason again: the
+bound form carries an arm for an element that is never unset.
 
-The corollary: do not chase the last few percent. The floor is 90, and the suite
-currently reports 100 on all four measures over `src/lib/**` — one component, one test,
-no branches at all. That figure is a floor being proved to work rather than an
-achievement, and it says nothing about what the number will look like once components
-with real behaviour arrive. When it falls back towards the floor, the answer is still not
-a contrived test.
+The corollary: do not chase the last few percent. The floor is 90, and the suite reports
+100 on statements, functions and lines over `src/lib/**` and one branch short of it — the
+compiled arm `Icon`'s size interpolation carries and no default can reach, which
+[Testing](../reference/testing.md) records as dead by construction. That is the figure a
+real component set produces, and it is the reason the floor is 90 and not 100: a branch
+the compiler emits and no input reaches is not a gap in the tests.
 
 ## Tests inject, they do not stub
 
@@ -64,12 +69,14 @@ not evidence that anything works.
 
 Stubbing a global is banned outright, and
 [decision 0005](../decisions/0005-ports-and-fakes.md) is what makes the ban affordable:
-when a side effect arrives it sits behind a port, and the real adapter takes its platform
-object as a defaulted argument rather than reading a global. That rule is worth more here
-than it sounds, because the test environment came over unchanged and provides no
-`localStorage` and no `navigator.clipboard` at all. Nothing in this repository has a side
-effect yet — the one component takes no props and touches no platform — so until the
-first one lands the rule is held by review rather than by a failing test.
+a side effect sits behind a port — `src/lib/ports/preferences.ts` is the first — and the
+real adapter takes its platform object as a defaulted argument rather than reading a
+global, so `tests/preferences.test.ts` reaches every arm of it by passing a host in. That
+rule is worth more here than it sounds, because the test environment came over unchanged
+and provides no
+`localStorage`, no `navigator.clipboard` and no `matchMedia` at all. The preferences port
+is the one side effect, and its test is what holds the rule: an adapter that reached for
+the global would fail in jsdom, and one that takes its host as an argument runs.
 
 ## The specification is the arbiter
 

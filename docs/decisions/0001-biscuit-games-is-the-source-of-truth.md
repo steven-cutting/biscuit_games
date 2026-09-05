@@ -78,11 +78,15 @@ games disagreeing about what turning high contrast on means. Naming that is not 
 and one in the game, where it takes effect — with an unbounded gap between them during
 which both repositories are self-consistent and only one is correct.
 
-**The hub owns a design system while holding almost none of its implementation.** `src/` is
-a skeleton on purpose ([decision 0011](0011-skeleton-not-a-second-application.md)): one
+**The hub owns a design system, and now holds it.** When this was decided `src/` was a
+skeleton on purpose ([decision 0011](0011-skeleton-not-a-second-application.md)): one
 route, one component, and a token vocabulary in `src/app.css` that this repository mostly
-does not render. Ownership here means the vocabulary and the reasoning behind it, not a
-library anything installs.
+did not render, so ownership meant the vocabulary and the reasoning behind it.
+[Decision 0013](0013-shared-material-travels-as-a-package.md) made it a library a game
+installs, and [decision 0014](0014-the-hub-holds-the-design-system.md) put the
+implementation here — the platform primitives, the icons, the contrast test and the port —
+so the hub is authoritative over material it holds rather than material a game renders on
+its behalf. The route still mounts almost none of it.
 
 **The platform now has a record that outlives any one game.** A decision written here
 survives Poodl being rewritten, retired or replaced. That is the return on every cost

@@ -10,9 +10,8 @@ requires: []
 
 About half an hour, from a fresh clone to a green gate — the first run downloads a browser
 and a checker. The change is small on purpose; what matters is that it passes through every
-layer the repository has. There are fewer layers here than in a game: `src/` is deliberately
-a skeleton ([decision 0011](../decisions/0011-skeleton-not-a-second-application.md)), so the
-loop is a specification, the one component, its test, its story, and the gate.
+layer the repository has. There are fewer layers here than in a game — no rules, no state,
+no data — so the loop is a specification, a component, its test, its story, and the gate.
 
 ## 1. Get the workspace running
 
@@ -70,11 +69,11 @@ be looked at in; it names `config.minimum_text_contrast` (4.5) and
 raises the floor nowhere, being a second palette that clears the same bar rather than the
 version where legibility is finally attended to.
 
-Then note what this repository does not do with it. Nothing here recomputes those ratios
-against the palette: Poodl's `tests/contrast.test.ts` was not ported, so both figures are an
-inherited claim carried by `src/app.css`, not a measurement taken on this side. The axe pass
-in the workshop sees only what a story actually renders. Reading the guarantee is the
-obligation, and no gate will read it for you.
+Then note what this repository does with it. `tests/contrast.test.ts` recomputes those
+ratios against the palette in all four combinations, so both figures are measured here on
+every run of `just check`; the axe pass in the workshop sees only what a story actually
+renders. Reading the guarantee is still the obligation — the test holds the figures, not
+the reasoning.
 
 ## 4. Add a case to the test
 
@@ -109,8 +108,9 @@ just storybook-test
 
 Every story renders in real Chromium with axe run over it, so a new state is a new axe pass
 in that combination: evidence about what is rendered there, not about the ratios the
-specification names. The rule is the one every change here follows — the component change,
-its Testing Library assertion and its story land in the same commit.
+specification names, which `tests/contrast.test.ts` measures in the same gate. The rule is
+the one every change here follows — the component change, its Testing Library assertion and
+its story land in the same commit.
 
 ## 6. Run the whole gate
 
@@ -136,8 +136,8 @@ where this loop ends.
 
 ## What you just touched
 
-A specification you read and did not change, the one component this repository has, its test,
-its story, and the gate. That is the whole loop; every change after this one is the same
+A specification you read and did not change, one component, its test, its story, and the
+gate. That is the whole loop; every change after this one is the same
 shape, and adding a component to the design system is this shape with
 [Port a design system component](../how-to/port-a-design-system-component.md) in front of it.
 

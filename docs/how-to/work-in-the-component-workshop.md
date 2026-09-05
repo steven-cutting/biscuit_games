@@ -9,11 +9,11 @@ requires: []
 # Work in the component workshop
 
 The workshop is Storybook, served locally. It renders one component at a time, in every
-state its surface names, in either palette, with the accessibility check running as you
-go. Here it is not a convenience. The hub has one route and one component, so the workshop
-is the only way to see a component at all, and it is where the design system's components
-get built before any game consumes one. Why it exists is in
-[Decision 0008](../decisions/0008-component-workshop.md).
+state its surface names, in either palette, with the accessibility check running as you go.
+Here it is not a convenience. The hub has one route, and its front door mounts none of the
+platform primitives yet, so the workshop is the only way to see a component at all, and it
+is where the design system's components are built before any game consumes one. Why it
+exists is in [Decision 0008](../decisions/0008-component-workshop.md).
 
 ## Run it
 
@@ -54,27 +54,22 @@ installs the system libraries Chromium links against.
 
 ## Where stories live
 
-Stories live in `stories/` at the repository root, one file per component. The layout rule
-and what the story run proves are in [Testing](../reference/testing.md).
+Stories live in `stories/` at the repository root, one file per component, plus
+`stories/fixtures.ts` for the two figures the plays measure against. The layout rule and
+what the story run proves are in [Testing](../reference/testing.md).
 
-Today there is exactly one file, `stories/Wordmark.stories.svelte`, because there is
-exactly one component. That is
-[Decision 0011](../decisions/0011-skeleton-not-a-second-application.md) rather than an
-omission: this repository is a skeleton and a source of truth, and a component lands here
-when a game needs it, not before.
+`stories/Foundations.stories.svelte` is the one exception to one-file-per-component, and it
+is recorded here as one: it documents the palette, the type ramp, the spacing scale and the
+radii rather than a component. Poodl carried the same exception; here the tokens are the
+vocabulary this repository owns, so specimens of them are the point rather than a deviation
+from it. The palette is pinned in its dark and dark high-contrast forms, where the values
+were designed first.
 
-No Foundations story exists yet. Poodl carried `stories/Foundations.stories.svelte` as the
-one recorded exception to one-file-per-component, documenting the palette, type ramp,
-spacing and radii rather than a component. Here the tokens are not an exception to
-anything. `src/app.css` is the vocabulary this repository owns, so specimens of it are the
-point rather than a deviation from it, and writing that story is the natural next
-component-shaped change. What it would have to show is in [Tokens](../design/tokens.md).
-
-One caution about specimens: they are for looking at. Nothing in this repository
-recomputes a contrast ratio — `tests/contrast.test.ts` was not ported — so every figure
-the handbook quotes is inherited from Poodl rather than measured here. A specimen that
-printed a ratio beside a swatch would be printing a claim, and it would drift from the
-colour the moment the colour moved.
+One caution about specimens: they are for looking at. `tests/contrast.test.ts` measures
+every pair in all four combinations, so a specimen that printed a ratio beside a swatch
+would be printing a figure the test already holds — and one that would drift from the
+colour the moment the colour moved. The sheet shows the colour; the test states the
+number.
 
 ## Write a story
 
@@ -105,8 +100,9 @@ element per state.
 ```
 
 `Wordmark` takes no props, so it needs no args. A component that takes props declares them
-as a typed constant — `const pressed: ComponentProps<typeof Button> = { … }` — and passes
-it to a story as `args`.
+as typed constants and passes them to a story as `args`;
+`stories/HeaderBar.stories.svelte` is the worked example, including a `template` snippet
+that passes a `brand` snippet through.
 
 Imports reach into `src/` with a relative path, matching `tests/`.
 
@@ -119,17 +115,17 @@ Four rules on top of the format:
    so most components will cite it for their theme and contrast states and for nothing
    else. Where nothing governs — `Wordmark` is brand rather than behaviour — say so in the
    story's description and name the authority it does answer to, which is
-   [Design direction](../design/direction.md).
+   [Design direction](../design/direction.md). The shells govern nothing of their own
+   either: `Modal`, `Notice` and `Announcer` each say which kind of product guarantee they
+   exist to discharge, and cite `appearance.allium` for the colour clause.
 2. **A story is a fixture, not an assertion.** The evidence still lives in `tests/`, and the
    coverage floor is still earned there.
-3. **Never touch a browser global.** There is no `src/lib/ports/` in this repository, and
-   there will not be one until the first side effect arrives; when it does, it arrives
-   behind a port with an in-memory fake beside it — that is
-   [Decision 0005](../decisions/0005-ports-and-fakes.md), a standing rule rather than a
-   description of existing code. The rule is stated here because the story run is a real
-   browser, so `localStorage` and the clipboard exist and would work. A story that reached
-   for one would pass and prove nothing. Construct the component against the fake, as
-   `tests/` does.
+3. **Never touch a browser global.** `src/lib/ports/preferences.ts` is the port that
+   exists, with `createFakePreferences` beside the real adapter — that is
+   [Decision 0005](../decisions/0005-ports-and-fakes.md) carried out. The rule is stated
+   here because the story run is a real browser, so `matchMedia`, `localStorage` and the
+   clipboard exist and would work. A story that reached for one would pass and prove
+   nothing. Construct the component against the fake, as `tests/` does.
 4. **Reach for a play function when the guarantee is about interaction.** A story that tabs
    to a control and activates it is executable evidence in a way a rendered picture is not.
    The two on `Wordmark` are the worked examples of the smaller case. The first takes two
@@ -139,7 +135,8 @@ Four rules on top of the format:
    mark's silence is a separate claim and takes a separate assertion —
    [Testing](../reference/testing.md) is the full account. The second asserts that pinning
    the dark theme reached `document.documentElement`, which is the element every palette in
-   `src/app.css` is keyed on.
+   `src/app.css` is keyed on. `Modal`'s focus trap and `HeaderBar`'s narrowest-width story
+   are the worked examples of the larger case.
 
 A story that needs composition — a wrapper, a sibling, children of its own — either sets
 `asChild` and supplies children, which ignores args, or supplies a snippet named `template`,
@@ -155,13 +152,14 @@ the attribute is present only when the setting is on and the device is not askin
 The route does less than that — `src/app.html` writes the attribute flat and reads no device
 preference — so the workshop is the more faithful of the two, and this is one place a story
 is not showing you what the hub does today. A story pins a value with a `globals` prop, which
-beats the toolbar and disables the matching control, as the wordmark's "Dark theme" story
-does.
+beats the toolbar and disables the matching control, as the dark pin in every story file
+that draws something does.
 
 Reduced motion is a simulation, labelled as one: it freezes declarative motion in the
-preview but cannot make the browser report the preference. Nothing in the hub animates yet
-— every duration token is zero until `data-animations` says otherwise — so that control is
-here for the components still to come.
+preview but cannot make the browser report the preference. `Modal`'s arrival is the one
+keyframed animation here and the controls' colour transitions are the rest, all of them
+gated on `data-animations` — every duration token is zero until the attribute says
+otherwise — so that control has something to freeze.
 
 Check both palettes before you finish. Colour never carries meaning alone here, which is
 `AppearanceNeverCarriesMeaningAlone` in `appearance.allium`, and high contrast changes
@@ -185,7 +183,7 @@ to error; its own default only reports.
    inspects it at all. It also downgrades an element whose visible text is a single
    character to *incomplete*, which reports without failing, and that square holds one
    letter. Measure by hand when a guarantee rests on something the tool does not report,
-   and remember that nothing in this repository will recompute the figure for you.
+   and if the thing is a colour pair, add it to `tests/contrast.test.ts`, which will.
 5. **If a rule is genuinely wrong for this project**, configure it once, where the
    configuration lives, with a stated reason. The rule about suppressions does not bend for
    this tool; see [Quality philosophy](../explanation/quality-philosophy.md).

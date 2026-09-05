@@ -12,10 +12,11 @@ requires: []
 
 ## Context
 
-This repository has no side effect. `src/lib/ports/` does not exist, and nothing here
-reads storage, asks for the time, draws a random number or touches the clipboard. That is
-the honest state of a skeleton — [Decision 0011](0011-skeleton-not-a-second-application.md)
-records why — rather than an omission waiting to be filled in.
+When this was decided the repository had no side effect: `src/lib/ports/` did not exist,
+and nothing here read storage, asked for the time, drew a random number or touched the
+clipboard. That was the honest state of the skeleton
+[Decision 0011](0011-skeleton-not-a-second-application.md) chose, rather than an omission
+waiting to be filled in.
 
 The first one is already named, though. `docs/specs/appearance.allium` opens with a
 `given` block declaring three preferences the reader expressed to their operating system
@@ -24,8 +25,8 @@ and not to Biscuit Games: `prefers_dark_colour_scheme`, `prefers_reduced_motion`
 implements the `Appearance` surface has to go and ask the device for all three, and asking
 the device is a side effect however small the answer is.
 
-So this record is a standing rule for the port that arrives, not a description of code
-that exists. It is written now, while there is nothing to correct, because the alternative
+So this record was written as a standing rule for the port that would arrive, ahead of the
+code, because the alternative
 is writing it after the first `matchMedia` call has already been made inline in a
 component and every test that touches that component has learned to stub a global.
 
@@ -40,6 +41,11 @@ Tests inject fakes. Stubbing a global is banned.
 
 The directory is created by the first port and not before.
 
+**Carried out on 2026-09-04.** `src/lib/ports/preferences.ts` is the first port, brought
+across by [decision 0014](0014-the-hub-holds-the-design-system.md) with one change to the
+adapter: its defaulted argument is the host object rather than the `matchMedia` function, so
+every arm is reached by argument and no global is stubbed.
+
 ## Consequences
 
 The domain and the components stay testable without a browser, and time, randomness and
@@ -50,9 +56,10 @@ that came with the toolchain. Under Node 26 with jsdom there is no `localStorage
 own experimental global shadows jsdom's and stays undefined — and no `navigator.clipboard`
 at all. Code that read either global directly would be untestable here. Because the
 adapters take theirs as arguments, both real code paths still run under test. jsdom's
-`window` arrives without `matchMedia` in the same way, so the appearance port will meet
-the same wall on the day it is written; a defaulted argument is what lets its real adapter
-be exercised rather than skipped.
+`window` arrives without `matchMedia` in the same way, and the preferences port met that
+wall on the day it was written: its adapter takes the host object as the defaulted
+argument and answers for an absent `matchMedia` itself, so `tests/preferences.test.ts`
+exercises the real adapter with a fake host, an empty one and none at all.
 
 There is a cost, and it is proportionally larger here than it was in Poodl. Poodl spread
 the ceremony across several boundaries. A hub site may only ever have one, and an
@@ -65,10 +72,10 @@ No tool checks any of this. The rule is enforced by review, by the `component-ch
 `code-review` skills, and indirectly by the 90% coverage floor over `src/lib/**`, which
 turns hard to test into a failing run.
 
-The record has to be read as an instruction rather than an inventory. A contributor
-looking for `src/lib/ports/` will not find it, and should not conclude that the rule was
-dropped. [Layering and dependency direction](../explanation/layering.md) says the same
-thing from the other side.
+The record is an instruction first and an inventory second. A contributor looking for
+`src/lib/ports/` finds one file, and the shape of that file is the rule.
+[Layering and dependency direction](../explanation/layering.md) says the same thing from the
+other side.
 
 ## What would reopen this
 

@@ -9,8 +9,22 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- The design system's implementation, ported from Poodl at
+  `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`: `Icon` and the 22 restroked Lucide SVGs with
+  their ISC text; `IconButton`, `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer`,
+  each with a test and a story; `createMediaPreferences` and `createFakePreferences`, the
+  first port; `darkActive`, `animationsActive` and `highContrastActive`, the three
+  derivations `appearance.allium` states; the types `IconName`, `ThemeChoice`,
+  `PreferencesPort`, `FakePreferences`, `MatchMedia`, `MediaQueryListLike` and
+  `DeviceAnswers`; `tests/contrast.test.ts`, which measures every pair the stylesheet
+  declares in all four combinations of theme and high contrast against the floors
+  `src/lib/config.ts` mirrors from the specification; and `stories/Foundations.stories.svelte`,
+  the token sheet. The play-surface primitives stay in Poodl. See
+  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md).
+
 - A published package. `@steven-cutting/biscuit-games` on GitHub Packages carries the token
-  vocabulary, the shared components, the two committed typefaces and
+  vocabulary, the shared components and the icons they draw, the preferences port and the
+  appearance derivations, the two committed typefaces and
   `docs/specs/appearance.allium`. A game repository installs an exact version rather than
   holding a copy, so drift becomes a version bump instead of a silent divergence.
   `docs/reference/published-artefacts.md` is the interface and
@@ -36,6 +50,27 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Decision 0011 is superseded by 0014 and marked rather than deleted: a platform-shaped
+  component is built here first, whether or not a second consumer exists. Decision 0010 is
+  narrowed, and its contrast-test reopener and decision 0005's first-port paragraph each
+  carry a *carried out* mark.
+
+- `HeaderBar` and `Notice` are generalised from Poodl's contracts — a `brand` snippet, a chip
+  and a list of actions; a `message` and a `tone` — so a game supplies its own words, and the
+  preferences adapter takes its host object rather than a `matchMedia` function, so every
+  arm is reached by argument. `docs/operations/poodl-handover.md` carries what each costs
+  Poodl when it consumes the package.
+
+- `package.json`'s `files` excludes `dist/assets/fonts` rather than all of `dist/assets`, so
+  the icons reach the tarball, and `just package-smoke` renders an icon and a button in the
+  scaffolded consumer and asserts the SVG markup arrived. `src/lib/assets/icons/raw.d.ts`
+  keeps the emitted declarations typed as strings.
+
+- The handbook describes the repository as it now is. The tokens, accessibility, testing,
+  layering, repository-map, workshop and porting pages are rewritten around the port, and
+  every page that said nothing here measured a ratio is corrected. Five heading anchors
+  changed; the handover page lists them.
+
 - Chromatic is live. `CHROMATIC_PROJECT_TOKEN` was set on 2026-09-03 and build 1 published and
   auto-accepted on `main`. Six places still said no project existed; each has been corrected,
   and the application id and permalink are recorded once in
@@ -56,8 +91,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `src/app.css` did **not** move, and that is the notable part. `svelte-package` emits
   `src/lib/` and nothing else, so the obvious reading is that the stylesheet had to move to be
   shippable. It did not: CSS needs no compilation, so `files` and `exports` publish it from
-  where it lives, the three `@font-face` URLs need no edit, and the file this repository calls
-  frozen stayed frozen. The alternative was eighty edits to prose that is currently true.
+  where it lives, the three `@font-face` URLs need no edit, and the stylesheet stayed put.
+  The alternative was eighty edits to prose that was true at the time.
 
 - The repository itself, bootstrapped from Poodl at commit
   `c26cc4642afa6b1349db70a0f497203db3986599`. Biscuit Games is now the platform's source of
@@ -83,10 +118,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - The design system's token vocabulary. `src/app.css` comes over whole, with Bricolage
   Grotesque and Instrument Sans as committed latin-subset variable woff2 files and their OFL
-  texts. `docs/design/tokens.md` is the owning page. The application around it is
-  deliberately a skeleton — one route and one component, `Wordmark`, with its test and its
-  story — which is
-  [decision 0011](docs/decisions/0011-skeleton-not-a-second-application.md).
+  texts. `docs/design/tokens.md` is the owning page. The application around it was, at
+  first, a skeleton — one route and one component, `Wordmark`, with its test and its story —
+  which was [decision 0011](docs/decisions/0011-skeleton-not-a-second-application.md); the
+  platform primitives followed under 0014, above.
 
 - Ten agent skills under `.agents/skills/`, with the thin `.claude/` and `.codex/` bridges.
   `word-list-change` did not come over, `svelte-change` became `component-change`, and
@@ -98,6 +133,44 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   decision created: what a version bump carries, and what still travels by citation and no
   number describes.
 
+### Fixed
+
+Three defects the automated reviewers on pull request 3 found in the ported primitives, none
+of which any gate here could see. Nothing is released, so no version moves and no consumer
+took any of them; the entries are here because the components above are the artefact.
+
+- `Modal`'s focus trap works out which of a panel's controls the keyboard really stops on
+  rather than trusting `querySelectorAll` to say. A CSS selector is not the sequential focus
+  order: it matches every radio of a group where the keyboard stops on one, it matches a
+  control the layout does not draw, one a disabled `fieldset` has turned off, one carrying
+  `tabindex="-1"`, and an `input[type="hidden"]`, none of which the keyboard visits; and it
+  misses a disclosure's `<summary>` and an editable region, which it does. A match of the
+  first kind standing last meant the wrap never fired and the Tab that should have returned to
+  Close carried focus out to the page the dialog had declared `aria-modal` over — where Escape
+  no longer closes it either, because the handler is on the panel; one of the second kind was
+  simply unreachable. Three contracts were generalised on the way over; this is the first
+  place the ported *behaviour* parts from Poodl at
+  `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`, whose copy carries the same defect;
+  [the Poodl handover](docs/operations/poodl-handover.md) records what that costs Poodl.
+- `HeaderBar` keys its actions by position rather than by label. A label is the name a reader
+  hears and nothing in the contract asks two of them to differ, so keying on it took the whole
+  header down on a repeated name and threw away the focused control whenever a toggle was
+  renamed by the press that operated it — which is the ordinary shape of a chrome action.
+- The 4px lift in `Modal`'s arrival carries the comment the coincident-literal rule asks for.
+  It matches `--s-2` by value and not by meaning, and the component now says so, the way
+  `Button`'s 48px and `HeaderBar`'s 56px already did.
+
+Two gaps in the evidence rather than in the code, found by the same review:
+
+- `tests/contrast.test.ts` measures text on `--surface` — the ground a `Modal` panels itself
+  in — and the pressed ring on the four grounds beyond the two a game's keys sit on. Neither
+  can fail under the palette as it stands; they are here because this file's method is to
+  enumerate the pairs the stylesheet paints rather than to reason about which of them a
+  tighter pair already implies.
+- `Button`'s bindable `element` has a test. It is the library's only bindable prop and the
+  handle `Modal` says a child carries focus across its own swap by, and deleting the binding
+  left the whole suite green.
+
 ### Deliberately not included
 
 - Any deployment. There is no Pages workflow, no `site-root/`, no staging script and no
@@ -105,11 +178,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   move rather than an addition. See
   [decision 0012](docs/decisions/0012-the-domain-root-stays-with-poodl.md).
 
-- `tests/contrast.test.ts`. Nothing in this repository recomputes a contrast ratio, so every
-  figure in `src/app.css` is inherited from the tree where it was measured rather than
-  measured here. It is the most valuable single thing that could be added next, and until it
-  lands the stylesheet should be treated as frozen for anything larger than one considered
-  change.
+- The play-surface primitives — `Tile`, `Board`, `Keyboard`, `PhysicalKeyboard`,
+  `DistributionChart` and `HowToPlay` — and the block of Poodl's contrast test that measures
+  Poodl's own state separations. Both are a game's, and
+  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md) says why.
 
 - Poodl's own edits. This repository records what Poodl has to change in
   `docs/operations/poodl-handover.md`; it does not change it.

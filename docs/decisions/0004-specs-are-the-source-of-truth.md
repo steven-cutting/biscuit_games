@@ -61,11 +61,12 @@ The checking is uneven, and the weak half is the half that matters. `allium` is 
 and pinned here ([decision 0007](0007-project-managed-allium-cli.md)); `just check-specs`
 and `just analyse-specs` are gates, and both report empty diagnostics and empty findings.
 That proves the module parses and analyses clean. It proves nothing about whether anything
-obeys it. Nothing in this repository recomputes a contrast ratio —
-`tests/contrast.test.ts` was not ported — so `EveryCombinationMeetsTheLegibilityFloor` is
-an obligation stated rather than an obligation measured, and the figures quoted around it
-in this handbook are inherited claims, not measurements. No gate here can see a game
-repository at all, so downstream conformance is enforced by attention alone.
+obeys it. `tests/contrast.test.ts` measures `EveryCombinationMeetsTheLegibilityFloor` over
+every pair the stylesheet declares, in all four combinations, and `tests/appearance.test.ts`
+holds the three derivations the `Appearance` surface states clause by clause — so the
+obligations this module states are measured here as far as this repository implements
+them, which is [decision 0014](0014-the-hub-holds-the-design-system.md). No gate here can
+see a game repository at all, so downstream conformance is enforced by attention alone.
 
 ## What would reopen this
 

@@ -28,7 +28,7 @@ ethics is worth reading either way. Where the report and this repository disagre
 [Purpose and scope](../project/purpose-and-scope.md), the decision records and the Allium
 specifications win.
 
-Nothing here is a measurement taken in this repository. Every figure the report quotes —
+Nothing in this report is a measurement taken in this repository. Every figure it quotes —
 the Core Web Vitals thresholds, the WCAG target sizes, the specification release dates —
 is an inherited claim from the source the surrounding text names, and no check here
 recomputes any of them.

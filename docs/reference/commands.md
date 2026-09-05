@@ -56,9 +56,9 @@ The full account is in [Develop locally](../how-to/develop-locally.md#do-not-ins
 | `just storybook` | The component workshop on port 6006, with hot module replacement. |
 | `just frontend-watch [path]` | Vitest in watch mode over one path, or over everything. The iteration loop; it never exits, so it is not a gate. Pins `vite.config.ts`, so the browser project stays out of it. |
 
-The hub is one route and one component, so `just storybook` is where most work happens and
-`just dev` is where you confirm the route still assembles. See
-[A skeleton, not a second application](../decisions/0011-skeleton-not-a-second-application.md).
+The hub is one route that mounts none of the components it holds, so `just storybook` is
+where most work happens and `just dev` is where you confirm the route still assembles. See
+[The hub holds the design system](../decisions/0014-the-hub-holds-the-design-system.md).
 
 ## Format and repair
 

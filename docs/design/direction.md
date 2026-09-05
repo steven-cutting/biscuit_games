@@ -239,10 +239,9 @@ seconds on comprehension. Three other things carry the differentiation instead:
    screen, and it is the cheapest differentiation available.
 
 The first two are not paint. Both move figures answerable to the floors
-`docs/specs/appearance.allium` states in its `config` block, and nothing in this repository
-recomputes them: `tests/contrast.test.ts` has not been ported here, so every ratio quoted in
-`src/app.css` is an inherited claim rather than a measurement, and
-[Design tokens](tokens.md) records that. The second also changes the lightness scheme
+`docs/specs/appearance.allium` states in its `config` block, and `tests/contrast.test.ts`
+measures every one of them here, in all four combinations — [Design tokens](tokens.md)
+records how. The second also changes the lightness scheme
 `src/app.css` documents at length — a key nothing is known about hugs the page, a scored key
 steps away from it. That scheme is what telling an untried key from a scored one costs, and
 it survives a dimmed screen that takes the hues with it. The guarantee naming that

@@ -23,8 +23,8 @@ behaviour.
 | Hub | The static site this repository builds: one route that says what Biscuit Games is and links out to each game. It is the front door, and the site itself is published nowhere. |
 | Shared surface | Material this repository is authoritative for on every game's behalf — a token, a shared component, a specification surface, a decision record. Changing one changes every game, which is why what counts is enumerated in [What the hub owns](what-the-hub-owns.md) rather than assumed. Narrower than it sounds: the Allium `surface` below is one boundary in one module. |
 | Token | A named value in `src/app.css`: a colour, a space, a type step, a duration, a font face. Components name tokens. They do not write the values. |
-| Primitive | A shared component with no game in it. `Wordmark` is the only one that exists here; the rest are ported one at a time, and only once a second consumer asks for the same shape. |
-| Consumer | Whatever takes a shared surface and uses it — a game repository, the hub's own route, a story, a test. A shape with one consumer is not shared material yet. |
+| Primitive | A shared component with no game in it. Eight exist here; the rest are ported one at a time, and a platform-shaped one is ported ahead of its second consumer — see [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md). |
+| Consumer | Whatever takes a shared surface and uses it — a game repository, the hub's own route, a story, a test. A shape only one game could ever render is not shared material, however many consumers it has. |
 | Break | The single deliberate warm exception the operating rule allows: perfect, broken once, on purpose, and the break is always Biscuit. A decision with none is cold; a decision with two is noise. See [Design direction](../design/direction.md). |
 
 ## The repository
@@ -34,7 +34,7 @@ behaviour.
 | Specification | An `.allium` file under `docs/specs/`. Decides behaviour. There is exactly one today, `appearance.allium`, and it decides how everything here looks. |
 | Surface | A boundary in a specification: what is exposed, what operations are provided, and what is guaranteed. |
 | Guarantee | A named prose assertion on a surface. Acceptance criteria, not aspiration. |
-| Port | The interface a side effect sits behind, with a real adapter and an in-memory fake beside it. A standing rule rather than a directory: nothing here reaches for a browser global yet, so `src/lib/ports/` does not exist. |
+| Port | The interface a side effect sits behind, with a real adapter and an in-memory fake beside it. `src/lib/ports/preferences.ts` is the first: the device's preferences, read through `matchMedia`. |
 | Fake | The in-memory implementation of a port, used by tests. Not a mock: it behaves, rather than recording calls. |
 | Gate | A check that can fail the build. Listed in [Quality gates](../reference/quality-gates.md). |
 | Recipe | A `Justfile` target. The only supported way to run anything. |
