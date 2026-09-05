@@ -132,14 +132,14 @@ happened that has not, which is the failure mode this whole page is written agai
   report it. It is corrected by hand or it stays wrong indefinitely.
 
 Nothing is owed on `src/app.css`, but one thing about it is worth knowing before the next
-copy. Poodl's landing page wears this stylesheet, and the comments in the copy here have
-been rewritten to say which of the tests and gates they describe are Poodl's — because none
-of them exist in this repository, and read plainly they claimed a gate was watching values
-that nothing here reads. No declaration moved: not a token name, not a value, not a
-selector, not a font path. So the two files still agree about everything that renders, and
-they now disagree about prose that is correct on each side of the boundary. A copy taken
-raw from here would carry sentences that name Poodl in the third person inside Poodl. Take
-the declarations and leave the comments, or re-point them on arrival.
+copy. Poodl's landing page wears this stylesheet, and the comments in the copy here describe
+this repository's own gate — `tests/contrast.test.ts` measures here now — and name which of
+Poodl's gates are Poodl's where a rule is still only stated over there. No declaration
+moved: not a token name, not a value, not a selector, not a font path. So the two files
+still agree about everything that renders, and they disagree about prose that is correct
+on each side of the boundary. A copy taken raw from here would carry sentences that name
+Poodl in the third person inside Poodl. The package makes the copy unnecessary; until Poodl
+takes it, take the declarations and leave the comments.
 
 And the sharpest item, which is a rewrite only in the sense that someone has to decide what
 it should say.
@@ -191,11 +191,15 @@ Poodl, and worth trying before a secret is created.
 go with it: Poodl's `@font-face` blocks and its copies of the three woff2 files are no longer
 needed, because the package's stylesheet names them by relative URL and they resolve beside it.
 And `tests/contrast.test.ts` reads the stylesheet from disk, so it has to read it from
-`node_modules` instead. That test is the only thing in the platform that measures a contrast
-ratio, and losing it to a path change would be the worst possible outcome of this work. Move it
-before deleting the file, not after — and have it assert that the path it resolved contains
-`node_modules`, because a resolve that silently fell back to the old copy would stay green
-while proving nothing.
+`node_modules` instead. Once it does, the thirteen cases this repository's copy of the test
+also runs become redundant and may be retired; the block that measures Poodl's own state
+separations — `AnUntriedKeyIsDistinguishableFromAScoredOne`, against
+`minimum_state_separation` and `minimum_mark_separation` from Poodl's `game.allium` — stays,
+because it is the only thing in the platform that measures those figures, and losing it to a
+path change would be the worst possible outcome of this work. Move it before deleting the
+file, not after — and have it assert that the path it resolved contains `node_modules`,
+because a resolve that silently fell back to the old copy would stay green while proving
+nothing.
 
 **The `Appearance` surface in `docs/specs/settings.allium`.** This is the item to be careful
 with, because the package does not settle it. Allium has no cross-repository import, and
@@ -215,9 +219,40 @@ platform's history to compare the two files, and it closes the gap the section a
 the one place this repository's authority can break with no gate seeing it. It is the single
 most valuable item on this page.
 
-**Shared components, when Poodl wants one.** Nothing is owed here yet. `Wordmark` is the only
-component published and Poodl has its own. The item exists so the direction is written down: a
-shape two games render arrives from the package rather than being copied a second time.
+**The shared components, the icons, the port and the derivations.** Since
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) the package carries
+Poodl's own platform primitives — `Icon` and the twenty-two icons, `IconButton`, `Button`,
+`HeaderBar`, `Modal`, `Notice` and `Announcer` — with `createMediaPreferences`,
+`createFakePreferences`, `darkActive`, `animationsActive` and `highContrastActive`, and every
+type a consumer writes against. Each of Poodl's copies becomes an import, and the copy, its
+test block and its story go: `src/lib/components/{Icon,IconButton,Button,HeaderBar,Modal,Notice,Announcer}.svelte`,
+`src/lib/components/icons.ts`, `src/lib/assets/icons/`, `src/lib/ports/preferences.ts` and
+`src/lib/domain/appearance.ts`, with `ThemeChoice` imported rather than declared in
+`src/lib/domain/types.ts`. Poodl keeps `src/lib/config.ts`, which mirrors Poodl's own
+specifications, and keeps every test that measures a figure those specifications state.
+
+Three of the contracts changed on the way, and Poodl's call sites change with them:
+
+- `HeaderBar` takes `brand`, `chip` and `actions` rather than a mode, a status and five
+  callbacks. Poodl passes its lockup as the `brand` snippet — the words in an element of
+  class `words`, so the collapse below 26rem still reaches them — or accepts the heading
+  reading "biscuit games" and edits the assertions in its `tests/primitives.test.ts` that
+  expect "biscuit games / poodl". The chip's word and label — "No game under way — change
+  game" and the rest — move to Poodl's route beside the state that chooses them, and the
+  four actions become an array carrying their labels and `popup: 'dialog'`.
+- `Notice` takes `message` and `tone` rather than Poodl's `Notice` union. The sentences move
+  to the route beside the state that chooses them, with `tone: 'success'` for a completed
+  copy and the default `alert` for the four rejections.
+- `createMediaPreferences` takes a host object rather than a `matchMedia` function. The
+  route's no-argument call is unaffected; the tests that pass `media.matchMedia` pass
+  `{ matchMedia: media.matchMedia }` instead.
+
+And five heading anchors this repository renamed with the port, each a link Poodl may hold:
+`testing.md`'s "The contrast test is not ported" and "What a ported contrast test will hit"
+are now one section, "The contrast test"; `tokens.md`'s "Nothing here recomputes a ratio"
+and `accessibility.md`'s "Every figure here is inherited, not measured" are each now "How
+the figures are measured"; and `port-a-design-system-component.md`'s "When to port, and
+when to restyle in place" is now "What is ported, and what stays a game's".
 
 **The version is the thing to record.** Whatever Poodl installs, it installs exactly — no
 caret, no tilde, matching its own pinning rule — and the page Poodl gains says which version its

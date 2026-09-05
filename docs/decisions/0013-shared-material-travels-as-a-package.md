@@ -43,8 +43,10 @@ described.
 Publish `@steven-cutting/biscuit-games` to GitHub Packages, and supersede
 [decision 0002](0002-shared-material-travels-by-citation.md) in full.
 
-The package carries four things: the design tokens stylesheet, the shared components, the two
-committed typefaces, and `docs/specs/appearance.allium`. It carries no handbook page. The
+The package carried four things when this was decided: the design tokens stylesheet, the
+shared components, the two committed typefaces, and `docs/specs/appearance.allium`.
+[Decision 0014](0014-the-hub-holds-the-design-system.md) added the icon set, the preferences
+port and the appearance derivations. It carries no handbook page. The
 pages stay where they are and are still cited rather than installed, which is why 0002's
 documentary obligation survives its own supersession.
 
@@ -55,8 +57,8 @@ obvious reading is that the stylesheet has to move there to be shippable. It doe
 `@font-face` rules need no edit — they read `url('./lib/assets/fonts/…')` relative to `src/`,
 the tarball preserves that layout, and the faces resolve inside a consumer's `node_modules`
 exactly as they do here. The alternative was eighty edits to prose that is currently true, in
-a change that already rewrites two dozen pages, to a file this repository calls frozen. The
-smallest coherent change was the one that left it alone.
+a change that already rewrites two dozen pages, to a file this repository then called
+frozen. The smallest coherent change was the one that left it alone.
 
 What a version means is stated rather than inferred, and
 [Published artefacts](../reference/published-artefacts.md) owns it: the export map, the entry
@@ -104,15 +106,17 @@ of a `@guarantee` still cross the boundary as citations nothing resolves. The
 rename is now a major version somebody can see, while a renamed page is still a link that rots
 silently for a month.
 
-**Nothing here still recomputes a contrast ratio.** `tests/contrast.test.ts` was not ported,
-so the figures in the stylesheet remain inherited claims — and they are now inherited claims
-that ship. Publishing raises the price of that gap rather than changing its shape.
+**The figures that ship are measured.** `tests/contrast.test.ts` was not ported when this
+was decided, so the stylesheet's figures shipped as inherited claims, and publishing raised
+the price of that gap. [Decision 0014](0014-the-hub-holds-the-design-system.md) closed it:
+every pair the palette declares is measured here before it ships.
 
 **The typefaces leave the repository as a redistributable for the first time.** Both are
-OFL-1.1 and their licence texts ship beside them in `src/lib/assets/fonts/`, which is what the
-licence asks for. The package itself is `UNLICENSED`: this repository intentionally generates
-no licence file, a public repository without one reserves all rights, and stating that is
-honest where leaving it implied is not.
+OFL-1.1 and their licence texts ship beside them in `src/lib/assets/fonts/`, which is what
+the licence asks for. The icon set followed under decision 0014, ISC-licensed, with its text
+beside it in `src/lib/assets/icons/`. The package itself is `UNLICENSED`: this repository
+intentionally generates no licence file, a public repository without one reserves all
+rights, and stating that is honest where leaving it implied is not.
 
 ## What would reopen this
 

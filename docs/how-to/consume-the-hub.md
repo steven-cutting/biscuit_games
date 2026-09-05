@@ -106,15 +106,29 @@ is `ReducedMotionOverridesTheAnimationSetting`.
 
 ```svelte
 <script lang="ts">
-  import { Wordmark } from '@steven-cutting/biscuit-games';
+  import { Button, HeaderBar, Icon } from '@steven-cutting/biscuit-games';
+
+  const openSettings = () => {};
+  const play = () => {};
 </script>
 
-<Wordmark />
+<HeaderBar actions={[{ icon: 'settings', label: 'Settings', onclick: openSettings }]} />
+<Button variant="primary" onclick={play}>Play</Button>
+<Icon name="check" />
 ```
 
 Components are Svelte 5 and runes only, and they take callbacks as props rather than dispatching
 events. Svelte is a peer dependency, so the game brings its own and two copies never land in one
-bundle.
+bundle. `Icon` draws by name from the map the package ships, and that map imports each SVG with
+Vite's `?raw`, so the game's build has to be Vite-class — every SvelteKit game's is.
+`HeaderBar` draws the platform's wordmark unless the game passes its own lockup as the `brand`
+snippet, and a lockup that wants to give up its words below 26rem the way the wordmark does puts
+them in an element carrying the class `words` — that class is the whole of the contract. The
+preferences port and the three appearance derivations come through the same root import:
+`createMediaPreferences` reads the device, `createFakePreferences` is what a game's tests inject,
+and `darkActive`, `animationsActive` and `highContrastActive` are the `Appearance` surface's
+derivations as functions. [Published artefacts](../reference/published-artefacts.md) lists the
+whole surface.
 
 A component names tokens the stylesheet declares and ships no copy of their values, so a
 component imported without step 3 renders — and renders wrong, in inherited type and inherited

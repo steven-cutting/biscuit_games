@@ -29,9 +29,8 @@ names both projects, so the browser project loads and Chromium comes with it —
 wanted one jsdom file. The recipe pins `vite.config.ts` the way `just frontend-unit` and
 `just frontend-coverage` already do; see [Testing](../reference/testing.md).
 
-There is one test file today, so the suite and that file are the same run. That stops
-being true the moment a second component lands, and the habit of naming the file is worth
-keeping until then.
+There are eight test files, so name the one you are working in; `just frontend-unit` is the
+whole suite.
 
 Framework configuration and conventions are described in
 [Testing](../reference/testing.md); this page is about narrowing down a failure.
@@ -39,16 +38,18 @@ Framework configuration and conventions are described in
 ## Narrow down a failing test
 
 1. Run the single file first. A failure that only appears in the whole suite is usually
-   shared state, and there is almost none of it here — one component, one test file, and
-   no side effects to construct.
+   shared state, and there is little of it here — the components hold no state that
+   outlives a render, and the one side effect, the preferences port, is a fake a test
+   constructs for itself.
 2. If a component assertion fails, read the DOM that Testing Library prints. It shows the
    accessible names, which is what the queries match on.
 3. If the expectation is about appearance — theme, high contrast, animations — work it
    through by hand against `docs/specs/appearance.allium`. The specification is the
-   arbiter, not the current code. Note what it will not do for you: nothing in this
-   repository recomputes a contrast ratio, so `EveryCombinationMeetsTheLegibilityFloor`
-   fails no test here. Any ratio quoted in the handbook is an inherited claim, and a
-   change that could move one is answered by measuring, not by a green run.
+   arbiter, not the current code. Note what it will do for you: `tests/contrast.test.ts`
+   measures `EveryCombinationMeetsTheLegibilityFloor` over every pair the palette
+   declares, in all four combinations, so a change that could move a ratio is answered by
+   that run — and a pair the test does not yet hold is added to it rather than measured
+   by hand.
 4. Do not weaken an assertion to make it pass. If the specification is wrong, change the
    specification — see [Work with the specifications](work-with-the-specs.md).
 
@@ -66,14 +67,13 @@ Never lower the threshold in `vite.config.ts`.
 
 Read a red coverage gate here as arithmetic before reading it as a missing branch. The
 floor is 90% of branches, functions, lines and statements over `src/lib/**`, and the
-measured glob matches exactly one file today: `src/lib/components/Wordmark.svelte`, the
-fonts beside it being neither TypeScript nor Svelte. A file added under `src/lib/` without
-a test is reported at zero and joins totals small enough that one such file of comparable
-size takes the whole figure to roughly half — far under the floor, however completely
-everything else is covered. So the usual cause is not a branch nobody thought about; it is
-something landing without its test — the case
-[decision 0011](../decisions/0011-skeleton-not-a-second-application.md) makes likely, and
-the one the floor exists to catch. The remedy is the test, in the same change.
+measured glob matches every `.ts` and `.svelte` file under it — the components, `icons.ts`,
+the port, the domain, `config.ts` and the barrel; the SVGs and fonts beside them are
+neither. A file added under `src/lib/` without a test is reported at zero and drags the
+figure down. So the usual cause is a file landing without its test — the case the floor
+exists to catch — or a ported suite that left an arm dead, which
+`just frontend-coverage` names by line. The remedy is the test, in the same change;
+[Testing](../reference/testing.md) records the one arm accepted as dead by construction.
 
 ## Debug a browser problem
 

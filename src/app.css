@@ -3,8 +3,8 @@
  *
  * This is the platform's token file and the reason this repository exists.
  * `docs/design/tokens.md` is the owning page; `docs/design/direction.md` is the
- * reasoning behind it. A game repository copies from here and cites it; nothing
- * is published or imported (decision 0002).
+ * reasoning behind it. A game takes it from the published package rather than
+ * by copying (decision 0013).
  *
  * `docs/specs/appearance.allium`'s Appearance surface decides which of these
  * apply: theme starts dark and follows the device only while the viewer has
@@ -19,12 +19,17 @@
  *
  * The result and key tokens below are the game surface's, and they are carried
  * here whole rather than pruned: this file is the system, and a hub copy
- * missing half of it would make a game's the superset. They are inherited
- * values, not measured ones — `tests/contrast.test.ts` has not been ported yet,
- * so nothing in this repository recomputes a ratio. Until it is, the figures
- * quoted in the comments below are Poodl's measurements and are a comment to be
- * trusted, which is exactly the state that test exists to end. The floors
- * themselves are stated in `appearance.allium`'s config block.
+ * missing half of it would make a game's the superset. They are measured
+ * values: `tests/contrast.test.ts` reads this file from disk, drives all four
+ * combinations through the root attributes and recomputes every pair against
+ * the floors `appearance.allium`'s config block states, which
+ * `src/lib/config.ts` mirrors. Nearly every figure quoted in the comments below
+ * is what that test measures, written down so the reasoning beside a token can
+ * be read without running it; there the test, not the comment, is the evidence.
+ * The exceptions are the two separation windows pinning `--n-65` and `--n-75`
+ * immediately below. A separation between two of a game's own states is the
+ * game's figure to state and to measure — `appearance.allium` says so — and
+ * only Poodl's gate holds those two.
  */
 /*
  * Committed latin-subset variable fonts, per decision 0010. Extracted from the
@@ -194,8 +199,7 @@
    * cannot is exempt from the floor entirely, by
    * `Appearance.@guarantee AnUnavailableControlIsExempt`, which is why
    * --text-disabled and the disabled button's --rule border are the two inks
-   * that Poodl's `tests/contrast.test.ts` deliberately does not measure — and
-   * here nothing measures any of them, because that test is not ported.
+   * `tests/contrast.test.ts` deliberately does not measure, here as in Poodl.
    * Being unmeasured is exactly why they are the values the design system
    * states rather than values chosen here — n-8 light, n-7 in both
    * high-contrast palettes, n-6 dark — and the four are copied from that
@@ -299,18 +303,18 @@
  * The dark theme is reached two ways — by the device while the player has
  * chosen system, and by the dark choice itself, which is the default and the
  * one the markup ships — and both must carry the same values.
- * In Poodl a jsdom test could only drive the attribute — jsdom answers no
- * media query — so it read the two blocks as text and held them equal. That
- * test is not ported, so here neither block is seen by any gate at all. Keep
- * them in step by hand, and change neither alone: nothing will tell you.
+ * A jsdom test can only drive the attribute — jsdom answers no media query —
+ * so `tests/contrast.test.ts` reads the two blocks as text and holds them
+ * equal, which is what makes every ratio it takes cover both routes. Change
+ * neither alone: the test will tell you.
  *
  * The high-contrast pair inside the media block exists for specificity: the
  * light high-contrast block below is (0,2,0) and sits later in the sheet than
  * this (0,2,0) base, so without a (0,3,0) pair here every token the light
  * block declares would leak into a device-dark player who asked for high
  * contrast. That is also why the two high-contrast blocks declare exactly the
- * same set of token names — parity is what makes the shadowing total. No gate
- * here asserts that the sets match; it is held by whoever edits them.
+ * same set of token names — parity is what makes the shadowing total, and the
+ * same test asserts that the two sets match.
  */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
@@ -413,7 +417,8 @@
  * same as `[data-theme='dark']`, so it sits after it to win at equal weight;
  * the dark pair below is (0,3,0) and wins outright. Some of these
  * declarations repeat the bare-root value — that redundancy is the parity the
- * media comment above explains, and nothing but review holds the sets equal.
+ * media comment above explains, and `tests/contrast.test.ts` holds the sets
+ * equal.
  */
 :root[data-high-contrast='true'] {
   --background: var(--n-11);
@@ -496,9 +501,8 @@ body {
  * is the property that applies to `::selection`.
  *
  * The pair is pinned once on bare `:root` rather than answered per theme, and
- * measured 6.93 in all four combinations. Poodl's `tests/contrast.test.ts`
- * recomputes that figure and asserts this rule is what spends it; that test is
- * not ported, so here the figure is one more of the header's inherited claims.
+ * measured 6.93 in all four combinations. `tests/contrast.test.ts` recomputes
+ * that figure and asserts this rule is what spends it.
  */
 ::selection {
   background-color: var(--brand-warm);
@@ -510,10 +514,12 @@ body {
  * there and not one of them owns it, which is why the rules sit in the
  * stylesheet rather than in any one component. Over there they are measured by
  * `tests/directManipulation.test.ts` and by the width stories in
- * `stories/Keyboard.stories.svelte`. None of that came here: this repository
- * has neither the module, the test, the stories, nor a control to apply them
- * to. The rules stay because the file is carried whole rather than pruned —
- * see the header — and they are inert until a component arrives.
+ * `stories/Keyboard.stories.svelte`. Neither the module nor that test came
+ * here, and the contract is stated by no specification of this repository's —
+ * `docs/explanation/accessibility.md` names that gap. What did come is the
+ * controls the rules apply to, `Button`, `IconButton` and `HeaderBar`, whose
+ * stories measure a rendered control against the figures in
+ * `stories/fixtures.ts`. The rules themselves are held by reading.
  *
  * ATapDoesOnlyWhatTheControlDoes. `manipulation` declines the platform's guess
  * at what a second tap meant, which is what makes fast repeated tapping on the
@@ -573,21 +579,24 @@ textarea {
 /*
  * EveryControlIsAComfortableTarget, top to bottom, where every control meets the
  * figure outright. 44px is `config.minimum_touch_target` in Poodl's
- * `game.allium`, where `MINIMUM_TOUCH_TARGET` in `src/lib/config.ts` is the same
- * number and a test compares the resolved value against it so the two cannot
- * drift apart. Neither the module nor the constant exists here, so the 44 below
- * is a literal nothing in this repository can check.
+ * `game.allium`; here it is `MINIMUM_TOUCH_TARGET` in `stories/fixtures.ts`,
+ * which the Button, IconButton and HeaderBar plays measure a rendered control
+ * against, and which is a story fixture rather than a `src/lib/config.ts` value
+ * because no specification in this repository states the figure yet.
+ * `IconButton` takes its width from that same number and its height from this
+ * rule.
  *
- * Across is deliberately not declared. The on-screen keyboard is the one place
- * the figure cannot be met in that direction, so a floor here would be wrong for
- * a key and would have to be fought back inside `Keyboard.svelte` — the fight
- * that, lost, is the sideways scroll this rule exists alongside. Every other
- * control carries a label that takes it past the figure on its own, and the
- * story run measures that rather than assuming it.
+ * Across is deliberately not declared. A game's on-screen keyboard is the one
+ * place the figure cannot be met in that direction, so a floor here would be
+ * wrong for a key and would have to be fought back inside the keyboard — the
+ * fight that, lost, is the sideways scroll this rule exists alongside. Every
+ * other control carries a label that takes it past the figure on its own, or
+ * sets its own width as `IconButton` does, and the story run measures that
+ * rather than assuming it.
  *
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite
- * reason — `ShareResults` has to stay selectable by hand.
+ * reason — text a reader copies by hand has to stay selectable.
  */
 button,
 input[type='text'],
@@ -606,9 +615,8 @@ textarea {
  * raised surface, a primary button on the ink itself — and ink and paper
  * between them always do, because one of the two is always at the far end of
  * the range. The narrowest edge either ring meets on the two key grounds is
- * 17.04 to one, far past the 3.0 a control's boundary answers to. Poodl's
- * `tests/contrast.test.ts` recomputes both rather than trusting this sentence;
- * here the sentence is all there is.
+ * 17.04 to one, far past the 3.0 a control's boundary answers to.
+ * `tests/contrast.test.ts` recomputes both rather than trusting this sentence.
  *
  * A ring rather than a filter, which was the first thing tried. `filter` dims
  * the letter along with the key, which costs
@@ -618,12 +626,13 @@ textarea {
  *
  * No transition and no animation: the acknowledgement "owes nothing to whether
  * animations are running", so `data-animations` must not reach it the way it
- * reaches the tile reveal. `box-shadow` is set by no component, so the cue is
- * not something a key can override by accident.
+ * reaches `Modal`'s arrival. `box-shadow` is set by no pressable component —
+ * `Button` and `IconButton` each say so — so the cue is not something a
+ * control can override by accident.
  *
  * Two selectors, because the first rule in this block suppresses the platform's
  * flash on four kinds of control and a replacement owed to one of them is owed
- * to all. The row rather than the box: `SettingsPanel` makes the `<label>` the
+ * to all. The row rather than the box: a settings row makes the `<label>` the
  * 44px target precisely because a label bound to its control activates it across
  * its whole area, so the row is what the finger is aimed at and the row is what
  * has to answer. A ring drawn on the native box instead would be a cue on the
@@ -631,12 +640,12 @@ textarea {
  * platform's to paint or ignore.
  *
  * `:has(input:not(:disabled))` is the same carve-out `:not(:disabled)` makes on
- * the button half: the disabled hard-mode row must not report a touch that does
- * nothing. It also settles which labels are in scope. A label bound by `for` —
- * `SharePanel`, `LinkReady`, `ResultsReady` — matches neither selector and
- * needs no ring, because pressing it moves focus into the field and the focus
- * outline above is the acknowledgement, arriving on the control that took the
- * tap rather than on the words pointing at it.
+ * the button half: a disabled preference row must not report a touch that does
+ * nothing. It also settles which labels are in scope. A label bound by `for` to
+ * a text field matches neither selector and needs no ring, because pressing it
+ * moves focus into the field and the focus outline above is the
+ * acknowledgement, arriving on the control that took the tap rather than on
+ * the words pointing at it.
  */
 button:active:not(:disabled),
 label:has(input:not(:disabled)):active {
@@ -646,9 +655,11 @@ label:has(input:not(:disabled)):active {
 }
 
 /*
- * Present to assistive technology, absent to the eye. The live region uses it,
- * because what it says is already on the screen in another form: the marks are
- * on the board and the conclusion is in the modal.
+ * Present to assistive technology, absent to the eye. `Announcer` is the live
+ * region that uses it, because what it says is already on the screen in
+ * another form. `HeaderBar` restates these declarations for the lockup's words
+ * below 26rem, because those words are another component's element and a media
+ * query can add no class to them.
  */
 .visually-hidden {
   position: absolute;

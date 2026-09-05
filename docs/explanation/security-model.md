@@ -21,11 +21,12 @@ Very little, and that is the point.
 
 - **Nothing is collected.** No analytics, no telemetry, no error reporting, no cookies.
   Nothing leaves the browser.
-- **Nothing is stored remotely.** There is nowhere to upload anything to. Nothing is
-  stored on the device either: the front end is a skeleton with no persistence, and
-  `docs/specs/appearance.allium` describes appearance settings that no code here reads or
-  writes. A game that keeps state keeps it in that game's own code and in the visitor's
-  own browser.
+- **Nothing is stored remotely.** There is nowhere to upload anything to. Nothing is stored
+  on the device either: the front end has no persistence, and the appearance settings
+  `docs/specs/appearance.allium` describes are stored nowhere here. The one thing code reads
+  is the device's own preferences, through `src/lib/ports/preferences.ts`, and it writes
+  nothing back. A game that keeps state keeps it in that game's own code and in the
+  visitor's own browser.
 - **There are no credentials in the product.** No sign-in, no tokens, nothing secret in
   the build or the bundle. The `ripsecrets` gate exists to keep it that way. The
   repository has exactly one secret and it belongs to the toolchain, not to the site: a
@@ -81,8 +82,10 @@ moves here, this is the first section that has to change.
 - **Credential leakage.** `ripsecrets` scans every commit, and its output is suppressed so
   a match never copies the matched value into a log.
 - **Third-party content at runtime.** There is none. The site loads no external script,
-  font or image — both typefaces are committed and served from the same origin as
-  everything else — so there is nothing to subvert between a host and the browser.
+  font or image — both typefaces and the icon set are committed and served from the same
+  origin as everything else, and every icon is inlined through `{@html}` from
+  repository-owned SVG and never from input — so there is nothing to subvert between a
+  host and the browser.
 
 ## What a version does not defend
 

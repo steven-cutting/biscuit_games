@@ -22,7 +22,8 @@
       `prefers-reduced-motion` reaches no rule in app.css either.
 
   So two of the three are unhonoured rather than merely unreachable, and neither
-  is waiting on the preferences port: a media query would answer both.
+  is waiting on the preferences port — src/lib/ports/preferences.ts exists, and
+  nothing on this route calls it — because a media query would answer both.
   docs/explanation/accessibility.md owns that account.
 -->
 <html lang="en" data-theme="dark" data-animations="on">

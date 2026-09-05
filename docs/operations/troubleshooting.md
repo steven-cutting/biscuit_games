@@ -140,12 +140,13 @@ recipe unconditionally.
 They are not available. Node ships its own experimental `localStorage` that shadows the
 one jsdom would provide and stays undefined; `navigator.clipboard` is absent entirely.
 
-Nothing here touches either today — `src/` is a skeleton and its one component is
-stateless — so this arrives with something ported from Poodl rather than on its own. It is
-not a thing to work around with a stub. A side effect goes behind a port, and the adapter
-takes its platform object as a defaulted argument, so a test passes one in. That is
-[decision 0005](../decisions/0005-ports-and-fakes.md), which is a standing rule for the
-first side effect to arrive rather than a description of code already present. See
+Nothing here touches either today — the one side effect is the device's preferences, and
+jsdom has no `matchMedia` either — so this arrives with something ported from Poodl rather
+than on its own. It is not a thing to work around with a stub. A side effect goes behind a
+port, and the adapter takes its platform object as a defaulted argument, so a test passes
+one in: `src/lib/ports/preferences.ts` does exactly that, taking the host object and
+answering for an absent `matchMedia` itself. That is
+[decision 0005](../decisions/0005-ports-and-fakes.md), carried out. See
 [Testing](../reference/testing.md).
 
 ## Something works under `just dev` but not in the build

@@ -39,13 +39,13 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
    reactive statements and no `createEventDispatcher`; child-to-parent
    communication passes callbacks as props. Enforced by review and by
    `eslint-plugin-svelte`.
-3. **Side effects sit behind a port.** The skeleton has none yet, and the first is
-   already named: `appearance.allium` reads the device's colour-scheme,
-   reduced-motion and contrast preferences. When it arrives it lands in
-   `src/lib/ports/` as an interface, a real adapter taking its platform object as
-   a defaulted argument, and an in-memory fake. Tests inject the fake; they never
-   stub a global — and never will, because the story run is a real browser where
-   a global would work.
+3. **Side effects sit behind a port.** `src/lib/ports/preferences.ts` is the first
+   and the worked example: `appearance.allium` reads the device's colour-scheme,
+   reduced-motion and contrast preferences, and the port is an interface, a real
+   adapter taking its platform object as a defaulted argument, and an in-memory
+   fake. Tests inject the fake, or hand the adapter a host of their own; they
+   never stub a global — and never will, because the story run is a real browser
+   where a global would work.
 4. **Every dependency is pinned to an exact version.** No `^`, no `~`, in
    `package.json` or `pyproject.toml`. Lockfiles are committed and
    `just lock-check` proves they match. `peerDependencies` is the one dependency
@@ -66,8 +66,8 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
    reports its state to the accessibility tree and keeps every non-colour
    indication its live form carried.
 7. **Coverage does not fall below the floor.** 90% on branches, functions, lines
-   and statements over `src/lib/**` — today a single component, and kept at that
-   number precisely so the first real one cannot land untested. Lower the code's
+   and statements over `src/lib/**` — eight components, the icon map, the port,
+   the domain and the barrel, every one of them tested. Lower the code's
    complexity, not the threshold in `vite.config.ts`. Nothing lands under
    `src/lib/` without a test in `tests/`: an untested file inside the coverage
    glob is reported at zero and sinks the run.
@@ -88,16 +88,25 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
   `strictTypeChecked`; EditorConfig for whitespace; `markdownlint-cli2` for
   Markdown, which Prettier deliberately does not touch.
 - `src/app.css` is the platform's token file. Nothing in a component hard-codes a
-  colour, a size or a duration that the file already names.
+  colour, a size or a duration that the file already names — with one carve-out
+  the ported primitives use: a figure that coincides with a token by value and
+  not by meaning stays a literal, and carries a comment saying which token it
+  coincides with and why it is not named. A control's height is not a step on
+  the spacing scale. `Button`'s 48px and `Notice`'s 40px are the worked
+  examples; the porting guide states the rule.
 - Components are PascalCase `.svelte` files under `src/lib/components/`.
   Semantic HTML first: real buttons, labels bound to controls, keyboard and
-  focus handling, visible loading and error states.
+  focus handling, visible loading and error states. The one `.ts` file beside
+  them, `icons.ts`, is the icon map: every SVG in `src/lib/assets/icons/` has a
+  key, and `Icon` draws by key.
 - Tests live in `tests/`, never colocated with `src/`. `*.test.ts` for Vitest,
   `*.spec.ts` reserved for Playwright. Component tests query by accessible role
   and name — never by class or test id.
 - Stories live in `stories/` at the repository root, as `*.stories.svelte` in
-  Svelte CSF, one file per component. The hub has one route, so the workshop is
-  not a convenience here: it is the only way to see a component at all. A new
+  Svelte CSF, one file per component, plus `Foundations.stories.svelte`, the
+  token sheet, and `fixtures.ts` for the figures the plays measure against. The
+  hub has one route, and it mounts none of the primitives yet, so the workshop
+  is not a convenience here: it is the only way to see a component at all. A new
   component lands with its test and its story in the same change.
 - **Just** is the task runner and the only supported interface to the checks.
   Pre-commit runs through `prek` under `uv`, split in two:
@@ -151,8 +160,10 @@ carry a stated reason.
   blocks precisely so unresolved product decisions are visible; do not silently
   resolve one.
 
-This repository intentionally generates no license file, so the package it
-publishes is `UNLICENSED`. It has two artefacts and no more: the
+This repository intentionally generates no licence file of its own, so the
+package it publishes is `UNLICENSED`; the third-party texts under
+`src/lib/assets/` — the OFL for the typefaces, the ISC for the icons — travel
+with the assets they cover. It has two artefacts and no more: the
 `@steven-cutting/biscuit-games` package, which a release publishes to GitHub
 Packages, and the component workshop, which is published to Chromatic. The
 *site* is published nowhere — there is no deployment workflow for it, because
@@ -195,8 +206,15 @@ nothing in this repository was taken from the template directly.
 Deliberate deviations from Poodl, each recorded in
 [the decision records](docs/decisions/README.md):
 
-- The application is a skeleton — `src/app.css`, one route, and `Wordmark` with
-  its test and its story — while the toolchain came over whole.
+- The application came over in two steps. The toolchain came whole, with
+  `src/app.css`, one route and `Wordmark`; the platform primitives, the icon set,
+  the contrast test and the preferences port followed by decision 0014, ported
+  from Poodl at `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`, and the play-surface
+  primitives stayed where they are rendered.
+- Two component contracts are generalised — `HeaderBar` takes a brand snippet,
+  a chip and actions; `Notice` takes a message and a tone — and the preferences
+  adapter takes its host object rather than a `matchMedia` function. Decision
+  0014 records each, and the Poodl handover carries what each costs Poodl.
 - The site is published nowhere. No Pages workflow, no `site-root/`, no staging
   script, and no `BASE_PATH` set anywhere: the domain root stays with Poodl for
   now. The workshop is published, the package is ready to publish, and the site

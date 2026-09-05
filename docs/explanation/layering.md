@@ -8,33 +8,39 @@ requires: []
 
 # Layering and dependency direction
 
-Four layers — two live, two reserved — and imports only ever run downwards.
+Four layers, and imports only ever run downwards.
 
-| Layer | State | May import | Must not |
-| --- | --- | --- | --- |
-| `src/routes/` | Live | components, and domain and ports once either exists | be imported by anything below it |
-| `src/lib/components/` | Live | other components, and domain types once they exist | import a port adapter, or reach for a browser global |
-| `src/lib/domain/` | Reserved | domain and its own types | import a component, a route, a port, or anything with a side effect |
-| `src/lib/ports/` | Reserved | types and configuration | import a component or a route |
+| Layer | May import | Must not |
+| --- | --- | --- |
+| `src/routes/` | components, domain and ports | be imported by anything below it |
+| `src/lib/components/` | other components and domain types | import a port adapter, or reach for a browser global |
+| `src/lib/domain/` | domain and its own types | import a component, a route, a port, or anything with a side effect |
+| `src/lib/ports/` | types and configuration | import a component or a route |
 
-The live half fits in a paragraph. `src/routes/` is three files: `+layout.svelte`, which
-imports the stylesheet and renders its children; `+layout.ts`, which prerenders the tree;
-and `+page.svelte`, the front door. `src/lib/components/` is one component,
-`Wordmark.svelte`, which takes no props, holds no state and touches no global. The two
-reserved rows describe nothing that exists — they are the rule the first occupant will be
-held to, which is the whole point of writing them down before there is anything to enforce
-them against. See [Decision 0011](../decisions/0011-skeleton-not-a-second-application.md).
+`src/routes/` is three files: `+layout.svelte`, which imports the stylesheet and renders
+its children; `+layout.ts`, which prerenders the tree; and `+page.svelte`, the front door.
+`src/lib/components/` is the platform primitives — `Wordmark`, `Icon`, `IconButton`,
+`Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` — which take callbacks as props,
+hold no application state and touch no browser global; `Modal` reads
+`document.activeElement`, and
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) says why focus on the
+component's own document is not a global in the sense this table means. `src/lib/domain/`
+is `appearance.ts`, the three derivations the `Appearance` surface states, and `types.ts`,
+the `ThemeChoice` enumeration. `src/lib/ports/` is `preferences.ts`, the first port. Nothing
+above the components calls the domain or the port yet: the hub's front door writes its
+appearance flat, and a game is the consumer of both.
 
 `src/app.css` is not a layer. It is the token vocabulary, imported once at the root layout
 so that every route sits in the same palette, and nothing below the layout imports it; a
 component names a token rather than shipping its own copy of the value.
 [Design tokens](../design/tokens.md) is the page that owns those names. `src/lib/assets/`
-is the committed fonts and their licence texts — data with a directory, not code with a
-position.
+is the committed fonts and the icon set, each with its licence text — data with a
+directory, not code with a position; `icons.ts` in the components layer is what reaches the
+icons, and nothing else does.
 
-There is no `src/lib/config.ts` and no `src/lib/domain/types.ts` here. Poodl has both
-because it has values a specification declares and a state shape to name. If such a file
-arrives, it sits below everything and imports nothing.
+`src/lib/config.ts` mirrors the two floors `appearance.allium` declares and is read by the
+contrast test; `src/lib/domain/types.ts` names `ThemeChoice`. Both sit below everything and
+import nothing.
 
 ## `src/lib/app/` is deliberately absent
 
@@ -43,11 +49,13 @@ value, plus the single rune-bearing shell that wires the ports to it. That shape
 to Poodl, not to the platform, and its reasoning stays in Poodl's handbook rather than
 being restated here.
 
-The hub has no rules to reduce. One prerendered page, one component, and no state that
-outlives a render leaves a reducer with nothing to be pure about, so there is no
-`src/lib/app/` and no store. A change that introduces one is not adding a layer; it is
-turning this repository into a second application, which is exactly what
-[Decision 0011](../decisions/0011-skeleton-not-a-second-application.md) refuses.
+The hub has no rules to reduce. One prerendered page and no state that outlives a render
+leaves a reducer with nothing to be pure about, so there is no `src/lib/app/` and no store.
+A change that introduces one is not adding a layer; it is turning this repository into a
+second application, which
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) did not do and
+[decision 0011](../decisions/0011-skeleton-not-a-second-application.md)'s reasoning still
+warns against.
 
 ## Why the direction matters
 
@@ -69,29 +77,27 @@ a rule, or remembers a fact between renders is not component code and stays behi
 procedure is
 [Port a design system component](../how-to/port-a-design-system-component.md).
 
-**The reserved layers stay cheap.** Because nothing above them assumes their absence,
-adding `src/lib/domain/` or `src/lib/ports/` later is an addition rather than a
-rearrangement. That is the return on writing two rows of a table for directories that do
-not exist.
+**The lower layers arrived as additions.** Nothing above them had assumed their absence,
+so `src/lib/domain/` and `src/lib/ports/` landed without a rearrangement. That was the
+return on writing two rows of a table for directories that did not yet exist.
 
 ## Where a side effect goes
 
-There are no ports here. `src/lib/ports/` does not exist, because nothing in this
-repository reads storage, asks for the time, draws a random number or touches the
-clipboard. That is the honest state of a skeleton, not an omission.
-
-The rule still stands for the first side effect that arrives. A port is three things in
-one file:
+One port. `src/lib/ports/preferences.ts` reads the device's colour-scheme, reduced-motion
+and more-contrast preferences through `matchMedia`, and watches them, which is what
+`SystemFollowsTheDeviceAsItChanges` asks. It is three things in one file:
 
 1. An interface naming what the application needs, in the application's vocabulary.
 2. A real adapter, with the platform object as a defaulted argument rather than a global
    read.
 3. An in-memory fake with the same interface.
 
-The likeliest first one is the device's preferences. `docs/specs/appearance.allium` names
-the reduced-motion, dark-scheme and more-contrast signals the platform reports, and jsdom
-supplies a `window` without `matchMedia`, so whatever implements that surface will have to
-answer for the absence itself rather than be stubbed around.
+The adapter takes its host — the object `matchMedia` hangs off — as the defaulted argument,
+so a test passes a fake, an empty object or nothing, and every arm is reached with no global
+stubbed. jsdom supplies a `window` without `matchMedia`, and the adapter answers for the
+absence itself: a device the platform cannot ask is a device that asked for nothing. Nothing
+in this repository reads storage, asks for the time, draws a random number or touches the
+clipboard, so there is no second port.
 
 The rule that follows: **tests inject fakes, they never stub globals.** A stubbed global
 leaks between tests and hides the fact that the code reached outside its layer. The

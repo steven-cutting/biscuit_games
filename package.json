@@ -26,7 +26,7 @@
   },
   "files": [
     "dist",
-    "!dist/assets",
+    "!dist/assets/fonts",
     "src/app.css",
     "src/lib/assets/fonts",
     "docs/specs",

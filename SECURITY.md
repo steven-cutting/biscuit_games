@@ -30,8 +30,9 @@ there.
 ## What this project already does
 
 - No server, no accounts, no database, and no data collected about anyone.
-- No external scripts, fonts or images at runtime; both typefaces are committed and served
-  from the same origin as everything else.
+- No external scripts, fonts or images at runtime; both typefaces and the icon set are
+  committed and served from the same origin as everything else, and every icon is inlined
+  from repository-owned SVG, never from input.
 - Every dependency pinned to an exact version and locked; `just lock-check` fails if a
   manifest and its lockfile disagree.
 - The Allium checker is pinned by version and SHA-256 rather than fetched by tag.

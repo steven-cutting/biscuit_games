@@ -42,7 +42,7 @@ nothing uploads it, and the domain root stays with Poodl — that is
 
 | Entry point | What it is |
 | --- | --- |
-| `@steven-cutting/biscuit-games` | The shared components, as Svelte 5 source with their generated types. |
+| `@steven-cutting/biscuit-games` | The shared components as Svelte 5 source, the icon set they draw, the preferences port, the three appearance derivations, and every type a consumer writes against, with generated declarations. |
 | `@steven-cutting/biscuit-games/app.css` | The token vocabulary, the theme and contrast palettes, and the `@font-face` blocks. |
 | `@steven-cutting/biscuit-games/assets/fonts/*` | The two typefaces and their OFL texts. |
 | `@steven-cutting/biscuit-games/specs/appearance.allium` | The shared specification module, as text. |
@@ -51,15 +51,27 @@ Components ship as Svelte source rather than compiled output, which is what `sve
 produces and what a consumer's own compiler expects. Svelte is a peer dependency, declared as
 `>=5.56.8 <6`, so a game brings its own copy and two rune runtimes never meet in one bundle.
 
+The icons travel inside the root entry rather than behind a specifier of their own. `Icon`
+renders one of the twenty-two Lucide SVGs by name, the files are copied to
+`dist/assets/icons/` with their ISC text, and the map that names them keeps Vite's `?raw`
+suffix — so a consumer's build has to be Vite-class, which every SvelteKit game's is, and
+`just package-smoke` is the check that the markup arrives.
+
 The stylesheet and the specification are published from where they already live rather than
 from `dist/`, because neither needs compiling. That is why `src/app.css` is still at
 `src/app.css` and why its `@font-face` rules still read `url('./lib/assets/fonts/…')`: the
 tarball preserves the layout those relative URLs were written against, so the faces resolve
 inside a consumer's `node_modules` exactly as they do here.
 
-Nothing else ships. This handbook is not in the package, the stories are not in the package,
-and the tests are not in the package. A game reads these pages by citation, which is the part
-[decision 0013](../decisions/0013-shared-material-travels-as-a-package.md) leaves standing.
+Nothing else is part of the interface. This handbook is not in the package, the stories are
+not in the package, and the tests are not in the package. One file ships without being
+exported: `svelte-package` emits everything under `src/lib/`, so `src/lib/config.ts` arrives
+as `dist/config.js` and its declarations, and no entry in the `exports` map names it. It is
+not the way to the two floors — a consumer reads those from the specification the package
+carries — and a deep import that reached for it would be coupling a game to this
+repository's layout. A game reads these pages by citation,
+which is the part [decision 0013](../decisions/0013-shared-material-travels-as-a-package.md)
+leaves standing.
 
 ## Registry access
 
@@ -98,10 +110,10 @@ the build still succeeds, and the colour is simply absent. There is no smaller v
 consumer could take without reading, so there is no smaller version.
 
 **A token's value moving is minor and never patch.** It changes what every palette spending
-that token measures, and the figures in the stylesheet's comments are inherited claims rather
-than measurements — nothing here recomputes a ratio, which is
-[Design tokens](../design/tokens.md)'s standing warning. A minor bump tells a consumer to look.
-A patch would tell them there is nothing to look at.
+that token measures. `tests/contrast.test.ts` measures the palette's own pairs here, but not
+the pairs a game's own components make with it — [Design tokens](../design/tokens.md) draws
+that line. A minor bump tells a consumer to look at those. A patch would tell them there is
+nothing to look at.
 
 The version lives in `package.json` and in `CHANGELOG.md`, and either the two agree or the
 release is wrong. The changelog entry names the token, the prop or the guarantee that moved, by

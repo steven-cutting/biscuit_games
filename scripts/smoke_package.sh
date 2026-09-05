@@ -2,10 +2,12 @@
 # Build the package, install it into a throwaway Vite project, and build that.
 #
 # Everything else in the gate reads this repository's own tree, where the hub
-# imports `src/app.css` by relative path and its components through `$lib`.
-# Neither exercises the `exports` map, the emitted types, or the three
-# `@font-face` URLs a consumer resolves from inside `node_modules`. A broken
-# export map ships green without this.
+# imports `src/app.css` by relative path and its components by relative path
+# too. Neither exercises the `exports` map, the emitted types, the three
+# `@font-face` URLs a consumer resolves from inside `node_modules`, or the
+# `?raw` icon imports a consumer's Vite has to resolve from `dist/assets/`. A
+# broken export map, or a `files` entry that strips the icons, ships green
+# without this.
 #
 # Needs the network, so `just check` does not run it. It works entirely inside a
 # temporary directory and leaves this worktree untouched.
@@ -44,14 +46,21 @@ npm install "$tarball" >/dev/null
 # A consumer takes the components through the package root and the tokens
 # through their own specifier: the barrel deliberately does not import the
 # stylesheet, so a component that arrived without it would render unstyled.
+# `Icon` is the component whose markup arrives through Vite's `?raw`, which is
+# the import shape nothing else in the gate resolves. `Button` is here because
+# it is the control a consumer reaches for first, so a consumer that cannot
+# compile it has nothing worth installing; the assertions below read the icon
+# markup and `Wordmark`'s scoped class, not `Button`'s own styles.
 rm -f src/App.svelte
 cat > src/App.svelte <<'SVELTE'
 <script lang="ts">
-  import { Wordmark } from '@steven-cutting/biscuit-games';
+  import { Button, Icon, Wordmark } from '@steven-cutting/biscuit-games';
   import '@steven-cutting/biscuit-games/app.css';
 </script>
 
 <Wordmark />
+<Icon name="check" />
+<Button variant="primary">Continue</Button>
 SVELTE
 
 printf '==> building\n'
@@ -72,6 +81,14 @@ grep -q '@font-face' "$css" || { printf 'the @font-face blocks did not ship\n' >
 # The component's scoped styles. Their absence is what a wrong `sideEffects`
 # would produce, and it fails silently: the wordmark renders, unstyled.
 grep -q '\.lockup' "$css" || { printf "the component's scoped styles were dropped\n" >&2; exit 1; }
+
+# The icon markup, which arrives as a string inside the JavaScript rather than
+# as a stylesheet or a URL: `icons.js` imports each SVG with Vite's `?raw`, and
+# the files it names live under `dist/assets/icons/`. A `files` entry that
+# stripped them would fail the consumer's build; a resolver that handed back a
+# URL instead of the source would build and render an empty span. Only the
+# markup itself proves both.
+grep -q 'stroke="currentColor"' dist/assets/*.js || { printf 'the icon markup did not ship\n' >&2; exit 1; }
 
 # One Svelte, deduped against the peer. Two rune runtimes in one bundle fail in
 # ways that are traced back here hours later, and `npm ls svelte` alone will not say

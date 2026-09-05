@@ -97,10 +97,11 @@ Commissioned from an illustrator. The first set is a budget as much as a wish li
 
 Explicitly excluded from the first set: per-guess reactions.
 
-The ambient poses read a clock, and a clock is a side effect. There is no port for one in
-this repository yet; when the poses arrive, the time is read through a port rather than
-through a global, which is what [decision 0005](../decisions/0005-ports-and-fakes.md)
-requires of any side effect that lands here.
+The ambient poses read a clock, and a clock is a side effect. There is no clock port in this
+repository yet — the device's preferences are the only port — and when the poses arrive, the
+time is read through a port rather than through a global, which is what
+[decision 0005](../decisions/0005-ports-and-fakes.md) requires of any side effect that lands
+here.
 
 ## The character reference sheet
 

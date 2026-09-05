@@ -8,6 +8,14 @@ requires: []
 
 # Decision 0011: A skeleton, not a second application
 
+> **Superseded on 2026-09-04 by
+> [Decision 0014](0014-the-hub-holds-the-design-system.md).** The hub now holds the design
+> system's implementation — the platform primitives, the icon set, the contrast test and the
+> preferences port came across from Poodl — and a platform-shaped component is built here
+> first, whether or not a second consumer exists. The one-route site stands. Everything below
+> stands as written: it is the account of why the skeleton was chosen, and why the gate was
+> adopted before there was anything for it to guard.
+
 ## Context
 
 The whole SvelteKit toolchain came over from Poodl. The gate runs in order and snapshots

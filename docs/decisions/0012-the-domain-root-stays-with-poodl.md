@@ -84,9 +84,9 @@ condition Poodl's 0009 wrote down.
 
 Sooner than that, either of two things.
 
-The hub site growing into something worth visiting. A skeleton with one route and one
-component has nothing to publish that the landing page does not already say; a hub that
-says what Biscuit Games is and links to each game does, and at that point the strange
+The hub site growing into something worth visiting. A one-page site that mounts none of the
+components it holds has nothing to publish that the landing page does not already say; a hub
+that says what Biscuit Games is and links to each game does, and at that point the strange
 thing above stops being tolerable.
 
 Or Poodl's landing page growing past the smallest honest thing its own decision says it

@@ -168,7 +168,9 @@ check:
 # preprocessor `svelte.config.js` names, with a .d.ts emitted beside it.
 # The stylesheet and the specification are not compiled and are published from
 # where they already live, which is why neither appears in the output and why
-# `src/app.css` never had to move to be shippable.
+# `src/app.css` never had to move to be shippable. The icons do appear in it,
+# copied whole to dist/assets/icons/, because `icons.ts` reaches them by
+# relative path and the emitted module still does.
 package-build:
     npm run package
 

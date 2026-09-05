@@ -9,10 +9,11 @@ requires: []
 # Design tokens
 
 `src/app.css` is the token vocabulary of the Biscuit Games design system. It is this
-repository's principal artefact — the hub is a skeleton around it, and this file is the
-thing worth having. [Decision 0010](../decisions/0010-biscuit-games-design-system.md)
-records how it was chosen; [Design direction](direction.md) is the reasoning behind the
-look it carries; this page is the reference for what is actually in it.
+repository's principal artefact: the platform components under `src/lib/components/` spend
+it, every game wears it, and `tests/contrast.test.ts` measures it.
+[Decision 0010](../decisions/0010-biscuit-games-design-system.md) records how it was chosen;
+[Design direction](direction.md) is the reasoning behind the look it carries; this page is
+the reference for what is actually in it.
 
 This file is published, as `@steven-cutting/biscuit-games/app.css`. A game repository
 imports it at an exact version rather than copying it, which is
@@ -22,46 +23,54 @@ but only for a consumer that takes the bump, so
 [Published artefacts](../reference/published-artefacts.md) states what each level of change
 means before you make one.
 
-The hub itself spends about twenty of these tokens, between `src/routes/+page.svelte`,
-`src/lib/components/Wordmark.svelte` and the element rules at the foot of `src/app.css`.
-The rest are carried whole rather than pruned. That is deliberate: this file is the
-system, and a hub copy missing half of it would leave a game's copy as the superset, which
-is exactly the arrangement [decision 0001](../decisions/0001-biscuit-games-is-the-source-of-truth.md)
-exists to prevent.
+The hub's route and the platform components spend most of the semantic vocabulary between
+them. The result and key groups, which only a game's play surface spends, are carried whole
+rather than pruned. That is deliberate: this file is the system, and a hub copy missing half
+of it would leave a game's copy as the superset, which is exactly the arrangement
+[decision 0001](../decisions/0001-biscuit-games-is-the-source-of-truth.md) exists to
+prevent.
 
-## Nothing here recomputes a ratio
+## How the figures are measured
 
-`tests/contrast.test.ts` has not been ported. No test, recipe or hook in this repository
-reads a colour out of `src/app.css` and computes a contrast ratio, and
-[Quality gates](../reference/quality-gates.md) lists none that does.
+`tests/contrast.test.ts` reads this file from disk, puts it in a document, drives all four
+combinations of theme and high contrast through the root attributes, and recomputes every
+pair the palette declares against the two floors `appearance.allium` states —
+`minimum_text_contrast = 4.5` and `minimum_boundary_contrast = 3.0`, mirrored in
+`src/lib/config.ts`. That is `EveryCombinationMeetsTheLegibilityFloor` run rather than
+read, in every combination and not the one a change was looked at in. The test came from
+Poodl by [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), minus the
+block that measured Poodl's own state separations, which `appearance.allium` assigns to the
+game; [Testing](../reference/testing.md) says what it holds.
 
-Every figure quoted in the file's comments — 3.69, 4.89, 5.20, 3.28, 6.93, 17.04 — is
-**inherited from Poodl at commit `c26cc4642afa6b1349db70a0f497203db3986599`**, where it was
-measured. Here it is a comment to be trusted, which is the precise condition that test
-exists to end. Treat every one of them as provenance, not as evidence.
+Most of the figures quoted in the file's comments — 4.89 and 5.20 for the absent letter on
+the scored ground, 6.93 for the warm pair, 17.04 for the focus ring — are what that test
+measures, written beside the tokens so the reasoning can be read without running it. There
+the test is the evidence and the comment is the provenance: when a value moves, the test
+fails before the comment is wrong. The two exceptions are 3.69 and 3.28, the distances
+`--n-65` and `--n-75` hold from the untried letter beside them. Those are separations
+between two of a game's states, so this test does not measure them and Poodl's does; they
+stay inherited claims here, and the raw-palette section below says what pins them.
 
 Two consequences follow, and neither is optional.
 
-- **`src/app.css` is frozen for anything larger than a single considered change.** A
-  repaint, a ramp swap, a new semantic name across four blocks — none of those can be
-  shown correct here. They wait for the test. Porting `tests/contrast.test.ts` is the
-  remedy, and it is a smaller job than any of the changes it unblocks.
-- **A single change carries its own arithmetic.** Compute the ratio by hand against
-  `appearance.allium`'s floors, record it in a comment beside the token, and say in the
-  pull request that it was computed rather than measured.
+- **A change to the palette is shown correct or incorrect by the gate.** A repaint, a ramp
+  swap, a new semantic name across four blocks — each is measured in all four combinations
+  on the next run, and the `token-change` skill is the procedure.
+- **A new pair is a new assertion.** Any ink on any ground the test does not already
+  measure is added to it in the same change. A figure computed by hand and recorded in a
+  comment is the claim the test was written to replace.
 
-The file's comments also still name `game.allium`, `sharing.allium`,
-`tests/directManipulation.test.ts`, `src/lib/config.ts` and `Keyboard.svelte`. None of
-those exists here. They are the game's, they came with the file, and where a comment says
-a gate "recomputes" something it is describing Poodl's gate and not one of ours.
+The file's comments still name `game.allium` and `tests/directManipulation.test.ts`. Those
+are Poodl's, they came with the file, and each comment that names one says so; the rules
+they describe are stated by no specification here, which
+[Accessibility](../explanation/accessibility.md) records as a gap.
 
-What automation there is amounts to axe running at error level over the workshop's
-stories. Today that is one component in two states, and the high-contrast global is never
-switched on in the run, so neither high-contrast palette is ever rendered, let alone
-checked. `docs/specs/appearance.allium` states the floors —
-`minimum_text_contrast = 4.5` and `minimum_boundary_contrast = 3.0` — and
-`EveryCombinationMeetsTheLegibilityFloor` holds them in all four combinations of theme and
-high contrast. In this repository that guarantee is met by reading, not by running.
+Axe runs at error level over every story as well, in the appearance each story's globals
+select, and every story file that draws something pins dark, and dark high contrast where
+the look inverts. Axe
+measures one rendered story; the contrast test measures the palette. Neither stands in for
+the other, and [Accessibility](../explanation/accessibility.md) says what each can and
+cannot see.
 
 ## The shape of the file
 
@@ -87,8 +96,8 @@ Three properties of this arrangement are load-bearing.
 
 - **The dark palette is stated twice on purpose.** It is reached by the device while the
   reader has chosen system, and by the dark choice itself — which is the default and the
-  one `src/app.html` ships. The two texts must stay identical, and nothing checks that
-  they do.
+  one `src/app.html` ships. The two texts must stay identical, and
+  `tests/contrast.test.ts` reads both as text and holds them equal.
 - **Order and specificity are deliberate.** `:root[data-high-contrast='true']` is (0,2,0),
   the same weight as `:root[data-theme='dark']`, so it sits after it to win at equal
   weight; the dark high-contrast pairs are (0,3,0) and win outright. Moving a block is a
@@ -97,7 +106,8 @@ Three properties of this arrangement are load-bearing.
   declare the same twenty-four names, and some of those declarations repeat the bare-root
   value. That redundancy is the parity: shadowing is only total when the set is complete.
   A token added to one block and not the others leaks the wrong palette into whoever asked
-  for the combination you forgot — most often high contrast on a dark device.
+  for the combination you forgot — most often high contrast on a dark device — and the
+  same test holds the two high-contrast blocks to the same set of names.
 
 `color-scheme` is set once on bare `:root` and never overridden, so `[data-theme='light']`
 and `[data-theme='dark']` restate it. Without those two declarations an explicit choice
@@ -117,11 +127,12 @@ Never named by a component. These are the values the semantic layer points at.
 | Light-only tile fills | `--fill-exact-light`, `--fill-present-light`, `--fill-exact-light-hc`, `--fill-present-light-hc` |
 
 `--n-65` and `--n-75` are the two greys the even ramp does not hold, and each was pinned
-by a constraint window rather than by taste — inherited windows, in the terms of the
-section above. The result hues were chosen on the near-black page first, and high contrast
-answers with a stronger palette in the same hue families rather than a different pair of
-hues: telling marks apart without colour vision is the job of shape and words, and what
-high contrast buys is distance from the page.
+by a constraint window rather than by taste. The windows hold Poodl's state separations,
+which are a game's own figures, so Poodl's contrast test measures them and this one
+deliberately does not — the section above says why. The result hues were chosen on the
+near-black page first, and high contrast answers with a stronger palette in the same hue
+families rather than a different pair of hues: telling marks apart without colour vision is
+the job of shape and words, and what high contrast buys is distance from the page.
 
 ## The semantic vocabulary
 
@@ -138,8 +149,10 @@ What a component names. Each row lists tokens that move together between palette
 | Brand | `--brand-warm`, `--brand-warm-ink` | The rationed warm pair, pinned once |
 | Scrim | `--scrim` | The dialog backdrop, `rgba(0, 0, 0, 0.72)` |
 
-The result and key groups are the game surface's. Nothing in the hub renders one today,
-and that is not a reason to delete them — see the opening section. `--key-untried-bg` and
+The result and key groups are the game surface's. Nothing in the hub renders a mark or a
+key, and that is not a reason to delete them: the palette is decided here, so
+`tests/contrast.test.ts` measures them here, and `--key-untried-rule` is the boundary of two
+platform controls — `Button`'s secondary and `HeaderBar`'s chip. `--key-untried-bg` and
 `--key-scored-bg` are derived once on bare `:root` from `--background` and
 `--surface-raised`, so they follow the theme through the tokens they name rather than
 being restated per palette.
@@ -151,8 +164,8 @@ quiet grounds, not a general dimmer.
 
 `--text-disabled` and a disabled control's `--rule` border are the two inks the design
 system states rather than derives. They are exempt from every figure by
-`Appearance.@guarantee AnUnavailableControlIsExempt`, which means nothing would have
-recomputed them even with the contrast test in place — so they drift silently, and
+`Appearance.@guarantee AnUnavailableControlIsExempt`, so the contrast test measures neither
+— they drift silently, and
 [decision 0010](../decisions/0010-biscuit-games-design-system.md) records the drift that
 already happened once.
 
@@ -223,9 +236,11 @@ Two families, three committed files, all latin-subset variable woff2 under
 
 They were extracted from the pinned `@fontsource-variable` 5.3.0 packages, and the
 `src/app.css` header carries the package name, version, tarball URL and sha256 for each.
-That header is the only lockfile these files have: fonts are the one asset class
-`package-lock.json` does not govern, so the checksum in the comment is what a future
-re-extraction is checked against. Both faces are OFL 1.1, and the licence texts sit beside
+That header is the only lockfile these files have: fonts and icons are the two asset
+classes `package-lock.json` does not govern, so the checksum in the comment is what a
+future re-extraction is checked against. The icons' provenance is simpler — Lucide,
+restroked to 1.5, with the ISC text beside them in `src/lib/assets/icons/` — and
+`tests/icons.test.ts` holds the restroke. Both faces are OFL 1.1, and the licence texts sit beside
 them as `OFL-bricolage-grotesque.txt` and `OFL-instrument-sans.txt`. Deleting either text
 is a licensing defect, not a cleanup.
 
@@ -243,11 +258,11 @@ Once, in `::selection`, which paints `--brand-warm-ink` on `--brand-warm`. That 
 whole ration.
 
 The pair is pinned on bare `:root` rather than answered per theme, so one pair serves all
-four palettes; the inherited figure is 6.93 in every one of them. The rule matters as much
+four palettes; the measured figure is 6.93 in every one of them. The rule matters as much
 as the value: a token that is measured and never rendered is a figure that cannot regress
 where anyone would see it, which is why the design system's own colour is spent somewhere
-a reader actually meets it. In Poodl the contrast test asserts that this rule is what
-spends it. Here nothing does.
+a reader actually meets it. `tests/contrast.test.ts` asserts that this rule is what
+spends it.
 
 The lockup itself stays neutral. `Wordmark.svelte` draws in `--text`, and what makes the
 wordmark the wordmark is the name, the display face and the mark's one soft corner — see
@@ -262,14 +277,16 @@ shape of the work:
    change than an alias and needs a stated reason.
 2. Redeclare it in every palette block that declares its neighbours. Identical sets, all
    five blocks, or the parity above stops holding.
-3. Do the arithmetic by hand against `appearance.allium`'s floors, in all four
-   combinations, and record it beside the token. Nothing here will do it for you.
+3. Run `just frontend-coverage`. `tests/contrast.test.ts` measures the new value against
+   `appearance.allium`'s floors in all four combinations, and a pair it does not yet hold
+   is added to it in the same change. Update the figure in the comment beside the token,
+   which is provenance rather than evidence.
 4. Look at it in the workshop. The toolbar in `.storybook/preview.ts` drives theme, high
    contrast, animations and simulated reduced motion onto the document root, which is
    where every palette is keyed — see
-   [Work in the component workshop](../how-to/work-in-the-component-workshop.md). There is
-   no token specimen story here yet; `stories/Wordmark.stories.svelte` is the only story in
-   the repository.
+   [Work in the component workshop](../how-to/work-in-the-component-workshop.md).
+   `stories/Foundations.stories.svelte` is the specimen: the palette on its grounds, pinned
+   dark and dark high-contrast, the type ramp, the spacing scale and the radii.
 5. Run the `consumer-impact` skill. A renamed or removed token leaves a game's stylesheet
    resolving to nothing, and no gate here can say so.
 6. Run `just check`, and request `/chromatic` on the pull request. A token change is a

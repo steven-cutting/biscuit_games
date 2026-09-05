@@ -109,18 +109,20 @@ only place they are declared.
 | `minimum_text_contrast` | 4.5 | Text on any control the reader can operate, and body copy, against what is behind it |
 | `minimum_boundary_contrast` | 3.0 | A control's boundary against the page, where it draws one |
 
-No TypeScript module mirrors them. `src/lib/config.ts` was not ported, and with `src/` a
-skeleton there is nothing here for the figures to configure — see
-[Layering](../explanation/layering.md). Nor does anything recompute a ratio:
-`tests/contrast.test.ts` was not ported either, so both numbers are figures this
-repository states and a consumer proves. Whether `src/app.css` meets them is an inherited
-claim from Poodl's gate, not a measurement taken here.
+`src/lib/config.ts` mirrors them as `MINIMUM_TEXT_CONTRAST` and
+`MINIMUM_BOUNDARY_CONTRAST`, named for the parameters they mirror, and
+`tests/contrast.test.ts` reads them there: it recomputes every pair the stylesheet declares
+against both floors in all four combinations of theme and high contrast, so whether
+`src/app.css` meets them is a measurement taken here on every run. Changing a figure in the
+module without changing it in `docs/specs/` is drift, and the module is not exported — a
+consumer reads the specification the package carries. See
+[Layering](../explanation/layering.md).
 
-What follows from that is a working rule rather than a gate. A change to a colour token
-carries its own arithmetic, computed by hand against these two floors and recorded beside
-the token — [Design tokens](../design/tokens.md) states the terms. The guarantee that
-names them, `EveryCombinationMeetsTheLegibilityFloor`, holds in all four combinations of
-theme and high contrast, and in this repository it is met by reading.
+What follows from that is a gate rather than a working rule. A change to a colour token is
+measured by the test, and a pair the test does not yet hold is added to it in the same
+change — [Design tokens](../design/tokens.md) states the terms. The guarantee that names
+them, `EveryCombinationMeetsTheLegibilityFloor`, holds in all four combinations of theme
+and high contrast, and in this repository it is met by measurement.
 
 ## Version pins
 

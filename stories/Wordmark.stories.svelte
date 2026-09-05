@@ -40,8 +40,9 @@
   globals={{ theme: 'dark' }}
   parameters={{ docs: { story: { inline: false } } }}
   play={async () => {
-    // The one thing that proves preview.ts's attribute contract reaches the
-    // document root, which is where every palette in app.css is keyed.
+    // The first story to prove preview.ts's attribute contract reaches the
+    // document root, which is where every palette in app.css is keyed; every
+    // dark pin in the other story files rests on the same line.
     await expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
   }}
 />

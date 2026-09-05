@@ -76,9 +76,10 @@ game's.
 
 `just check-specs` and `just analyse-specs` both report an empty `diagnostics` array and
 an empty `findings` array, and no waiver stands in the module. Both recipes read
-structure. Neither renders anything, and `tests/contrast.test.ts` was not ported, so
-nothing in this repository recomputes a contrast ratio: 4.5 and 3.0 are figures the hub
-states and a consumer's own gate proves.
+structure. Neither renders anything; `tests/contrast.test.ts` does, and measures 4.5 and
+3.0 over every pair the stylesheet declares in all four combinations, so the floors are
+figures the hub states and the hub's own gate proves. A game's own pairs are proved in the
+game.
 
 ## Open questions are a feature
 
@@ -107,11 +108,12 @@ settings mean and never where the switches live, how they are guarded or how the
 stored — a settings panel belongs to the product that owns it, and there is no settings
 panel here. How is this repository's business; `AGENTS.md` decides that.
 
-Nor is it a claim about what exists. `src/` is a skeleton
-([decision 0011](../decisions/0011-skeleton-not-a-second-application.md)), so much of
-what the module states has nothing here to implement. A guarantee is an obligation on
-anything that renders a Biscuit Games surface, whenever and wherever it comes to be
-rendered.
+Nor is it a claim about what exists. The hub's route carries no settings and mounts none of
+the components it holds, so some of what the module states has nothing on the page to
+implement; its three derivations and the port that feeds them are in `src/lib/`, which is
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md). A guarantee is an
+obligation on anything that renders a Biscuit Games surface, whenever and wherever it comes
+to be rendered.
 
 ## Related pages
 

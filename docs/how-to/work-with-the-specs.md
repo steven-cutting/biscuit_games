@@ -40,21 +40,23 @@ from as well as an entity would, and they say it without a warning attached.
 
 1. Change the specification first. Add or amend the rule, its triggers, its guards and
    its outcomes.
-2. Check what depends on it. Nothing in this repository does — there is one module and it
-   imports nothing — so what depends on it is the games, and no gate here can see them.
+2. Check what depends on it. Here: `src/lib/config.ts` mirrors its two floors and
+   `tests/contrast.test.ts` measures them, `src/lib/domain/appearance.ts` implements its
+   three derivations and `tests/appearance.test.ts` holds them clause by clause, and
+   `src/lib/ports/preferences.ts` reads its three givens. Beyond here: the games, which no
+   gate can see.
    Run the `consumer-impact` skill: a changed `@guarantee` changes what a game already
    claims to satisfy. That asymmetry is
    [decision 0002](../decisions/0002-shared-material-travels-by-citation.md).
 3. Derive tests from the changed clauses and confirm they fail before implementing. A
    test that is green before you write any code is either already covered or vacuous.
-   Know the limit while you do it: `tests/contrast.test.ts` was not ported, so nothing
-   here recomputes a contrast ratio. `config.minimum_text_contrast` and
-   `config.minimum_boundary_contrast` are figures this repository states and a consumer
-   proves.
+   The floors already have one: `tests/contrast.test.ts` measures
+   `config.minimum_text_contrast` and `config.minimum_boundary_contrast` over the palette,
+   and a changed floor fails it before any code moves.
 4. Implement until they pass, without weakening any test. Some of what this module states
-   has nothing here to implement — `src/` is a skeleton
-   ([decision 0011](../decisions/0011-skeleton-not-a-second-application.md)) — and is
-   answered in `src/app.css` or in a game. That is a reason to carry the change onward,
+   is implemented here — the derivations in `src/lib/domain/appearance.ts`, the floors in
+   `src/app.css` — and some has nothing on the hub's page to implement, because the route
+   carries no settings, and is answered in a game. That is a reason to carry the change onward,
    never a reason to skip the tests this repository can run.
 5. Run `just check-specs`. It fails on any diagnostic at all, whatever its severity, so
    a diagnostic is a regression: fix it, or — for a verified checker gap — waive it on the

@@ -14,38 +14,46 @@ acceptance criteria for any change that touches a surface — here, and in every
 the design system. The module imports nothing, so a game inherits these obligations whole
 rather than restating them, and owes an account of any state it adds on top.
 
-This is the platform's model rather than a survey of this repository's code. `src/` is a
-skeleton — one route, one component, one stylesheet, per
-[decision 0011](../decisions/0011-skeleton-not-a-second-application.md) — so most of what is
-stated below has nothing here to implement. It is stated anyway. An obligation nobody has
-written down is one the first implementation gets to decide by accident.
+This is the platform's model, and since
+[decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) the platform
+primitives that implement it are here too: `Button`, `IconButton`, `HeaderBar`, `Modal`,
+`Notice` and `Announcer`, the preferences port that reads the device, and the contrast test
+that measures the palette. What is stated below names, for each obligation, what here
+discharges it and what still waits. An obligation nobody has written down is one the first
+implementation gets to decide by accident.
 
-## Every figure here is inherited, not measured
+## How the figures are measured
 
-`tests/contrast.test.ts` was not ported. Nothing in this repository recomputes a contrast
-ratio, in any theme, for any pair of colours. Read that before reading anything below,
-because almost every number on this page, and every number in `src/app.css`'s comments, is a
-figure Poodl measured against a palette this repository copied.
+`tests/contrast.test.ts` reads `src/app.css` from disk, drives all four combinations of theme
+and high contrast through the root attributes, and recomputes every pair the palette declares
+against the floors `appearance.allium` states. Read that before reading anything below,
+because every number on this page and every number in the stylesheet's comments is a figure
+that test measures here, in this palette, on every run of `just check`.
 
-The consequences are worth stating plainly rather than discovering.
+What it measures is the stylesheet's declarations, not the surfaces this repository renders.
+The result and key tokens are a game's to spend, and they are measured here anyway because
+the palette is decided here: a token that fails this test fails on a board this repository
+has never seen. What it deliberately does not measure is any separation between two of a
+game's own states — how far an untried key sits from a scored one — because
+`appearance.allium` leaves that figure to the game, and Poodl's gate holds it against Poodl's
+own specification.
 
-- **A ratio quoted in a comment is a claim.** `src/app.css` still cites `game.allium`,
-  `src/lib/config.ts` and test files that do not exist here. Those citations are provenance —
-  where the value came from — never evidence that anything checks it now.
-- **Nothing catches drift.** A token edited here resolves to whatever it resolves to and the
-  gate stays green. That is the copy-and-cite cost
-  [decision 0002](../decisions/0002-shared-material-travels-by-citation.md) accepts, seen from
-  its sharp end.
-- **A review computes by hand and says so.** The `accessibility-review` skill in
-  `.agents/skills/` asks for exactly that, and a review that quotes a figure without saying
-  where it came from has added a second unmeasured claim.
-- **A game proves the copy where a test can run.** A value leaves here as a number with a
-  citation attached; the repository that renders it is the one that can measure it.
+The consequences are worth stating plainly.
+
+- **A ratio quoted in a comment is provenance for a measurement.** The comment says why the
+  value was chosen; the test says whether it still clears the floor.
+- **Drift is caught.** A token edited here either clears the floor in all four combinations
+  or fails the run.
+- **A review reads the test, not the arithmetic.** The `accessibility-review` skill in
+  `.agents/skills/` asks whether a new pair was added to the test, not for a figure computed
+  by hand.
+- **A game proves what only it renders.** A game's separations, and any pair its own
+  components introduce, are measured where those components run.
 
 The two floors themselves are different in kind. `config.minimum_text_contrast` at 4.5 and
 `config.minimum_boundary_contrast` at 3.0 are thresholds the specification states, as ratios
-naming no colour. They are true without a gate. What no gate here can tell you is whether a
-rendering meets them.
+naming no colour, and `src/lib/config.ts` mirrors them for the test to read. They are true
+without a gate. The gate is what says whether a rendering meets them.
 
 ## What the specification decides
 
@@ -78,8 +86,9 @@ Biscuit Games starts, and by `system`, which follows the device as it changes an
 following it, which is `SystemFollowsTheDeviceAsItChanges`. `src/app.css` therefore declares
 the dark palette twice, once under `[data-theme='dark']` and once under
 `prefers-color-scheme: dark`, and that duplication is the one way this palette can drift out
-of step with itself. In Poodl a test read both blocks as text and held them equal. Here
-nothing does, so the two blocks are kept in step by whoever edits them.
+of step with itself. `tests/contrast.test.ts` reads both blocks as text and holds them
+equal, and holds the two high-contrast blocks to the same set of names, which is what makes
+every ratio it measures cover both routes.
 
 **More contrast asked of the operating system turns high contrast on.** The device wins the
 same way it does for motion, so a reader who has already asked their system does not have to
@@ -90,11 +99,14 @@ open question rather than a decision.
 
 That is the rule. What holds here is less, in both halves. There is no settings panel to carry
 the reader's own answer, and the module excludes one deliberately, because a panel belongs to
-the product that owns it. And nothing here derives `high_contrast_active` from a live device
-preference either: `prefers-contrast: more` reaches no selector in `src/app.css`, which keys
-the high-contrast palette on `data-high-contrast='true'` and on nothing else. That second half
-needs no panel and no port — a media query answers it — so it is the smaller of the two debts
-and the one to pay first. Today a reader who asked their system for more contrast gets the
+the product that owns it. And the route does not yet derive `high_contrast_active` from a
+live device preference either. The pieces exist — `src/lib/ports/preferences.ts` asks
+`prefers-contrast: more`, and `highContrastActive` in `src/lib/domain/appearance.ts` makes
+the derivation, both tested against a fake — but nothing on the route calls them, and
+`prefers-contrast: more` reaches no selector in `src/app.css`, which keys the high-contrast
+palette on `data-high-contrast='true'` and on nothing else. A media query in the stylesheet
+would answer the device half without the port, so it is the smaller of the two debts and
+the one to pay first. Today a reader who asked their system for more contrast gets the
 standard palette.
 
 **Motion respects the operating system.** Animations run only when the animations setting is
@@ -103,9 +115,11 @@ wins. `src/app.css` holds every duration at zero until `data-animations` is pres
 root, so a component may write its transition unconditionally and one derived answer stays the
 single gate; a media query of a component's own is a second opinion on the same question,
 which is how the two come apart. `src/app.html` states the default in the markup, and the
-workshop writes the same attribute from its own toolbar. Nothing here derives
-`animations_active` from a live device preference, because there is no preferences port and no
-surface asking for one. The derivation arrives with the first component that animates.
+workshop writes the same attribute from its own toolbar. The derivation exists —
+`animationsActive` in `src/lib/domain/appearance.ts`, fed by the reduced-motion answer the
+preferences port reads — and nothing on the route calls it yet. `Modal` is the one component
+whose arrival is keyframed, and `Button` and `IconButton` transition their colours; all
+three are gated on the same attribute, which the route writes flat.
 
 ## The one exemption, and how narrow it is
 
@@ -127,10 +141,10 @@ The exemption is from the figures and from nothing else.
   low-priority is not unavailable, and the exemption does not stretch to reach it.
 
 In `src/app.css` this is why `--text-disabled` and the disabled button's `--rule` border are
-the two inks Poodl's contrast test deliberately never measured — and being unmeasured is
-exactly why they are the values the design system states rather than values chosen here. Here
-that distinction has gone flat: nothing measures anything, so those two inks are no longer
-distinguishable from the rest of the palette by what checks them.
+the two inks `tests/contrast.test.ts` deliberately never measures, here as in Poodl — and
+being unmeasured is exactly why they are the values the design system states rather than
+values chosen here. `Button` and `IconButton` spend them, with the state carried by the
+`disabled` attribute and the words kept, which `tests/primitives.test.ts` holds.
 
 This is also the one place a silent gate agrees with the specification rather than merely
 failing to reach it. Axe declines to judge a disabled control — `is_disabled_default` in its
@@ -141,12 +155,12 @@ exempt.
 
 Three obligations came across with the tokens and answer to no clause in `appearance.allium`.
 In Poodl they were stated in the game's own modules — a direct-manipulation contract, two
-config values this repository does not have, and a keyboard clause repeated on every surface
-that provides an operation. They are kept as standing rules — in `src/app.css`, and
-in the `accessibility-review` skill — because the stylesheet still spends them and because
-they are platform habits rather than one game's. Where they are finally stated is not yet
-decided: the first surface here that needs them, or a game's own module, is what will force
-the answer.
+config values this repository holds only as story fixtures, and a keyboard clause repeated
+on every surface that provides an operation. They are kept as standing rules — in
+`src/app.css`, in `stories/fixtures.ts`, and in the `accessibility-review` skill — because
+the stylesheet and the platform's controls spend them and because they are platform habits
+rather than one game's. Where they are finally stated is not yet decided, and it is the
+next specification question this repository owes an answer to.
 
 **Everything is keyboard operable.** Every operation a surface provides can be reached and
 invoked from the keyboard alone, with visible focus. `:focus-visible` in `src/app.css` draws a
@@ -156,12 +170,20 @@ rather than per caller: focus goes into the panel when it opens, Escape closes i
 inside rather than wandering out to whatever is behind, and focus returns to whatever opened
 it on the way out. That last one is easy to leave out and invisible until someone tries —
 closing destroys the element focus is on, the browser falls back to the document body, and the
-reader who tabbed to a control and pressed Escape resumes from the top of the page. There is
-no dialog here yet. When one arrives it carries the whole of that.
+reader who tabbed to a control and pressed Escape resumes from the top of the page. `Modal`
+is that dialog and carries the whole of that: focus into the panel on arrival, Escape to
+`onclose`, Tab cycling over the panel's focusable descendants, and focus handed back to the
+opener on the way out if it is still in the document. `tests/shells.test.ts` holds each.
+What the shell cannot do is catch a child that removes the control the reader just used — a
+removed element fires no `focusout` — so a child that swaps a control carries focus across
+its own swap, which is what `Button`'s bindable `element` is for.
 
-`.visually-hidden` is in the stylesheet too, with nothing yet to announce through it. A
-surface that changes something without moving focus owes an announcement; the platform states
-none, and the class is here so that the first one does not invent its own.
+`.visually-hidden` is in the stylesheet, and `Announcer` is the live region that uses it: a
+`role="status"` paragraph keyed on a sequence number, so the same sentence twice is heard
+twice. `Notice` is its visible counterpart — the sentence where the reader is looking, with
+`role="status"` so it is heard as well as seen, and never duplicated into `Announcer`. A
+surface that changes something without moving focus owes an announcement through one of the
+two; the platform states which shapes, and a game states which sentences.
 
 **Every control is big enough to hit.** 44px, in both directions, down to the 320px viewport
 that is the narrowest supported width. Both figures are inherited — Poodl's
@@ -177,7 +199,10 @@ than the design system's 480px, because a 480px shell caps a key in a ten-across
 deliberately not declared, since a floor in that direction would be wrong for a dense row and
 would have to be fought back wherever it applied. A game that genuinely cannot meet the figure
 in both directions says so in its own specification and states what the width of the screen is
-allowed to take away.
+allowed to take away. `stories/fixtures.ts` holds both figures for the plays that measure
+a rendered control: `Button`'s and `IconButton`'s boxes against the 44, and `HeaderBar` laid
+out at 320px with nothing scrolling sideways and every target whole. `IconButton` sets its
+own 44px width and takes its height from the stylesheet's floor.
 
 A text control is included on purpose: a 37px input is as much a target as a 37px button. It
 also needs a font no smaller than 16px, below which iOS Safari magnifies the page when the
@@ -216,10 +241,9 @@ control that took the tap rather than on the words pointing at it.
 
 ## How this is checked
 
-By test, not by audit — and there is very little here to test. `tests/` holds
-`wordmark.test.ts` and `stories/` holds `Wordmark.stories.svelte`. The conventions below are
-inherited rules waiting for material rather than a description of a body of evidence, and
-[Testing](../reference/testing.md) says which they are.
+By test, not by audit. `tests/` holds a suite per component group, the contrast test, the
+port's and the derivations'; `stories/` holds a file per component and the token sheet.
+[Testing](../reference/testing.md) says what each proves.
 
 **Query by accessible role and name.** A component test finds a control the way a screen
 reader does, so an assertion fails when a name is missing or wrong. Never by class, never by
@@ -228,10 +252,10 @@ test id.
 **Axe runs on every story.** `.storybook/preview.ts` sets the accessibility addon's test mode
 to `error`, where the addon's own default only reports, and the story run renders each story
 in real Chromium. That catches a class of defect a role-and-name query cannot see at all:
-contrast below threshold, a landmark used twice, a control with no computed name. Today it
-covers one component. The workshop toolbar can drive all four combinations of theme and high
-contrast, but each story is checked only in the appearance its globals select, so a palette is
-covered when a story pins it and never automatically. See
+contrast below threshold, a landmark used twice, a control with no computed name. It covers
+every component, but each story is checked only in the appearance its globals select, so a
+palette is covered when a story pins it and never automatically — which is why every story
+file pins dark, and dark high contrast where the look inverts. See
 [Decision 0008](../decisions/0008-component-workshop.md).
 
 **A gate's silence is not a pass.** Axe skips what it cannot attribute and declines to judge
@@ -249,8 +273,8 @@ what it cannot compute, and both blind spots fall exactly where a game's play su
   stand off its background rather than off a second state, so a game that needs that pair
   states it and holds it itself.
 
-Those are the smaller gaps. The larger one is the whole of the section above: no runner here
-recomputes a ratio at all, so a palette change is reviewed by reading and by hand.
+Those gaps are why the contrast test exists beside axe: it measures the palette, in every
+combination, including the pairs axe never attributes.
 
 Some things need a person, and always did. `-webkit-touch-callout` is declared and verified by
 neither runner, because jsdom's parser drops it, desktop Chromium does not report it, and the
