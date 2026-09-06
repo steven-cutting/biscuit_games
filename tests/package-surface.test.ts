@@ -37,6 +37,12 @@ import type {
  * and no game can import it. The type-only exports are held the same way, at
  * compile time: a type that stopped being exported fails `svelte-check` on the
  * import above before any assertion runs.
+ *
+ * What is asserted is reachability and nothing past it. Every assertion here
+ * should be able to fail for a barrel reason and no other, so a render checks
+ * that a component arrives and mounts rather than checking what it drew — its
+ * own suite holds that, and a defect asserted in two places is a defect reported
+ * under two names.
  */
 const COMPONENTS = [
   'Announcer',
@@ -137,7 +143,7 @@ describe('the package surface', () => {
 
     render(surface.Keyboard, { layout, marks: { q: mark } });
 
-    expect(screen.getByRole('button', { name: 'Q, correct' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(surface.claimKey(press, bindings)).toBe('q');
     expect(surface.latinLetters('Q')).toBe('q');
     expect(port.subscribe(() => false)).toBeTypeOf('function');

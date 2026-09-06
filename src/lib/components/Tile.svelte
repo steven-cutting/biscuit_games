@@ -79,12 +79,18 @@
    * `AnUnmarkedCellStandsOffAMarkedOne` states the figures and
    * `tests/contrast.test.ts` computes them.
    *
-   * 3rem is a literal on purpose, and it is the same carve-out `Button`'s 48px
-   * takes. It matches `--s-11` by value and not by meaning: that is the spacing
-   * scale, and a cell's size is not a gap between things. Naming the token here
-   * would resize every board when the scale moved for a reason of its own. The
-   * padding inside a `Key` is not in that carve-out and does name its tokens,
-   * because padding is spacing.
+   * 3rem is a literal on purpose, and it is the carve-out `Button`'s 48px takes
+   * — with one difference worth being exact about, because the same commit that
+   * wrote this comment moved `Key`'s padding to tokens on precisely this
+   * distinction. `Button` writes `48px` against a `--s-11` that is `48px`, so the
+   * coincidence is by value at every root size. This writes `3rem`, which equals
+   * `--s-11` only at the 16px root nothing here overrides. Neither is the
+   * spacing scale in meaning: that is a gap between things, and a cell's size is
+   * not one. The unit is the second decision and it is deliberate — a cell holds
+   * a letter at `--fs-board`, so it is sized in the same relative unit the letter
+   * is, and a reader who scales their text gets a cell that grows with it rather
+   * than a letter pressed against a fixed box. A `Key`'s padding is spacing, is
+   * in no carve-out, and names `--s-5` and `--s-1`.
    */
   .tile {
     position: relative;

@@ -555,16 +555,24 @@ input[type='radio'] {
  * native box inside that row, which shares the row's ring rather than carrying
  * one of its own.
  *
- * A checkbox nobody wrapped in a label is not on it. Such a control has no ring
- * of ours to fall back on, so it keeps the platform's own and reads as alive
- * under a finger; everything the rule above gives it still stands, which is the
- * whole of what ATapDoesOnlyWhatTheControlDoes asks for.
- * `tests/operation.test.ts` compares the two lists outright, because both of
- * them mention a label for unrelated reasons and a substring test passed the
- * whole time this was wrong.
+ * Two controls are deliberately off it. A checkbox nobody wrapped in a label has
+ * no ring of ours to fall back on, and neither has a label bound by `for` to a
+ * control outside it — `:has()` reaches a descendant and nothing else, so such a
+ * label matches no rule below. Both keep the platform's own flash and read as
+ * alive under a finger, and everything the rule above gives them still stands,
+ * which is the whole of what ATapDoesOnlyWhatTheControlDoes asks for.
+ *
+ * The qualifier on `label` is the whole of that: an unqualified `label` here
+ * suppressed the flash on every label on the page while the ring below reached
+ * only the ones wrapping a control, which is the same inversion this split
+ * exists to end, one element over. `tests/operation.test.ts` now decides it by
+ * asking each control in a fixture whether it matches each rule, rather than by
+ * comparing selector strings — two lists that mention a label for unrelated
+ * reasons compare equal as text and differ as element sets, and that is exactly
+ * how this went unnoticed.
  */
 button,
-label,
+label:has(input),
 label input[type='checkbox'],
 label input[type='radio'] {
   -webkit-tap-highlight-color: transparent;
@@ -657,11 +665,25 @@ textarea {
  * figure alone would be a declaration that did nothing. Inline rather than block,
  * because this is a global element rule in a stylesheet a game takes whole and
  * `flex` would stack two rows a consumer had laid side by side.
+ *
+ * And `gap` comes with it rather than after it. Flex wraps the label's text run
+ * in an anonymous item and trims the white space at its edges, so the word-space
+ * that used to sit between the native box and its words disappears the moment
+ * this rule applies. A declared gap is what puts it back, and a floor that
+ * silently closed that space would be a worse row than the short one it fixed.
+ *
+ * Only the wrapping form. `:has()` reaches a descendant, so a label bound by
+ * `for` to a control outside it matches nothing here — which is why the
+ * invariant names the label that *contains* the control rather than any label
+ * bound to one. A surface that binds by `for` sizes its own row, and keeps the
+ * platform's tap flash to acknowledge it, because the rule above leaves it
+ * alone.
  */
 label:has(input[type='checkbox']),
 label:has(input[type='radio']) {
   display: inline-flex;
   align-items: center;
+  gap: var(--s-4);
   min-block-size: 44px;
 }
 

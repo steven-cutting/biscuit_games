@@ -249,16 +249,30 @@ nothing is released, so no version moves and no consumer took any of them.
 - The row a preference is set from carries the 44px floor it had been promised in prose. A
   native checkbox is thirteen pixels and no stylesheet makes it forty-four, so
   `EveryControlIsAComfortableTarget` now states outright that such a control meets the figure
-  in the label bound to it — and `src/app.css` now declares it, with the `inline-flex` that
-  makes `min-block-size` apply to a `<label>` at all.
+  in the label that *contains* it — and `src/app.css` declares it, with the `inline-flex` that
+  makes `min-block-size` apply to a `<label>` at all and the `gap` that puts back the
+  word-space flex would otherwise trim. A label bound by `for` to a control outside it is
+  reached by no rule here, and the invariant says so: that row is the surface's own to size.
 - The tap-highlight suppression reaches only the controls that get a replacement. It was one
   rule with the callout suppression, so a bare checkbox lost the platform's own flash and no
   rule gave one back: `ATouchIsAcknowledged` inverted on the control least likely to be looked
-  at. `touch-action`, the callout and the selection suppression stay on all four kinds.
+  at. `touch-action`, the callout and the selection suppression stay on all four kinds. The
+  `label` in the flash list is qualified as `label:has(input)`, because an unqualified one
+  reaches every label on the page while both paying rules reach only the wrapping ones — the
+  same inversion, one element over.
+- A focused control keeps every key that activates it, not only Enter, and through both
+  channels. `claimKey` surrendered Enter alone and only where a binding was declared as an
+  action, which held for `QWERTY_BINDINGS` and for nothing a game might write: a surface
+  binding Space took it from every focused button and summary, and a browser fires that
+  activation on the keyup only when the keydown was not cancelled, so the control went quiet
+  rather than firing late.
 - `Key`'s padding names `--s-5` and `--s-1`. Padding is spacing, not the coincident-literal
-  carve-out a control's own dimension takes, and the literals were the same figure only at the
-  root font size. `Tile`'s 3rem *is* in the carve-out and now carries the comment the rule
-  asks for, the way `Button`'s 48px does.
+  carve-out a control's own dimension takes. The spacing scale is in pixels, so the padding now
+  moves with the scale and no longer with a reader's text size — a behaviour change, and the
+  trade the token rule makes everywhere. `Tile`'s 3rem *is* in the carve-out and now carries
+  the comment the rule asks for, stating the difference from `Button`'s 48px rather than
+  claiming to be identical to it: 48px coincides with `--s-11` at every root size, 3rem only
+  at the 16px one, and the unit is deliberate because a cell holds a letter sized in rem.
 
 And three gates named in a comment, in a claim, or in nothing at all:
 
@@ -272,8 +286,8 @@ And three gates named in a comment, in a claim, or in nothing at all:
   hands `modified` in already computed, so only `ctrlKey` had ever reached the adapter's own
   short-circuit. Green on arrival, and now driven rather than assumed.
 
-Two clauses were reworded rather than repaired, because the specification was wrong and the
-code was right:
+Three clauses were reworded rather than repaired, because the specification was wrong or
+could not say what the code had to do:
 
 - `EveryControlIsAComfortableTarget` names its second exemption: a control inside a line of
   running text takes its size from the text around it. This repository's only route has a link
@@ -282,7 +296,15 @@ code was right:
 - `AModifiedKeyIsNeverClaimed` names Control, Meta and Alt rather than "a platform modifier".
   Shift is not one of them: it carries no shortcut of its own, so a shifted letter is still the
   reader typing a letter — which is what `latinLetters` had always assumed, and what the loose
-  wording contradicted.
+  wording contradicted. The test is the shortcut and not the composing, and the clause says so:
+  Alt composes too, on macOS it is the compose key, and it is on the list anyway because it
+  also carries shortcuts. What that costs — a letter composed with Alt not arriving as a bare
+  key press — is named in the clause rather than left to be found.
+- `EveryMarkIsNamedInWords` says that a sentence of nothing but spaces is no words. The field
+  beside it, `is_told_in_words`, compares against the empty string and has no way to say
+  "blank", so the invariant carries that half and the comment on the field says which governs.
+  Written down because `drawnMark` trims, and a threshold decided in code rather than in the
+  specification is the thing invariant 1 exists to stop — including when the code is right.
 
 ### Deliberately not included
 

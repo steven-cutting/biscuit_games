@@ -79,6 +79,36 @@ describe('claimKey', () => {
     expect(claimKey(press(' '), WIRING)).toBeNull();
   });
 
+  /*
+   * Both keys the browser activates with, and through both channels. The
+   * surrender was once asked for Enter alone and inside the action branch alone,
+   * which held for `QWERTY_BINDINGS` and for nothing a game might write: a
+   * surface binding Space took it from every focused control, and one answering
+   * Enter through its alphabet reached the open channel and took that. Neither
+   * is exotic — `claimKey` and `KeyBindings` are the public surface a game
+   * supplies its own bindings through.
+   */
+  it('surrenders space to a control that has focus, as it does Enter', () => {
+    const crossword: KeyBindings = {
+      actions: { ' ': 'turn', Enter: 'submit' },
+      content: latinLetters
+    };
+
+    expect(claimKey(press(' ', { inActivatable: true }), crossword)).toBeNull();
+    expect(claimKey(press(' '), crossword)).toBe('turn');
+  });
+
+  it('surrenders an activating key the alphabet answers to, not only a bound action', () => {
+    const phrases: KeyBindings = {
+      actions: {},
+      content: (key) => (key === ' ' || key === 'Enter' ? key : latinLetters(key))
+    };
+
+    expect(claimKey(press(' ', { inActivatable: true }), phrases)).toBeNull();
+    expect(claimKey(press('Enter', { inActivatable: true }), phrases)).toBeNull();
+    expect(claimKey(press(' '), phrases)).toBe(' ');
+  });
+
   // The alphabet is the surface's, not the platform's. A game of numbers says so
   // here, and a game with no content channel at all passes one that never claims.
   it('takes the alphabet from the surface rather than assuming one', () => {
@@ -368,23 +398,30 @@ describe('the drawn keys and the typed ones', () => {
     expect(sorted(Object.values(QWERTY_BINDINGS.actions))).toEqual(sorted(drawnActions));
   });
 
+  /*
+   * Through `claimKey` rather than through `content` directly, because `claimKey`
+   * is what a typed key actually answers: the guards run first, and a binding
+   * that only agreed once they were skipped would agree about nothing a reader
+   * can do.
+   */
   it('answers a drawn content key with the value that key carries', () => {
     const content = drawn.filter((key) => key.kind !== 'action');
 
     expect(content).not.toHaveLength(0);
     for (const key of content) {
-      expect(QWERTY_BINDINGS.content(key.value), key.value).toBe(key.value);
+      expect(claimKey(press(key.value), QWERTY_BINDINGS), key.value).toBe(key.value);
     }
   });
 
   // The other direction: no drawn key is one the surface would refuse if typed.
   it('leaves no drawn key unanswered', () => {
     for (const key of drawn) {
-      const answered =
-        Object.values(QWERTY_BINDINGS.actions).includes(key.value) ||
-        QWERTY_BINDINGS.content(key.value) !== null;
+      const typed = Object.entries(QWERTY_BINDINGS.actions).find(
+        ([, value]) => value === key.value
+      );
+      const answered = claimKey(press(typed?.[0] ?? key.value), QWERTY_BINDINGS);
 
-      expect(answered, key.value).toBe(true);
+      expect(answered, key.value).toBe(key.value);
     }
   });
 });

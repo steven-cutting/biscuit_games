@@ -59,6 +59,8 @@ const CONTROLS = `
   <textarea></textarea>
   <label><input type="checkbox" /> High contrast</label>
   <input type="radio" />
+  <label for="dark">Dark</label>
+  <input id="dark" type="checkbox" />
 `;
 
 let stylesheet: HTMLStyleElement;
@@ -116,9 +118,24 @@ function ruleFor(selector: string): CSSStyleRule {
   throw new Error(`No rule for ${selector}`);
 }
 
-/** A rule's selectors, in the order it declares them and each on its own. */
-function selectorsOf(rule: CSSStyleRule): string[] {
-  return rule.selectorText.split(',').map((one) => one.trim());
+/**
+ * A rule's selector with `:active` taken out, so a fixture at rest can be asked
+ * which controls it reaches.
+ *
+ * Exactly `:active` and nothing else. Cutting at the first colon instead — which
+ * is what an earlier version of the test below did — turns
+ * `label:has(input:not(:disabled)):active` into `label`, and two rules that
+ * reach demonstrably different elements then compare equal as text. That is the
+ * shape of the defect this whole block exists to catch, so the helper is written
+ * not to have it.
+ */
+function atRest(rule: CSSStyleRule): string {
+  return rule.selectorText.replace(/:active/gu, '');
+}
+
+/** Every element of the fixture, so a rule is asked rather than read. */
+function controls(): Element[] {
+  return Array.from(host.querySelectorAll('*'));
 }
 
 describe('ATapDoesOnlyWhatTheControlDoes', () => {
@@ -233,6 +250,19 @@ describe('EveryControlIsAComfortableTarget', () => {
 
     expect(row.getPropertyValue('min-block-size')).toBe(`${String(MINIMUM_TOUCH_TARGET)}px`);
     expect(row.getPropertyValue('display')).toBe('inline-flex');
+    // Flex trims the white space around the label's text run, so the word-space
+    // between the native box and its words has to be declared or it is gone.
+    expect(row.getPropertyValue('gap')).not.toBe('');
+  });
+
+  /*
+   * And the shape the invariant hands back to the surface. `:has()` reaches a
+   * descendant, so a label bound by `for` to a control outside it is reached by
+   * no rule here — which is what the invariant now says rather than something
+   * this test discovered.
+   */
+  it('leaves a label bound to a control outside it to the surface that wrote it', () => {
+    expect(() => ruleFor('label[for]')).toThrow(/No rule for/u);
   });
 
   /*
@@ -297,19 +327,19 @@ describe('ATouchIsAcknowledged', () => {
    * story run measures the ring itself.
    */
   it('owes an acknowledgement to every control it took one from', () => {
-    const took = selectorsOf(ruleFor("label input[type='checkbox']"));
-    const gave = selectorsOf(ruleFor('button:active:not(:disabled)'));
+    const took = ruleFor('label:has(input)').selectorText;
+    const gives = atRest(ruleFor('button:active:not(:disabled)'));
+    const suppressed = controls().filter((control) => control.matches(took));
 
-    expect(took).toEqual([
-      'button',
-      'label',
-      "label input[type='checkbox']",
-      "label input[type='radio']"
-    ]);
-    expect(gave.map((one) => one.replace(/:.*$/u, '').replace(/\s.*$/u, ''))).toEqual([
-      'button',
-      'label'
-    ]);
+    expect(suppressed).not.toHaveLength(0);
+
+    for (const control of suppressed) {
+      // Its own ring, or the row's: a native box inside a label shares that
+      // label's rather than carrying one of its own.
+      const answered = control.matches(gives) || control.closest(gives) !== null;
+
+      expect(answered, control.outerHTML).toBe(true);
+    }
   });
 
   /*
@@ -320,12 +350,26 @@ describe('ATouchIsAcknowledged', () => {
    * the callout and the selection is a different rule and still reaches it \u2014
    * `ATapDoesOnlyWhatTheControlDoes` is owed to every control alike.
    */
-  it('leaves the platform its own flash where it offers no replacement', () => {
-    expect(selectorsOf(ruleFor("label input[type='checkbox']"))).not.toContain(
-      "input[type='radio']"
-    );
+  it.each([
+    ['a checkbox nobody wrapped in a label', 'input[type="radio"]'],
+    ['a label bound to a control outside it', 'label[for]']
+  ])('leaves the platform its own flash to %s', (_what, selector) => {
+    const took = ruleFor('label:has(input)').selectorText;
+    const control = host.querySelector(selector);
+
+    expect(control).not.toBeNull();
+    expect(control?.matches(took)).toBe(false);
+  });
+
+  /*
+   * And the first rule still reaches them, because
+   * `ATapDoesOnlyWhatTheControlDoes` is owed to every control alike — only the
+   * flash narrowed, and only because a flash taken is a flash owed back.
+   */
+  it('keeps every control the tap rules it is owed', () => {
     expect(resolved('input[type="radio"]', 'touch-action')).toBe('manipulation');
     expect(resolved('input[type="radio"]', 'user-select')).toBe('none');
+    expect(resolved('label[for]', 'user-select')).toBe('none');
   });
 
   /*

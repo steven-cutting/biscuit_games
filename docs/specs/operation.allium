@@ -37,6 +37,9 @@
 --     play-surfaces.allium states those, and states on-screen keys as a surface
 --     made of them; the size of one of those keys and its place in its row are
 --     this module's, under EveryControlIsAComfortableTarget.
+--   - How a surface binds a label to the control it names. The invariant says
+--     which shape the platform answers for and which the surface answers for
+--     itself, and says nothing about how either is written.
 --   - Where the switch is that stops a surface claiming bare keys, and whether
 --     there is one. A control that changes a setting belongs to the product
 --     that owns it, as it does in appearance.allium; the open question at the
@@ -134,11 +137,20 @@ contract DirectManipulation {
         -- other control.
         --
         -- Every other control meets the figure outright, and a control the
-        -- reader activates by pressing a label bound to it meets the figure in
-        -- that label rather than in its own box: the label is what the finger is
-        -- aimed at, so the label is what has to answer. All of this holds down
-        -- to config.narrowest_supported_width, at which the surface is usable
-        -- without scrolling sideways.
+        -- reader activates by pressing a label that contains it meets the figure
+        -- in that label rather than in its own box: the label is what the finger
+        -- is aimed at, so the label is what has to answer, and the words beside
+        -- the control are part of the target rather than next to it.
+        --
+        -- A label bound to a control it does not contain is the surface's own to
+        -- size. The platform cannot see that binding from the label — it is a
+        -- name matched against an identifier elsewhere in the document — so a
+        -- surface that binds that way answers for the row itself. Stated rather
+        -- than left out, because the shape is legal, common, and would otherwise
+        -- fall through the figure with nothing saying whose it was.
+        --
+        -- All of this holds down to config.narrowest_supported_width, at which
+        -- the surface is usable without scrolling sideways.
 
     @invariant ATouchIsAcknowledged
         -- A control shows that it was touched, from the moment of contact,
@@ -254,12 +266,19 @@ surface TypedInput {
         -- A key pressed together with a shortcut modifier — Control, Meta or
         -- Alt — belongs to the browser and the operating system, and is never
         -- taken. Those three and not every modifier the keyboard has: Shift
-        -- carries no shortcut of its own, and composes the character the reader
-        -- meant rather than addressing anything above the surface, so a shifted
-        -- letter is still the reader typing a letter and a surface that claims
-        -- letters claims that one. A surface deciding what its alphabet is is
-        -- free to case-fold or not; this clause says only that Shift is not what
-        -- takes a key away from it.
+        -- carries no shortcut of its own on any platform this runs on, so a
+        -- shifted letter is still the reader typing a letter and a surface that
+        -- claims letters claims that one. A surface deciding what its alphabet
+        -- is is free to case-fold or not; this clause says only that Shift is
+        -- not what takes a key away from it.
+        --
+        -- The test is the shortcut and not the composing. Alt composes as well
+        -- as it addresses — on macOS it is the compose key, where a reader types
+        -- a Nordic or accented letter with it — and it is on the list anyway,
+        -- because it also carries shortcuts a surface must not swallow. The cost
+        -- is real and named here rather than discovered: a game whose alphabet
+        -- includes a letter composed with Alt does not receive it as a bare key
+        -- press, and reaches it through a control the reader can operate.
 
     @guarantee DroppingTheClaimIsTotal
         -- Not claiming means not intercepting, rather than intercepting and

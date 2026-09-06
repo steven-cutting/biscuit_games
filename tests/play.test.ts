@@ -284,7 +284,9 @@ describe('Explainer', () => {
   it('gives a reader the sentences and not the examples', () => {
     render(ExplainerHost, {});
 
-    expect(screen.getAllByRole('listitem', { name: /marker bar\.$/iu })).toHaveLength(2);
+    // `[Mm]` rather than the `i` flag, which folds under `u` — the same folding
+    // `latinLetters` had removed from it in this file's sibling suite.
+    expect(screen.getAllByRole('listitem', { name: /[Mm]arker bar\.$/u })).toHaveLength(2);
     expect(screen.queryAllByRole('img')).toHaveLength(0);
     expect(screen.getAllByRole('img', { hidden: true })).toHaveLength(2);
   });

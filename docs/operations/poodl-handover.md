@@ -289,9 +289,11 @@ Five more contract changes come with them:
 **And two visual changes Poodl should expect in Chromatic.** `Tile` and `Key` drew the same
 indication to different figures — 62%/22% at 3px on a tile, 56%/20% at 2px on a key — and the
 system owns one set now, which is the tile's. And a key's padding names `--s-5` and `--s-1`
-rather than spelling 0.75rem and 0.125rem, which is the same figure at the root size and no
-longer the same figure once a reader has scaled their text — padding is spacing, so it takes
-the token and moves with the scale. Poodl's `Tile` baselines are unchanged; its `Keyboard`
+rather than spelling 0.75rem and 0.125rem. That is the same figure today and not the same
+kind of figure: the spacing scale is in pixels, so the padding now moves when the *scale*
+moves and stops moving when a reader scales their *text*. Padding is spacing and belongs to
+the scale, which is the trade the token rule makes everywhere; it is recorded here because it
+is a behaviour change and not only a substitution. Poodl's `Tile` baselines are unchanged; its `Keyboard`
 baselines all diff on the version it adopts.
 
 Three of the contracts changed on the way, and Poodl's call sites change with them:
@@ -353,13 +355,32 @@ repository stated and did not hold, or held somewhere the code disagreed with.
 
 **`src/app.css` gains a floor for the row a preference is set from.** A native checkbox is
 thirteen pixels and no stylesheet makes it forty-four, so `EveryControlIsAComfortableTarget`
-now says outright that such a control meets the figure in the label bound to it. The
+now says outright that such a control meets the figure in the label that *contains* it. The
 stylesheet had argued exactly that in prose beside the pressed ring and declared no floor for
 it, so `label:has(input[type='checkbox'])` and its radio twin now carry `inline-flex`,
-`align-items: center` and `min-block-size: 44px`. Poodl's `SettingsPanel` rows are the only
-place in the platform that renders the shape, so they are where it will be seen: a row
-shorter than 44px grows, and a row already taller does not move. `inline-flex` rather than
-`flex` on purpose, so two rows a layout had placed side by side stay side by side.
+`align-items: center`, `gap: var(--s-4)` and `min-block-size: 44px`. Poodl's `SettingsPanel`
+rows are the only place in the platform that renders the shape, so they are where it will be
+seen, and it is more than a height:
+
+- **A row shorter than 44px grows**, and a row already taller does not move.
+- **The row becomes a flex container**, so a scoped `label { display: … }` of Poodl's own is
+  overridden: `label:has(input[type='checkbox'])` is specificity (0,1,2) and beats both a
+  single class and a Svelte-scoped element selector whatever the source order. A row that
+  wants a different arrangement sets it on a wrapper rather than on the label.
+- **`gap` is load-bearing rather than cosmetic.** Flex wraps the label's text run in an
+  anonymous item and trims the white space at its edges, so the word-space between the native
+  box and its words vanishes the moment the rule applies. The declared gap is what puts it
+  back; a row that had its own spacing gets this one instead.
+- **`inline-flex` rather than `flex`**, so two rows a layout had placed side by side stay
+  side by side.
+
+**And one shape the platform hands back.** `:has()` reaches a descendant, so a label bound by
+`for` to a control outside it matches none of this — not the floor, and not the pressed ring.
+The invariant now says so rather than leaving it to be discovered: such a row is the surface's
+own to size, and it keeps the platform's tap flash to acknowledge it, because the suppression
+rule was narrowed to `label:has(input)` in the same change. **If Poodl's settings rows bind by
+`for`, taking the package gives them nothing here and they owe themselves the figure.** Which
+shape they use is the first thing to check when this version is adopted.
 
 **The tap-highlight suppression is now narrower than the callout suppression.** They were one
 rule, and it took the platform's own flash from a bare checkbox that no rule gave one back
@@ -367,7 +388,16 @@ to — `ATouchIsAcknowledged` inverted on the one control it was least likely to
 Poodl's copy of the stylesheet carries the same defect until it takes the package or makes
 the same split: `touch-action`, the callout and the selection suppression stay on all four
 kinds of control, and `-webkit-tap-highlight-color: transparent` goes only on `button`,
-`label`, and an input inside a label.
+`label:has(input)`, and an input inside a label. The qualifier on `label` is half the repair
+and is easy to drop: an unqualified `label` there takes the flash from every label on the
+page, including a `for`-bound one, while both paying rules reach only the labels that wrap a
+control — the same inversion, one element over.
+
+**And the evidence has to compare element sets, not selector strings.** The assertion that
+was supposed to hold the two lists equal passed for a year of nobody noticing, because both
+selectors contained the word `label`. Poodl's own version of this check, if it writes one,
+should ask each control in a fixture whether it matches each rule; comparing the rules as text
+is how the defect above survived being tested for.
 
 **`latinLetters` no longer claims two keys it does not name.** `/^[a-z]$/iu` folds case under
 Unicode, which also matches U+017F, the long s, and U+212A, the Kelvin sign — and the long s
@@ -376,12 +406,24 @@ for. It is `/^[a-zA-Z]$/u` now. Poodl's own physical-keyboard guard is the file 
 from; if it spells the test the same way it has the same hole, and a `ſ` typed into it
 reaches the game's word as a letter.
 
-**A `<summary>` keeps Enter.** The port classified a focused disclosure summary as something
-the browser does not activate, so a surface claiming keys took Enter from it and the
-disclosure would not open — `AClaimNeverReachesAFocusedControl`, broken on a control
-`Modal`'s own focusable list already knew about. The selector is
-`button, a[href], details > summary:first-of-type`. Poodl has the same guard in the code this
-was ported from, and a `<details>` anywhere on a screen that claims keys is where it shows.
+**A `<summary>` keeps Enter, and every focused control keeps Space.** The port classified a
+focused disclosure summary as something the browser does not activate, so a surface claiming
+keys took Enter from it and the disclosure would not open — `AClaimNeverReachesAFocusedControl`,
+broken on a control `Modal`'s own focusable list already knew about. The selector is
+`button, a[href], details > summary:first-of-type`.
+
+The selector was only half of it, and the other half is the one to carry over. `claimKey`
+surrendered a focused control's key for Enter alone, and only through the `actions` channel.
+Space activates a button and a summary exactly as Enter does, and a browser fires that
+activation on the keyup only when the keydown was not cancelled — so a surface binding Space
+did not make the control fire late, it made it go quiet. Both keys are surrendered now, before
+either channel, so a binding written as content rather than as an action cannot reach past the
+guard. Poodl's own bindings do not claim Space today; the guard is what stops the next ones
+having to remember not to.
+
+One case stays wrong and is worth carrying rather than rediscovering: a `<details>` written
+with no author `<summary>` has a summary in the browser's shadow tree, which no selector here
+can match. `Modal.svelte` documents the same limitation for the same reason.
 
 **And one clause reworded rather than repaired.** `AModifiedKeyIsNeverClaimed` said "a
 platform modifier" and meant three of them: Control, Meta and Alt. Shift is not among them —

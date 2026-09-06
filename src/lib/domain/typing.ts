@@ -12,7 +12,11 @@
 export interface KeyPress {
   /** The key's own name, as the platform reports it. */
   key: string;
-  /** A platform modifier was held. The browser's own shortcuts stay the browser's. */
+  /**
+   * A shortcut modifier was held — Control, Meta or Alt, and not Shift. The
+   * browser's own shortcuts stay the browser's, and a shifted letter is still
+   * the reader typing a letter. `AModifiedKeyIsNeverClaimed` names the three.
+   */
   modified: boolean;
   /** It began somewhere the reader is typing. */
   inTextEntry: boolean;
@@ -33,15 +37,18 @@ export interface KeyBindings {
 }
 
 /**
- * The key a browser activates a focused control with.
+ * The keys a browser activates a focused control with.
  *
- * A browser fact rather than a surface's choice, which is why it is named here
- * rather than passed in. Space is the other one and is absent deliberately:
- * nothing here ever claims it, so a focused control is activated by the browser
- * as it always was, and a surface that bound it would be taking the key back
- * from every control on the page.
+ * A browser fact rather than a surface's choice, which is why they are named
+ * here rather than passed in. Both of them, and Space was once left out on the
+ * argument that nothing here claims it — which is true of `QWERTY_BINDINGS` and
+ * is not a guarantee, because `claimKey` and `KeyBindings` are public and a game
+ * supplies its own. A crossword binding Space to change direction would have
+ * taken it from every focused button and summary on the page, and a browser
+ * activates on the keyup only when the keydown was not cancelled, so the control
+ * would have gone quiet rather than fired late.
  */
-const ACTIVATES = 'Enter';
+const ACTIVATES = new Set([' ', 'Enter']);
 
 /**
  * The 26 Latin letters, lowercased. A default, and only a default.
@@ -60,21 +67,26 @@ export function latinLetters(key: string): string | null {
  * The value this press carries, or `null` for a press the surface leaves alone.
  *
  * `AClaimNeverReachesAFocusedControl` is the pair of guards in the middle, and
- * the second of them is narrower than it looks: only the activating key is
+ * the second of them is narrower than it looks: only an activating key is
  * surrendered to a focused control. Taking the rest as well would silence the
  * surface for as long as anything held focus, which the clause grants
  * unconditionally on the surface's own state.
+ *
+ * The surrender is asked once, before either channel, and it used to be asked
+ * inside the action branch alone. A surface whose alphabet answered to Enter or
+ * Space — a phrase game spelling a space, a binding written as content rather
+ * than as an action — reached the open channel below and took the key from the
+ * focused control, which is the same defect the guard exists to prevent
+ * arriving by the other door.
  */
 export function claimKey(press: KeyPress, bindings: KeyBindings): string | null {
   if (press.modified || press.inTextEntry) {
     return null;
   }
 
-  const action = bindings.actions[press.key];
-
-  if (action !== undefined) {
-    return press.inActivatable && press.key === ACTIVATES ? null : action;
+  if (press.inActivatable && ACTIVATES.has(press.key)) {
+    return null;
   }
 
-  return bindings.content(press.key);
+  return bindings.actions[press.key] ?? bindings.content(press.key);
 }

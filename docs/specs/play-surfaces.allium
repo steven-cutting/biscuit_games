@@ -105,6 +105,12 @@ entity PlayCell {
     -- A mark with no words is a colour on its own, which the contract below
     -- forbids outright. Stated as a field so it is a property of the cell rather
     -- than a hope about whoever drew it.
+    --
+    -- This is the mechanical form of the test and not the whole of it: the
+    -- expression can compare against the empty string and has no way to say
+    -- "blank", so a sentence of nothing but spaces satisfies it and is not words.
+    -- EveryMarkIsNamedInWords carries that half, and governs where the two
+    -- differ.
     is_told_in_words: description != ""
 }
 
@@ -156,6 +162,14 @@ contract Marking {
         -- Every marked cell carries the game's own sentence for its mark, so
         -- what the shape says to the eye is said to a reader in words. A mark
         -- the game supplied no words for is not a mark the platform will draw.
+        --
+        -- A sentence of nothing but spaces is no words. It reaches a reader as
+        -- silence exactly as the empty one does, and the two arrive by the same
+        -- accidents — an interpolation that found nothing, a translation key
+        -- with no entry, a join over an empty list — so the platform declines
+        -- them alike. is_told_in_words above cannot say this, which is why it is
+        -- said here: a cell is told in words when its sentence has a word in
+        -- it, and drawing the mark is what the platform does only then.
 
     @invariant AnUnmarkedCellStandsOffAMarkedOne
         -- A cell nothing is known about hugs the page: the page's own ground, a

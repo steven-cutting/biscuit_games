@@ -85,11 +85,19 @@ Five components come across from Poodl, generalised on the way, under the obliga
 - **`Explainer`** — the scaffold of an explanation and not its words.
 
 **A mark is inseparable from the words for it.** The mark a component takes carries both the
-name and the game's sentence, so a painted state with nothing to say is unrepresentable
-rather than merely discouraged. Two independent optional props could not be enforced by the
-type system and could not be caught by a test: the tile would render, axe would pass, the bar
+name and the game's sentence, so the pair is what a call site passes. Two independent optional
+props could not have been caught by a test: the tile would render, axe would pass, the bar
 would draw, and a reader would hear a glyph with no state — `AMarkIsNeverOnlyAColour` failing
 silently in the one channel no gate inspects.
+
+> Amended on 2026-09-06, answering the review on pull request 4. This entry said bundling the
+> two made a painted state with nothing to say *unrepresentable*, and that was wrong:
+> `description` is a `string`, so `''` and `'   '` both type-check and no type refuses them
+> without a brand every caller would have to construct through. Bundling makes the omission
+> hard to reach by accident and not impossible. What holds the invariant is
+> `EveryMarkIsNamedInWords`' own closing clause — `drawnMark` in `src/lib/domain/types.ts`
+> declines to draw a mark whose sentence has no word in it — and the specification now says
+> in as many words that a sentence of nothing but spaces is no words.
 
 **`Board`, `DistributionChart` and `StatFigure` stay with the game**, and the ledger says so
 with the reason rather than by omission. They are refused on the same test that admitted the
