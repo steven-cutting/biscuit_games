@@ -7,7 +7,7 @@ description: Change a shared Allium specification and carry the change through t
 
 The specifications under `docs/specs/` decide shared behaviour for the whole platform. Code that disagrees with one is wrong until the specification is changed to say otherwise, so the specification moves first and everything else follows.
 
-1. Read `AGENTS.md` and `docs/explanation/specifications.md`. One module exists today: `appearance.allium`, the shared appearance surface every game inherits. A behaviour belonging to one game belongs in that game's own specifications instead.
+1. Read `AGENTS.md` and `docs/explanation/specifications.md`. Three modules exist today, and they are peers rather than layers: `appearance.allium` says how a surface looks, `operation.allium` how it is worked, and `play-surfaces.allium` what a surface played on owes. A behaviour belonging to one game belongs in that game's own specifications instead.
 2. Read the whole module before editing, including its `Scope`, `Excludes` and `open question` blocks. A change that belongs in another module's scope goes there instead.
 3. Edit the specification: state the rule as a trigger, its guards and its outcomes. Record what you could not decide as a new `open question` rather than guessing at a product decision.
 4. Keep the module self-contained. It imports nothing on purpose, so a game can inherit it rather than restate it; an external entity here draws a diagnostic precisely because a root module has no governing specification to name.

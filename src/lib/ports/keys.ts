@@ -41,8 +41,16 @@ export interface KeyHost {
 /** Somewhere the reader is typing. Every key is theirs. */
 const TEXT_ENTRY = 'input, textarea, select, [contenteditable]';
 
-/** Something the browser activates from the keyboard. */
-const ACTIVATABLE = 'button, a[href]';
+/**
+ * Something the browser activates from the keyboard.
+ *
+ * A disclosure's summary is one of them: Enter opens it, and Enter taken from it
+ * is a control that stops working while a surface is claiming keys — which is
+ * what `AClaimNeverReachesAFocusedControl` forbids. `Modal`'s focusable list
+ * already named it, and this is the same fact read from the other side, so the
+ * two are spelled the same way on purpose.
+ */
+const ACTIVATABLE = 'button, a[href], details > summary:first-of-type';
 
 /**
  * The device's own keyboard. The host is an argument rather than a global read,

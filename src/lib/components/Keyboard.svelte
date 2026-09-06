@@ -38,25 +38,37 @@
     /** Called with the `value` of the key that was pressed. */
     onpress?: (value: string) => void;
   } = $props();
+
+  /*
+   * `ALayoutIsSuppliedRatherThanFixed` closes with "a layout with no keys is not
+   * a keyboard", and this is the refusal. An empty layout is type-valid and
+   * stays so on purpose: a game builds its rows with `map`, and a non-empty
+   * tuple would stop type-checking exactly there. So the group is not drawn
+   * rather than drawn with nothing in it — a named group a reader can reach and
+   * find nothing inside is worse than no group at all.
+   */
+  const anyKeys = $derived(layout.some((row) => row.length > 0));
 </script>
 
-<div class="keyboard" role="group" aria-label={label}>
-  {#each layout as row, index (index)}
-    <div class="row">
-      {#each row as key (key.value)}
-        <Key
-          label={key.label ?? key.content ?? key.value}
-          content={key.content ?? key.value}
-          icon={key.icon}
-          mark={marks[key.value] ?? null}
-          action={key.kind === 'action'}
-          {disabled}
-          onpress={() => onpress?.(key.value)}
-        />
-      {/each}
-    </div>
-  {/each}
-</div>
+{#if anyKeys}
+  <div class="keyboard" role="group" aria-label={label}>
+    {#each layout as row, index (index)}
+      <div class="row">
+        {#each row as key (key.value)}
+          <Key
+            label={key.label ?? key.content ?? key.value}
+            content={key.content ?? key.value}
+            icon={key.icon}
+            mark={marks[key.value] ?? null}
+            action={key.kind === 'action'}
+            {disabled}
+            onpress={() => onpress?.(key.value)}
+          />
+        {/each}
+      </div>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .keyboard {

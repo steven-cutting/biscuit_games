@@ -31,9 +31,12 @@ because every number on this page and every number in the stylesheet's comments 
 that test measures here, in this palette, on every run of `just check`.
 
 What it measures is the stylesheet's declarations, not the surfaces this repository renders.
-The result and key tokens are a game's to spend, and they are measured here anyway because
-the palette is decided here: a token that fails this test fails on a board this repository
-has never seen. It measures the platform's own separations too, since
+The result and key tokens are the platform's to spend since
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) — `Tile` and `Key` are
+the surfaces that spend them, and both live here — and they were measured here even before
+that, because the palette is decided here: a token that fails this test fails on a board this
+repository has never seen. What a game still spends is the *arrangement* those cells are laid
+out in, and what each mark means in its own words. It measures the platform's own separations too, since
 [decision 0015](../decisions/0015-operation-and-play-are-specified-here.md):
 `play-surfaces.allium`'s `config.minimum_state_separation` and
 `config.minimum_mark_separation` are the windows `--n-65` and `--n-75` were pinned by, so the

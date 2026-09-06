@@ -116,6 +116,11 @@ function ruleFor(selector: string): CSSStyleRule {
   throw new Error(`No rule for ${selector}`);
 }
 
+/** A rule's selectors, in the order it declares them and each on its own. */
+function selectorsOf(rule: CSSStyleRule): string[] {
+  return rule.selectorText.split(',').map((one) => one.trim());
+}
+
 describe('ATapDoesOnlyWhatTheControlDoes', () => {
   it('sends a tap to the control rather than to the platform', () => {
     expect(resolved('button', 'touch-action')).toBe('manipulation');
@@ -212,6 +217,35 @@ describe('EveryControlIsAComfortableTarget', () => {
   });
 
   /*
+   * A native checkbox is thirteen pixels and no stylesheet can make it the
+   * figure, so the invariant grants it the label that activates it instead: a
+   * label bound to a control activates it across its whole area, so the row is
+   * what the finger is aimed at and the row is what has to answer. `app.css` had
+   * argued exactly that in prose beside the pressed ring and then declared no
+   * floor for it, which is a target the reader was promised and never given.
+   *
+   * The display is asserted with the figure rather than beside it: a `<label>`
+   * is inline by default and `min-block-size` does not apply to a non-replaced
+   * inline element, so the floor alone would be a declaration that does nothing.
+   */
+  it.each(['checkbox', 'radio'])('gives the row that activates a %s the figure too', (kind) => {
+    const row = ruleFor(`label:has(input[type='${kind}'])`).style;
+
+    expect(row.getPropertyValue('min-block-size')).toBe(`${String(MINIMUM_TOUCH_TARGET)}px`);
+    expect(row.getPropertyValue('display')).toBe('inline-flex');
+  });
+
+  /*
+   * And the control the invariant exempts outright. A link inside a sentence
+   * takes its size from the text around it, so a floor here would break the line
+   * it sits in \u2014 which is why the invariant now names that shape rather than
+   * leaving the repository's own route in violation of it.
+   */
+  it('leaves a link in a line of text to the text around it', () => {
+    expect(() => ruleFor('a')).toThrow(/No rule for a/u);
+  });
+
+  /*
    * Both figures, because the invariant closes on the second: every target
    * holds "down to config.narrowest_supported_width". Only the stories consume
    * that one, and a story frames itself to whatever the constant says — so
@@ -253,15 +287,45 @@ describe('ATouchIsAcknowledged', () => {
   /*
    * Every control the suppression reaches, and no more. Removing the platform's
    * flash is what creates the debt, so the two lists have to answer to each
-   * other. A text control is on neither list, because nothing takes its flash
-   * away in the first place.
+   * other \u2014 and they are compared as lists here rather than by asking whether
+   * each mentions the word "label", which both of them did for unrelated reasons
+   * while a bare radio lost its flash and got nothing back.
+   *
+   * A text control is on neither list, because nothing takes its flash away in
+   * the first place. `-webkit-tap-highlight-color` is jsdom's blind spot, so
+   * what is asserted is which selectors the rule that declares it carries; the
+   * story run measures the ring itself.
    */
   it('owes an acknowledgement to every control it took one from', () => {
-    const suppressed = ruleFor("input[type='radio']").selectorText;
-    const acknowledged = ruleFor('button:active:not(:disabled)').selectorText;
+    const took = selectorsOf(ruleFor("label input[type='checkbox']"));
+    const gave = selectorsOf(ruleFor('button:active:not(:disabled)'));
 
-    expect(suppressed).toContain('label');
-    expect(acknowledged).toContain('label');
+    expect(took).toEqual([
+      'button',
+      'label',
+      "label input[type='checkbox']",
+      "label input[type='radio']"
+    ]);
+    expect(gave.map((one) => one.replace(/:.*$/u, '').replace(/\s.*$/u, ''))).toEqual([
+      'button',
+      'label'
+    ]);
+  });
+
+  /*
+   * The control that keeps the platform's own flash, which is the other half of
+   * the same sum. A checkbox nobody wrapped in a label is not a control this
+   * platform draws, and taking its acknowledgement away while offering it no
+   * replacement was the one way to leave a control reading as dead. Suppressing
+   * the callout and the selection is a different rule and still reaches it \u2014
+   * `ATapDoesOnlyWhatTheControlDoes` is owed to every control alike.
+   */
+  it('leaves the platform its own flash where it offers no replacement', () => {
+    expect(selectorsOf(ruleFor("label input[type='checkbox']"))).not.toContain(
+      "input[type='radio']"
+    );
+    expect(resolved('input[type="radio"]', 'touch-action')).toBe('manipulation');
+    expect(resolved('input[type="radio"]', 'user-select')).toBe('none');
   });
 
   /*

@@ -13,6 +13,7 @@ import PhysicalKeyboard from '../src/lib/components/PhysicalKeyboard.svelte';
 import { createFakeKeys, createWindowKeys } from '../src/lib/ports/keys';
 import type { KeyHost } from '../src/lib/ports/keys';
 
+import { QWERTY, QWERTY_BINDINGS } from '../src/lib/components/layouts';
 import { claimKey, latinLetters } from '../src/lib/domain/typing';
 import type { KeyBindings, KeyPress } from '../src/lib/domain/typing';
 
@@ -97,6 +98,32 @@ describe('claimKey', () => {
   });
 });
 
+/*
+ * The default alphabet is the twenty-six Latin letters and nothing else, which
+ * is worth its own block because the obvious spelling of it is wrong. Under
+ * Unicode case folding `/[a-z]/iu` also admits the long s and the Kelvin sign,
+ * and the long s folds to itself — so the alphabet claimed two keys it does not
+ * name and handed one of them back unchanged as though it were a letter. The
+ * cases are enumerated instead, and the `u` flag stays.
+ */
+describe('latinLetters', () => {
+  it('names each of the twenty-six, in either case', () => {
+    expect(latinLetters('q')).toBe('q');
+    expect(latinLetters('Q')).toBe('q');
+  });
+
+  // U+017F LATIN SMALL LETTER LONG S and U+212A KELVIN SIGN.
+  it.each(['\u017f', '\u212a'])('refuses %s, which case folding once let through', (key) => {
+    expect(latinLetters(key)).toBeNull();
+  });
+
+  it('refuses a key that is no letter of this alphabet', () => {
+    expect(latinLetters('1')).toBeNull();
+    expect(latinLetters('\u00e9')).toBeNull();
+    expect(latinLetters('Enter')).toBeNull();
+  });
+});
+
 describe('the keys port', () => {
   /*
    * The adapter is reached by argument, so nothing here stubs a global. That is
@@ -157,6 +184,73 @@ describe('the keys port', () => {
 
     expect(seen[0]).toMatchObject({ inActivatable: true, modified: true });
     button.remove();
+  });
+
+  /*
+   * `AClaimNeverReachesAFocusedControl`, on the control the first spelling of
+   * `ACTIVATABLE` missed. A `<summary>` is a native control the browser opens
+   * with Enter, so Enter on one is the disclosure's; `Modal`'s focusable list
+   * already named it and the port did not.
+   */
+  it('reads a focused disclosure summary as something the browser activates', () => {
+    const platform = host();
+    const seen: KeyPress[] = [];
+    createWindowKeys(platform).subscribe((press) => {
+      seen.push(press);
+      return false;
+    });
+    const details = document.createElement('details');
+    details.innerHTML = '<summary>How to play</summary><p>Guess a word.</p>';
+    document.body.append(details);
+
+    platform.on(keydown('Enter', details.querySelector('summary')));
+
+    expect(seen[0]?.inActivatable).toBe(true);
+    details.remove();
+  });
+
+  /*
+   * Each flag on its own. The `claimKey` table above hands `modified` in already
+   * computed, so it holds the rule and says nothing about the adapter's own
+   * short-circuit — only `ctrlKey` had ever reached that chain. Green on arrival:
+   * the adapter was right, and the two branches are now driven rather than
+   * assumed.
+   */
+  it.each([
+    ['control', { ctrlKey: true }],
+    ['meta', { metaKey: true }],
+    ['alt', { altKey: true }]
+  ])('reads %s off the event as a modifier', (_which, init) => {
+    const platform = host();
+    const seen: KeyPress[] = [];
+    createWindowKeys(platform).subscribe((press) => {
+      seen.push(press);
+      return false;
+    });
+
+    platform.on(keydown('a', null, init));
+
+    expect(seen[0]?.modified).toBe(true);
+  });
+
+  /*
+   * Shift is deliberately not among them. It carries no browser or
+   * operating-system shortcut of its own, where each of the other three does, so
+   * a shifted letter is the reader typing a letter and `latinLetters` lowercases
+   * it. `AModifiedKeyIsNeverClaimed` says so in as many words.
+   */
+  it('does not read shift as a modifier, so a capital is still a letter', () => {
+    const platform = host();
+    const seen: KeyPress[] = [];
+    createWindowKeys(platform).subscribe((press) => {
+      seen.push(press);
+      return false;
+    });
+
+    platform.on(keydown('A', null, { shiftKey: true }));
+
+    expect(seen[0]?.modified).toBe(false);
+    expect(claimKey(seen[0] ?? press('A'), WIRING)).toBe('a');
   });
 
   /*
@@ -252,5 +346,45 @@ describe('PhysicalKeyboard', () => {
 
     expect(keys.listening).toBe(0);
     expect(keys.press({ key: 'a' })).toBe(false);
+  });
+});
+
+/*
+ * `TypedInput.@guarantee TypedKeysAnswerTheSameOperationsAsTheKeysOnScreen`.
+ *
+ * `layouts.ts` said this pair was held equal and named the wrong file for it;
+ * nothing anywhere compared the two, so the drawn keys and the typed ones could
+ * name different operations with every gate green. Green on arrival — they
+ * agreed already — and the point of writing it is that they cannot stop.
+ */
+describe('the drawn keys and the typed ones', () => {
+  const drawn = QWERTY.flat();
+  const sorted = (values: readonly string[]): string[] =>
+    [...values].sort((a, b) => a.localeCompare(b));
+
+  it('binds a physical key to every operation the layout draws, and to no other', () => {
+    const drawnActions = drawn.filter((key) => key.kind === 'action').map((key) => key.value);
+
+    expect(sorted(Object.values(QWERTY_BINDINGS.actions))).toEqual(sorted(drawnActions));
+  });
+
+  it('answers a drawn content key with the value that key carries', () => {
+    const content = drawn.filter((key) => key.kind !== 'action');
+
+    expect(content).not.toHaveLength(0);
+    for (const key of content) {
+      expect(QWERTY_BINDINGS.content(key.value), key.value).toBe(key.value);
+    }
+  });
+
+  // The other direction: no drawn key is one the surface would refuse if typed.
+  it('leaves no drawn key unanswered', () => {
+    for (const key of drawn) {
+      const answered =
+        Object.values(QWERTY_BINDINGS.actions).includes(key.value) ||
+        QWERTY_BINDINGS.content(key.value) !== null;
+
+      expect(answered, key.value).toBe(true);
+    }
   });
 });

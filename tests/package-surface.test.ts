@@ -4,8 +4,18 @@ import { describe, expect, it } from 'vitest';
 import * as surface from '../src/lib/index.js';
 import type {
   DeviceAnswers,
+  FakeKeys,
   FakePreferences,
   IconName,
+  KeyBindings,
+  KeyboardLayout,
+  KeyboardRow,
+  KeyDefinition,
+  KeyHost,
+  KeyPress,
+  KeysPort,
+  Mark,
+  MarkName,
   MatchMedia,
   MediaQueryListLike,
   PreferencesPort,
@@ -59,6 +69,22 @@ describe('the package surface', () => {
     expect(surface.highContrastActive).toBeTypeOf('function');
   });
 
+  /*
+   * The play surface's own exports, which the component names above do not
+   * reach: a game that can import `Keyboard` and not `QWERTY` has a keyboard it
+   * cannot lay out, and one that can import `PhysicalKeyboard` and not
+   * `createWindowKeys` has nothing to hand it. Each would have left every gate
+   * green.
+   */
+  it('exports the keys port, the claiming rule and the platform layout', () => {
+    expect(surface.createWindowKeys).toBeTypeOf('function');
+    expect(surface.createFakeKeys).toBeTypeOf('function');
+    expect(surface.claimKey).toBeTypeOf('function');
+    expect(surface.latinLetters).toBeTypeOf('function');
+    expect(surface.QWERTY).toBeInstanceOf(Array);
+    expect(surface.QWERTY_BINDINGS.actions).toBeTypeOf('object');
+  });
+
   it('exports components a consumer can render', () => {
     render(surface.Wordmark, {});
 
@@ -87,5 +113,34 @@ describe('the package surface', () => {
     expect(surface.darkActive(theme, port.prefersDark())).toBe(true);
     expect(surface.createMediaPreferences({ matchMedia }).prefersMoreContrast()).toBe(false);
     expect(icon).toBe('check');
+  });
+
+  // The same again for the play surface. Written out as a working consumer
+  // rather than as imports alone, so a type that stopped being exported fails
+  // `svelte-check` and a value that stopped being exported fails here.
+  it('names the play-surface types a consumer writes against', () => {
+    const name: MarkName = 'exact';
+    const mark: Mark = { name, description: 'correct' };
+    const key: KeyDefinition = { value: 'q', content: 'Q' };
+    const row: KeyboardRow = [key];
+    const layout: KeyboardLayout = [row];
+    const bindings: KeyBindings = surface.QWERTY_BINDINGS;
+    const press: KeyPress = {
+      key: 'q',
+      modified: false,
+      inTextEntry: false,
+      inActivatable: false
+    };
+    const fake: FakeKeys = surface.createFakeKeys();
+    const port: KeysPort = fake;
+    const emptyHost: KeyHost = {};
+
+    render(surface.Keyboard, { layout, marks: { q: mark } });
+
+    expect(screen.getByRole('button', { name: 'Q, correct' })).toBeInTheDocument();
+    expect(surface.claimKey(press, bindings)).toBe('q');
+    expect(surface.latinLetters('Q')).toBe('q');
+    expect(port.subscribe(() => false)).toBeTypeOf('function');
+    expect(surface.createWindowKeys(emptyHost).subscribe(() => false)).toBeTypeOf('function');
   });
 });

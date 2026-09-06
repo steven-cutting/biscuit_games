@@ -532,16 +532,42 @@ body {
  * `touch-action: none`, which would take the pinch as well —
  * DeliberateZoomIsNeverTakenAway says the first invariant is not licence for
  * that, and `app.html` leaves the viewport scalable for the same reason.
+ *
+ * Owed to every control alike, which is why the flash is not removed here. Doing
+ * both in one rule took the platform's acknowledgement from a bare checkbox that
+ * no rule below gives one back to, and ATouchIsAcknowledged is precisely about
+ * not doing that.
  */
 button,
 label,
 input[type='checkbox'],
 input[type='radio'] {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/*
+ * The debt, taken on deliberately and only where the next rule pays it. Removing
+ * the platform's flash is what creates it, so this list and the list below have
+ * to be the same controls: a button, the row a preference is set from, and the
+ * native box inside that row, which shares the row's ring rather than carrying
+ * one of its own.
+ *
+ * A checkbox nobody wrapped in a label is not on it. Such a control has no ring
+ * of ours to fall back on, so it keeps the platform's own and reads as alive
+ * under a finger; everything the rule above gives it still stands, which is the
+ * whole of what ATapDoesOnlyWhatTheControlDoes asks for.
+ * `tests/operation.test.ts` compares the two lists outright, because both of
+ * them mention a label for unrelated reasons and a substring test passed the
+ * whole time this was wrong.
+ */
+button,
+label,
+label input[type='checkbox'],
+label input[type='radio'] {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /*
@@ -604,6 +630,11 @@ textarea {
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite
  * reason — text a reader copies by hand has to stay selectable.
+ *
+ * A link is deliberately absent, and that is the invariant's second exemption
+ * rather than an omission: a link inside a sentence takes its size from the text
+ * around it, so a floor here would break the line it sits in. The hub's own route
+ * has one, in the list of games.
  */
 button,
 input[type='text'],
@@ -612,9 +643,33 @@ textarea {
 }
 
 /*
- * ATouchIsAcknowledged. The rule above removes the platform's own tap flash, and
- * removing it without replacing it leaves a control that reads as dead under
- * exactly the finger this contract exists for.
+ * The same figure, on the control that cannot carry it itself. A native checkbox
+ * is thirteen pixels and no stylesheet makes it forty-four, so the invariant
+ * grants it the label instead: a label bound to its control activates it across
+ * the whole of its area, so the row is what the finger is aimed at and the row is
+ * what has to answer. The rule below this one has said so in prose since it was
+ * written, and declared no floor — a target the reader was promised and never
+ * given, which is what `EveryControlIsAComfortableTarget` now states outright
+ * rather than leaving to be inferred.
+ *
+ * `inline-flex` is part of the floor rather than decoration. `min-block-size`
+ * does not apply to a non-replaced inline element, and a `<label>` is one, so the
+ * figure alone would be a declaration that did nothing. Inline rather than block,
+ * because this is a global element rule in a stylesheet a game takes whole and
+ * `flex` would stack two rows a consumer had laid side by side.
+ */
+label:has(input[type='checkbox']),
+label:has(input[type='radio']) {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+}
+
+/*
+ * ATouchIsAcknowledged. The flash rule above removes the platform's own tap
+ * feedback, and removing it without replacing it leaves a control that reads as
+ * dead under exactly the finger this contract exists for. This is the
+ * replacement, and the two lists are the same controls on purpose.
  *
  * The page's own ink drawn inside the control, backed by its own paper. Two
  * tones rather than one because no single tone stands off every ground a
@@ -637,14 +692,15 @@ textarea {
  * `Button` and `IconButton` each say so — so the cue is not something a
  * control can override by accident.
  *
- * Two selectors, because the first rule in this block suppresses the platform's
- * flash on four kinds of control and a replacement owed to one of them is owed
- * to all. The row rather than the box: a settings row makes the `<label>` the
- * 44px target precisely because a label bound to its control activates it across
- * its whole area, so the row is what the finger is aimed at and the row is what
- * has to answer. A ring drawn on the native box instead would be a cue on the
- * 13px thing nobody is aiming at, and inset shadow on a native checkbox is the
- * platform's to paint or ignore.
+ * Two selectors for four suppressed controls, because a native box inside a row
+ * shares that row's ring rather than carrying one of its own. The row rather
+ * than the box: a settings row is the 44px target precisely because a label
+ * bound to its control activates it across its whole area, so the row is what
+ * the finger is aimed at and the row is what has to answer — which is now what
+ * `EveryControlIsAComfortableTarget` says, and what the rule above declares. A
+ * ring drawn on the native box instead would be a cue on the 13px thing nobody
+ * is aiming at, and inset shadow on a native checkbox is the platform's to paint
+ * or ignore.
  *
  * `:has(input:not(:disabled))` is the same carve-out `:not(:disabled)` makes on
  * the button half: a disabled preference row must not report a touch that does

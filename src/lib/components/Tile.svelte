@@ -1,5 +1,6 @@
 <script lang="ts">
   import Marker from './Marker.svelte';
+  import { drawnMark } from '../domain/types.js';
   import type { Mark } from '../domain/types.js';
 
   /**
@@ -37,6 +38,8 @@
     label?: string;
   } = $props();
 
+  const shown = $derived(drawnMark(mark));
+
   /*
    * `Empty` is the platform's word, and it is capitalised because it stands
    * alone as the whole name. Where the caller has placed the cell its own
@@ -44,8 +47,8 @@
    */
   const name = $derived.by(() => {
     const parts = [label, content === '' ? (label === undefined ? 'Empty' : 'empty') : content];
-    if (mark !== null) {
-      parts.push(mark.description);
+    if (shown !== null) {
+      parts.push(shown.description);
     }
     return parts.filter((part) => part !== undefined && part !== '').join(', ');
   });
@@ -53,14 +56,14 @@
 
 <span
   class="tile"
-  class:filled={content !== '' && mark === null}
-  data-mark={mark?.name}
+  class:filled={content !== '' && shown === null}
+  data-mark={shown?.name}
   role="img"
   aria-label={name}
 >
   <span aria-hidden="true">{content}</span>
-  {#if mark !== null}
-    <Marker name={mark.name} />
+  {#if shown !== null}
+    <Marker name={shown.name} />
   {/if}
 </span>
 
@@ -75,6 +78,13 @@
    *
    * `AnUnmarkedCellStandsOffAMarkedOne` states the figures and
    * `tests/contrast.test.ts` computes them.
+   *
+   * 3rem is a literal on purpose, and it is the same carve-out `Button`'s 48px
+   * takes. It matches `--s-11` by value and not by meaning: that is the spacing
+   * scale, and a cell's size is not a gap between things. Naming the token here
+   * would resize every board when the scale moved for a reason of its own. The
+   * padding inside a `Key` is not in that carve-out and does name its tokens,
+   * because padding is spacing.
    */
   .tile {
     position: relative;

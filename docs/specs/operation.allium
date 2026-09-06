@@ -14,9 +14,10 @@
 --     when it replaces the control a reader is standing on.
 --   - What a dialog owes: focus in when it opens, Escape out, Tab held inside,
 --     and focus returned to whatever opened it.
---   - The comfortable target and the narrowest supported width, and the one
---     shape that cannot meet the target in both directions and what it does
---     instead.
+--   - The comfortable target and the narrowest supported width, the two shapes
+--     that cannot meet the target in both directions and what each does
+--     instead, and where a control meets the figure in the label that
+--     activates it rather than in its own box.
 --   - Touch: a tap doing the control's action and nothing else, deliberate zoom
 --     kept, and a touch acknowledged from the moment of contact.
 --   - A change nobody is looking at being said in words.
@@ -113,16 +114,29 @@ contract DirectManipulation {
 
     @invariant EveryControlIsAComfortableTarget
         -- Every control is at least config.minimum_touch_target across, in both
-        -- directions. One shape cannot be: a row of like controls sharing the
-        -- full width, with more of them in it than that figure divides into
-        -- config.narrowest_supported_width — counted before the gaps between
-        -- them, which only make it harder. There the row meets the figure top
-        -- to bottom, divides its width equally among the controls that build a
-        -- turn, and keeps a gap between them, so what such a control gives up is
-        -- bounded by the width of the screen and by nothing else. A control in
-        -- that row that ends a turn rather than builds one may be wider than the
-        -- others, and never narrower: those are the last place to save width.
-        -- Every other control meets the figure outright. All of this holds down
+        -- directions. Two shapes cannot be. The first is a row of like controls
+        -- sharing the full width, with more of them in it than that figure
+        -- divides into config.narrowest_supported_width — counted before the
+        -- gaps between them, which only make it harder. There the row meets the
+        -- figure top to bottom, divides its width equally among the controls
+        -- that build a turn, and keeps a gap between them, so what such a
+        -- control gives up is bounded by the width of the screen and by nothing
+        -- else. A control in that row that ends a turn rather than builds one
+        -- may be wider than the others, and never narrower: those are the last
+        -- place to save width.
+        --
+        -- The second is a control inside a line of running text, a link in a
+        -- sentence being the one that occurs: its size is set by the text around
+        -- it, and a control given the figure there would break the line it sits
+        -- in. A surface owes such a control a reading distance from the words
+        -- beside it, and owes it nothing else. Where the same destination is
+        -- also offered away from the prose, that offer meets the figure like any
+        -- other control.
+        --
+        -- Every other control meets the figure outright, and a control the
+        -- reader activates by pressing a label bound to it meets the figure in
+        -- that label rather than in its own box: the label is what the finger is
+        -- aimed at, so the label is what has to answer. All of this holds down
         -- to config.narrowest_supported_width, at which the surface is usable
         -- without scrolling sideways.
 
@@ -237,8 +251,15 @@ surface TypedInput {
         -- nothing else has asked for.
 
     @guarantee AModifiedKeyIsNeverClaimed
-        -- A key pressed together with a platform modifier belongs to the
-        -- browser and the operating system, and is never taken.
+        -- A key pressed together with a shortcut modifier — Control, Meta or
+        -- Alt — belongs to the browser and the operating system, and is never
+        -- taken. Those three and not every modifier the keyboard has: Shift
+        -- carries no shortcut of its own, and composes the character the reader
+        -- meant rather than addressing anything above the surface, so a shifted
+        -- letter is still the reader typing a letter and a surface that claims
+        -- letters claims that one. A surface deciding what its alphabet is is
+        -- free to case-fold or not; this clause says only that Shift is not what
+        -- takes a key away from it.
 
     @guarantee DroppingTheClaimIsTotal
         -- Not claiming means not intercepting, rather than intercepting and

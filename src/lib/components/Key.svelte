@@ -2,6 +2,7 @@
   import Icon from './Icon.svelte';
   import Marker from './Marker.svelte';
   import type { IconName } from './icons.js';
+  import { drawnMark } from '../domain/types.js';
   import type { Mark } from '../domain/types.js';
 
   /**
@@ -44,13 +45,14 @@
     onpress?: () => void;
   } = $props();
 
-  const name = $derived(mark === null ? label : `${label}, ${mark.description}`);
+  const shown = $derived(drawnMark(mark));
+  const name = $derived(shown === null ? label : `${label}, ${shown.description}`);
 </script>
 
 <button
   type="button"
   class:action
-  data-mark={mark?.name}
+  data-mark={shown?.name}
   aria-label={name}
   {disabled}
   onclick={() => onpress?.()}
@@ -60,8 +62,8 @@
   {:else}
     {content}
   {/if}
-  {#if mark !== null}
-    <Marker name={mark.name} />
+  {#if shown !== null}
+    <Marker name={shown.name} />
   {/if}
 </button>
 
@@ -82,7 +84,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 0.125rem;
+    padding: var(--s-5) var(--s-1);
     border: var(--rule-w) solid var(--key-untried-rule);
     border-radius: var(--radius-key);
     background: var(--key-untried-bg);

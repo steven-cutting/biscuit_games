@@ -252,11 +252,17 @@ Five more contract changes come with them:
   the value to change it to is literally `exact` in every place a mark reaches a rendered
   component. Renaming the engine's vocabulary instead would be Poodl changing its own rules
   to suit a stylesheet, which is the opposite of what this move was for.
-- **A mark carries its own words.** The package takes `{ name, description }` together
-  rather than a state and a separate sentence, because two optional props could not stop a
-  caller painting a state with nothing to say. Poodl's two duplicated `DESCRIPTION` maps —
-  one in `Tile.svelte`, one in `Keyboard.svelte` — become one map beside the other sentences
-  the game speaks, in `src/lib/domain/announcements.ts`.
+- **A mark carries its own words, and a mark without them is not drawn.** The package takes
+  `{ name, description }` together rather than a state and a separate sentence, so the pair
+  is what a call site passes. That is not the same as making a wordless mark impossible —
+  `description` is a `string` and `''` type-checks — so `drawnMark` decides: a mark whose
+  sentence is empty or blank is drawn as no mark at all, which is what
+  `play-surfaces.allium`'s `EveryMarkIsNamedInWords` says the platform does. Poodl inherits
+  that refusal, and it is the shape to watch for at the boundary: a cell whose mark
+  disappears is a call site handing in a sentence the game never wrote. Poodl's two
+  duplicated `DESCRIPTION` maps — one in `Tile.svelte`, one in `Keyboard.svelte` — become one
+  map beside the other sentences the game speaks, in `src/lib/domain/announcements.ts`, and
+  every value in it has to be a real sentence.
 - **`Tile` takes its content and the caller's own sentence.** Poodl's takes `letter` and
   `position` and composes "Position 3, C, correct" itself. The package's takes `content`, an
   optional mark, and a `label` that is where the cell is. `Board.svelte` composes it — it
@@ -270,16 +276,23 @@ Five more contract changes come with them:
   package's holds neither. Poodl passes `QWERTY` — which the package exports and which names
   the same two action values, `submit` and `delete` — and switches on the value `onpress`
   hands back. Its `knowledge` array becomes a `marks` record keyed by value, which is one
-  `Object.fromEntries` over `keyboardKnowledge()`.
+  `Object.fromEntries` over `keyboardKnowledge()`. One refusal comes with it: a layout with
+  no keys in it draws no keyboard and no group, because `ALayoutIsSuppliedRatherThanFixed`
+  says a layout with no keys is not a keyboard. A route that builds its rows from state and
+  renders before that state arrives sees nothing rather than an empty named group, which is
+  the better of the two and still a difference from Poodl's fixed `ROWS`.
 - **`PhysicalKeyboard` takes a port.** Poodl's route constructs `createWindowKeys()` and
   passes it in. The guards are unchanged in behaviour and now live in the package as a pure
   predicate, so Poodl's `tests/screens.test.ts` cases for them can be retired in favour of a
   case that the route wires the port at all.
 
-**And one visual change Poodl should expect in Chromatic.** `Tile` and `Key` drew the same
+**And two visual changes Poodl should expect in Chromatic.** `Tile` and `Key` drew the same
 indication to different figures — 62%/22% at 3px on a tile, 56%/20% at 2px on a key — and the
-system owns one set now, which is the tile's. Poodl's `Tile` baselines are unchanged; its
-`Keyboard` baselines all diff on the version it adopts.
+system owns one set now, which is the tile's. And a key's padding names `--s-5` and `--s-1`
+rather than spelling 0.75rem and 0.125rem, which is the same figure at the root size and no
+longer the same figure once a reader has scaled their text — padding is spacing, so it takes
+the token and moves with the scale. Poodl's `Tile` baselines are unchanged; its `Keyboard`
+baselines all diff on the version it adopts.
 
 Three of the contracts changed on the way, and Poodl's call sites change with them:
 
@@ -332,6 +345,50 @@ And two more, renamed by [decision 0015](../decisions/0015-operation-and-play-ar
 `specifications.md`'s "What the module is" is now "What the modules are". Both are in the
 class no version number describes, and both are written here before the rename lands rather
 than after somebody notices.
+
+## What the review on this repository's own change added
+
+Four of these reach Poodl, and none of them is a new promise: each is a clause this
+repository stated and did not hold, or held somewhere the code disagreed with.
+
+**`src/app.css` gains a floor for the row a preference is set from.** A native checkbox is
+thirteen pixels and no stylesheet makes it forty-four, so `EveryControlIsAComfortableTarget`
+now says outright that such a control meets the figure in the label bound to it. The
+stylesheet had argued exactly that in prose beside the pressed ring and declared no floor for
+it, so `label:has(input[type='checkbox'])` and its radio twin now carry `inline-flex`,
+`align-items: center` and `min-block-size: 44px`. Poodl's `SettingsPanel` rows are the only
+place in the platform that renders the shape, so they are where it will be seen: a row
+shorter than 44px grows, and a row already taller does not move. `inline-flex` rather than
+`flex` on purpose, so two rows a layout had placed side by side stay side by side.
+
+**The tap-highlight suppression is now narrower than the callout suppression.** They were one
+rule, and it took the platform's own flash from a bare checkbox that no rule gave one back
+to — `ATouchIsAcknowledged` inverted on the one control it was least likely to be noticed on.
+Poodl's copy of the stylesheet carries the same defect until it takes the package or makes
+the same split: `touch-action`, the callout and the selection suppression stay on all four
+kinds of control, and `-webkit-tap-highlight-color: transparent` goes only on `button`,
+`label`, and an input inside a label.
+
+**`latinLetters` no longer claims two keys it does not name.** `/^[a-z]$/iu` folds case under
+Unicode, which also matches U+017F, the long s, and U+212A, the Kelvin sign — and the long s
+lowercases to itself, so the default alphabet handed back a character no game has a letter
+for. It is `/^[a-zA-Z]$/u` now. Poodl's own physical-keyboard guard is the file this came
+from; if it spells the test the same way it has the same hole, and a `ſ` typed into it
+reaches the game's word as a letter.
+
+**A `<summary>` keeps Enter.** The port classified a focused disclosure summary as something
+the browser does not activate, so a surface claiming keys took Enter from it and the
+disclosure would not open — `AClaimNeverReachesAFocusedControl`, broken on a control
+`Modal`'s own focusable list already knew about. The selector is
+`button, a[href], details > summary:first-of-type`. Poodl has the same guard in the code this
+was ported from, and a `<details>` anywhere on a screen that claims keys is where it shows.
+
+**And one clause reworded rather than repaired.** `AModifiedKeyIsNeverClaimed` said "a
+platform modifier" and meant three of them: Control, Meta and Alt. Shift is not among them —
+it carries no shortcut of its own and composes the character the reader meant, so a shifted
+letter is still a letter and `latinLetters` lowercases it. The adapter was right and the
+sentence was loose. Poodl restates nothing here today, but any surface of its own that reads
+"a platform modifier" and adds `shiftKey` will silently drop every capital.
 
 **The version is the thing to record.** Whatever Poodl installs, it installs exactly — no
 caret, no tilde, matching its own pinning rule — and the page Poodl gains says which version its

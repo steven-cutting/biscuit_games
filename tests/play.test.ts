@@ -251,6 +251,24 @@ describe('Keyboard', () => {
       expect(key).toBeDisabled();
     }
   });
+
+  /*
+   * `ALayoutIsSuppliedRatherThanFixed` closes with "a layout with no keys is not
+   * a keyboard", and this is what makes that a refusal rather than a sentence.
+   * The empty layout is type-valid and always will be — a game builds its rows
+   * with `map` and a non-empty tuple would stop type-checking there — so the
+   * component declines to draw the group instead of naming one with nothing in
+   * it. Both shapes, because a layout of empty rows has no keys either.
+   */
+  it.each([
+    ['has no rows at all', []],
+    ['has rows with no keys in them', [[], []]]
+  ])('draws no keyboard when the layout %s', (_what, layout: KeyboardLayout) => {
+    render(Keyboard, { layout });
+
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
 });
 
 describe('Explainer', () => {
@@ -283,6 +301,19 @@ describe('Explainer', () => {
     unmount();
   });
 
+  /*
+   * Nothing makes a game's sentences unique, and the list was keyed by them: two
+   * rows explaining the same thing collided on the key and Svelte threw
+   * `each_key_duplicate` rather than rendering. A sentence is content, so it is
+   * not what a list is keyed by.
+   */
+  it('renders two rows that say the same thing', () => {
+    const said = 'Correct \u2014 right letter, right place. Marker bar.';
+    render(ExplainerHost, { first: said, second: said });
+
+    expect(screen.getAllByRole('listitem', { name: said })).toHaveLength(2);
+  });
+
   it('takes the words from whoever is explaining themselves', () => {
     render(ExplainerHost, {});
 
@@ -291,5 +322,67 @@ describe('Explainer', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Guess the word/)).toBeInTheDocument();
     expect(screen.getByText(/saved in this browser/)).toBeInTheDocument();
+  });
+});
+
+/*
+ * `Marking.@invariant EveryMarkIsNamedInWords` closes with "a mark the game
+ * supplied no words for is not a mark the platform will draw", and this is what
+ * draws it. Bundling the name with the sentence makes the pair what a caller
+ * passes; it does not make a wordless mark unrepresentable, because `string`
+ * admits the empty one and TypeScript has no way to refuse it. Left there, a
+ * blank sentence painted the cell, drew the bar, and said nothing about either
+ * \u2014 the exact failure the invariant names. So the paint is asserted here and
+ * not only the name: `Tile` already dropped an empty sentence out of its
+ * accessible name, which is what made the mismatch silent.
+ */
+describe('a mark the game supplied no words for', () => {
+  it.each([
+    ['nothing at all', ''],
+    ['only whitespace', '   ']
+  ])('draws a cell given %s as an unmarked one', (_what, description) => {
+    const { container } = render(Tile, {
+      content: 'A',
+      mark: { name: 'exact', description }
+    });
+
+    expect(container.querySelector('[data-mark]')).toBeNull();
+    expect(container.querySelector('[data-marker]')).toBeNull();
+    expect(screen.getByRole('img', { name: 'A' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['nothing at all', ''],
+    ['only whitespace', '   ']
+  ])('draws a key given %s as an unmarked one', (_what, description) => {
+    const { container } = render(Key, {
+      label: 'A',
+      content: 'A',
+      mark: { name: 'present', description }
+    });
+
+    expect(container.querySelector('[data-mark]')).toBeNull();
+    expect(container.querySelector('[data-marker]')).toBeNull();
+    expect(screen.getByRole('button', { name: 'A' })).toBeInTheDocument();
+  });
+
+  // The mark that draws no bar of its own is the one this could have been read
+  // as already holding, so it is asserted by its attribute rather than its bar.
+  it('draws an absent cell with no words as an unmarked one', () => {
+    const { container } = render(Tile, {
+      content: 'A',
+      mark: { name: 'absent', description: '' }
+    });
+
+    expect(container.querySelector('[data-mark]')).toBeNull();
+  });
+
+  // And a mark that does carry words is untouched by any of it.
+  it('leaves a mark that says something alone', () => {
+    const { container } = render(Tile, { content: 'A', mark: EXACT });
+
+    expect(container.querySelector('[data-mark]')).not.toBeNull();
+    expect(container.querySelector('[data-marker]')).not.toBeNull();
+    expect(screen.getByRole('img', { name: 'A, correct' })).toBeInTheDocument();
   });
 });

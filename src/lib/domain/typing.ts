@@ -43,9 +43,17 @@ export interface KeyBindings {
  */
 const ACTIVATES = 'Enter';
 
-/** The 26 Latin letters, lowercased. A default, and only a default. */
+/**
+ * The 26 Latin letters, lowercased. A default, and only a default.
+ *
+ * Both cases are written out rather than folded with the `i` flag. Under Unicode
+ * case folding `/[a-z]/iu` also matches U+017F, the long s, and U+212A, the
+ * Kelvin sign — so the default alphabet claimed two keys it does not name, and
+ * handed the long s straight back unchanged because it lowercases to itself. The
+ * `u` flag stays; the folding is what was wrong.
+ */
 export function latinLetters(key: string): string | null {
-  return /^[a-z]$/iu.test(key) ? key.toLowerCase() : null;
+  return /^[a-zA-Z]$/u.test(key) ? key.toLowerCase() : null;
 }
 
 /**

@@ -34,9 +34,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   A mark is `exact`, `present` or `absent`, after `--result-exact`, `--result-present` and
   `--result-absent` — the tokens this repository has declared and measured since decision
   0010, which is the argument for the move and why it did not wait for a second game. A mark
-  arrives with the game's own sentence for it and cannot arrive without one, so a painted
-  state with nothing to say is unrepresentable rather than merely discouraged. A game whose
-  vocabulary says `correct` maps at its call site.
+  arrives with the game's own sentence for it, and a mark whose sentence is blank is drawn as
+  no mark at all — `play-surfaces.allium`'s `EveryMarkIsNamedInWords` says the platform draws
+  no state it has no words for, and `drawnMark` is where it declines. A game whose vocabulary
+  says `correct` maps at its call site.
 
   `tests/play.test.ts` and `tests/typing.test.ts` are the evidence, five story files are the
   specimens, and `docs/reference/testing.md` grants this repository's first structural-hook
@@ -218,6 +219,70 @@ Two gaps in the evidence rather than in the code, found by the same review:
 - `Button`'s bindable `element` has a test. It is the library's only bindable prop and the
   handle `Modal` says a child carries focus across its own swap by, and deleting the binding
   left the whole suite green.
+
+Eight defects the automated reviewers on pull request 4 found in the play surface and the
+specifications that arrived with it, and three gates that were cited but never written. Again
+nothing is released, so no version moves and no consumer took any of them.
+
+- `latinLetters` no longer claims two keys it does not name. `/^[a-z]$/iu` folds case under
+  Unicode, which also matches U+017F, the long s, and U+212A, the Kelvin sign — and the long s
+  lowercases to itself, so the platform's default alphabet handed a game back a character no
+  game has a letter for. The cases are enumerated instead, as `/^[a-zA-Z]$/u`.
+- The keys port reads a focused `<summary>` as something the browser activates. Enter opens a
+  disclosure, so a surface claiming keys was taking Enter from one and calling
+  `preventDefault()` on it — `AClaimNeverReachesAFocusedControl` broken on a native control
+  `Modal`'s own focusable list already named. Poodl's copy of the guard carries it too.
+- `Explainer` keys its rows by position rather than by the sentence in them. Nothing asks two
+  of a game's explanations to differ, so two rows saying the same thing collided and threw
+  `each_key_duplicate` instead of rendering — the same defect, and the same cause, as
+  `HeaderBar`'s labels on the review before this one.
+- A mark with no words is not drawn. `{ name, description }` makes the pair what a caller
+  passes; it does not make a wordless mark unrepresentable, because `description` is a
+  `string` and `''` type-checks. Left there, a blank sentence painted the cell, drew the bar
+  and said nothing about either, which is the exact failure `EveryMarkIsNamedInWords` names.
+  `drawnMark` decides it once for `Tile` and `Key` both, and trims, because "supplied no words
+  for" is what a run of spaces is.
+- A layout with no keys draws no keyboard. `ALayoutIsSuppliedRatherThanFixed` says as much and
+  `Keyboard` had drawn a named, empty group instead. The empty layout stays type-valid on
+  purpose: a game builds its rows with `map`, and a non-empty tuple would stop type-checking
+  exactly there.
+- The row a preference is set from carries the 44px floor it had been promised in prose. A
+  native checkbox is thirteen pixels and no stylesheet makes it forty-four, so
+  `EveryControlIsAComfortableTarget` now states outright that such a control meets the figure
+  in the label bound to it — and `src/app.css` now declares it, with the `inline-flex` that
+  makes `min-block-size` apply to a `<label>` at all.
+- The tap-highlight suppression reaches only the controls that get a replacement. It was one
+  rule with the callout suppression, so a bare checkbox lost the platform's own flash and no
+  rule gave one back: `ATouchIsAcknowledged` inverted on the control least likely to be looked
+  at. `touch-action`, the callout and the selection suppression stay on all four kinds.
+- `Key`'s padding names `--s-5` and `--s-1`. Padding is spacing, not the coincident-literal
+  carve-out a control's own dimension takes, and the literals were the same figure only at the
+  root font size. `Tile`'s 3rem *is* in the carve-out and now carries the comment the rule
+  asks for, the way `Button`'s 48px does.
+
+And three gates named in a comment, in a claim, or in nothing at all:
+
+- `tests/typing.test.ts` holds `QWERTY` and `QWERTY_BINDINGS` equal. `layouts.ts` said
+  `tests/package-surface.test.ts` did, and it did not: the drawn keys and the typed ones could
+  have come to name different operations with every gate green.
+- `tests/package-surface.test.ts` asserts the play surface's runtime exports and writes against
+  its types. A game that could import `Keyboard` and not `QWERTY` has a keyboard it cannot lay
+  out, and removing either from the barrel left the whole suite green.
+- `tests/typing.test.ts` drives the real adapter with each modifier flag. The `claimKey` table
+  hands `modified` in already computed, so only `ctrlKey` had ever reached the adapter's own
+  short-circuit. Green on arrival, and now driven rather than assumed.
+
+Two clauses were reworded rather than repaired, because the specification was wrong and the
+code was right:
+
+- `EveryControlIsAComfortableTarget` names its second exemption: a control inside a line of
+  running text takes its size from the text around it. This repository's only route has a link
+  in a sentence, so the invariant as first written was false of the hub itself on the day it
+  was published.
+- `AModifiedKeyIsNeverClaimed` names Control, Meta and Alt rather than "a platform modifier".
+  Shift is not one of them: it carries no shortcut of its own, so a shifted letter is still the
+  reader typing a letter — which is what `latinLetters` had always assumed, and what the loose
+  wording contradicted.
 
 ### Deliberately not included
 

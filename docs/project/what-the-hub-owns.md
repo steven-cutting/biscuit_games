@@ -44,9 +44,11 @@ components live here rather than in the first game that rendered them.
 ## What lives in a game repository
 
 - **Its own rules, and the specifications that decide them.** Guessing, marking and hard
-  mode are Poodl's; tiles and matches will be Pawjong's. `docs/specs/` here holds one
-  module, and it imports nothing precisely so that a game can take appearance as given
-  rather than restate it.
+  mode are Poodl's; tiles and matches will be Pawjong's. `docs/specs/` here holds three
+  modules — `appearance.allium`, `operation.allium` and `play-surfaces.allium` — and none of
+  them imports another or anything else, precisely so that a game can take how a surface
+  looks, how it is worked and what it owes when it is played on as given rather than restate
+  any of them.
 - **How its play surface is arranged, and what its marks mean.** A board, a rack, a row of
   six attempts across five letters: an arrangement encodes a rule, and the rule is the
   game's. So does a mark's meaning — that a letter is in the word but in the wrong place is

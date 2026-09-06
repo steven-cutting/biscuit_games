@@ -78,7 +78,9 @@ export const QWERTY: KeyboardLayout = [
  * and the typed ones agree by naming the same values — `submit`, `delete` and
  * the letters — rather than because either component knows about the other.
  * `TypedKeysAnswerTheSameOperationsAsTheKeysOnScreen` is the clause, and
- * `tests/package-surface.test.ts` holds the two lists equal.
+ * `tests/typing.test.ts` holds the two lists equal — which it did not when this
+ * sentence first named a file with no such assertion in it, so the two could have
+ * come to name different operations with every gate green.
  */
 export const QWERTY_BINDINGS: KeyBindings = {
   actions: { Enter: 'submit', Backspace: 'delete' },

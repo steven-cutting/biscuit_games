@@ -20,6 +20,12 @@
    * the whole of the content. That leaves the sentences carrying the explanation
    * alone, which is why each row is named by its own sentence.
    *
+   * Named by it and not keyed by it. Nothing makes a game's sentences unique, and
+   * two rows explaining the same thing collided on the key and threw
+   * `each_key_duplicate` rather than rendering. The index is the key, as it is
+   * for `Keyboard`'s rows: a list a caller supplies whole is reordered by being
+   * replaced.
+   *
    * There is deliberately no dialog here. A caller that wants one writes
    * `<Modal title="How to play" {onclose}><Explainer … /></Modal>`, which is
    * three lines and no shared shape; a wrapper would only hard-code a title the
@@ -51,7 +57,7 @@
   {/if}
   {#if rows.length > 0}
     <ul>
-      {#each rows as row (row.says)}
+      {#each rows as row, index (index)}
         <li aria-label={row.says}>
           <span class="example" aria-hidden="true">{@render row.show()}</span>
           <span>{row.says}</span>
