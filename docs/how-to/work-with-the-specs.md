@@ -8,7 +8,7 @@ requires: []
 
 # Work with the specifications
 
-The Allium module under `docs/specs/` decides shared behaviour: what every Biscuit Games
+The Allium modules under `docs/specs/` decide shared behaviour: what every Biscuit Games
 surface owes the reader, whichever game is in front of them. This page is the procedure;
 [Specifications](../explanation/specifications.md) is the reasoning.
 
@@ -17,10 +17,14 @@ surface owes the reader, whichever game is in front of them. This page is the pr
 | Module | Owns |
 | --- | --- |
 | [`appearance.allium`](../specs/appearance.allium) | The shared appearance surface: theme, high contrast and animations, how each negotiates with a preference the device has already expressed, and the legibility every combination has to reach. |
+| [`operation.allium`](../specs/operation.allium) | How a surface is worked: keyboard operability and focus, what a dialog owes, the comfortable target and the narrowest supported width, what a finger is owed, and what a surface claiming bare key presses owes. |
+| [`play-surfaces.allium`](../specs/play-surfaces.allium) | What a surface played on owes: the four marks a cell wears, the words a game supplies for them, the separations between them, the on-screen keyboard, and the primer that explains them. |
 
-One module, and it is the platform's rather than a game's. Behaviour belonging to one game
-belongs in that game's own specifications; what lands here is what every game inherits
-instead of restating.
+Three modules, and every one of them is the platform's rather than a game's. Behaviour
+belonging to one game belongs in that game's own specifications; what lands here is what
+every game inherits instead of restating. A change that belongs in another module's scope
+goes there instead, and each module's `Excludes` block is where the line is drawn — they are
+written to be disjoint, which is the one thing `just check-specs` cannot verify.
 
 The module opens with `Scope`, `Includes`, `Excludes` and `Dependencies`. If your change
 falls under `Excludes` it belongs elsewhere — the controls that change a setting to the

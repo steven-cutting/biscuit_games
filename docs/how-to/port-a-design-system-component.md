@@ -56,7 +56,8 @@ on arrival, or leave the shape in the game.
    contract and its test are the settled ones. Where Poodl does not, read the reference
    component in the design project (`components/**` there). Either way, read the spec
    surface that will consume it — today that is `Appearance` in
-   `docs/specs/appearance.allium`, the only module this repository holds — and where source
+   `docs/specs/appearance.allium`, `Operation` and `Dialog` in `operation.allium`, and the
+   three surfaces in `play-surfaces.allium` — and where source
    and specification disagree, the specification wins; that is AGENTS.md invariant 1, and
    the deviations decision 0010 records are what the rule cost the first time anyone applied
    it.
@@ -88,8 +89,9 @@ on arrival, or leave the shape in the game.
    happens to equal a spacing step stays a literal, with a comment saying which token it
    coincides with and why it is not named — `Wordmark`'s mark, `Button`'s 48px and
    `Notice`'s 40px are the worked examples. The 44px touch target and the 320px narrowest
-   width are story fixtures in `stories/fixtures.ts`, because no specification here states
-   them yet; [Accessibility](../explanation/accessibility.md) names that gap.
+   width are `operation.allium`'s `config.minimum_touch_target` and
+   `config.narrowest_supported_width`, mirrored in `src/lib/config.ts` and measured by
+   `tests/operation.test.ts` and by the plays.
 5. **Land component, test and story in one change.** The test queries by role and name in
    `tests/`; the story covers the states the surface names, cites its guarantees, and pins
    dark and high contrast where the look inverts. Never set `box-shadow` on a pressable —

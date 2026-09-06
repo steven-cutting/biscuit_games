@@ -47,8 +47,10 @@ jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.t
 the binding delivered, because `bind:` is template syntax that a `.test.ts` has none of, and
 a component is the shape the consumer carrying focus across a swap actually writes. The
 `include` glob is `tests/**/*.test.ts`, so both are loaded and neither is collected.
-`stories/fixtures.ts` is the same arrangement on the story side: the two figures the plays
-measure a control against, imported by the stories that need them and never a story.
+On the story side the figures a play measures a control against come from
+`src/lib/config.ts`, which mirrors the module that states them — so a play is held to the
+specification rather than to a number beside it, and raising the figure in one place cannot
+leave the other behind.
 
 ## Conventions
 

@@ -38,6 +38,8 @@ unresolved ones are recorded there as `open question` blocks — see
 | [0012](0012-the-domain-root-stays-with-poodl.md) | The domain root stays with Poodl |
 | [0013](0013-shared-material-travels-as-a-package.md) | Shared material travels as a package |
 | [0014](0014-the-hub-holds-the-design-system.md) | The hub holds the design system |
+| [0015](0015-operation-and-play-are-specified-here.md) | Operation and play are specified here |
+| [0016](0016-the-play-surface-is-the-platforms.md) | The play surface is the platform's |
 
 ## The numbering
 
@@ -63,8 +65,10 @@ Three verbs, and they mean different things. A record is **superseded by** a suc
 replaces its answer, **narrowed by** one that changes part of its letter and none of its
 reasoning, and **carried out on** a date when what it planned actually happened — the third is
 not a supersession at all, and its mark sits beside the paragraph that stopped being true
-rather than at the top. A slug never moves, whichever verb applies, because a slug is what a
-cross-repository reference names.
+rather than at the top. A fourth reads a reopener rather than a decision: a trigger is
+**overruled on** a date when a later record acts without it, which is not the same as the
+trigger firing and must never be written as though it were. A slug never moves, whichever
+verb applies, because a slug is what a cross-repository reference names.
 
 ## Related pages
 

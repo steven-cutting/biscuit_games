@@ -3,7 +3,7 @@
   import { expect, fn, userEvent, within } from 'storybook/test';
 
   import HeaderBar from '../src/lib/components/HeaderBar.svelte';
-  import { MINIMUM_TOUCH_TARGET, NARROWEST_SUPPORTED_WIDTH } from './fixtures';
+  import { MINIMUM_TOUCH_TARGET, NARROWEST_SUPPORTED_WIDTH } from '../src/lib/config';
 
   // The gutter a page shell gives at every width, so a frame here leaves the
   // header exactly the room a route would.
@@ -36,7 +36,7 @@
     '',
     'The narrow story is the executable evidence that the collapse — words hidden, divider gone,',
     'icon gaps closed — keeps every target whole rather than shrinking one. The figures it',
-    'measures against are `stories/fixtures.ts`’s, and the fixture says why they live there.'
+    'measures against are `operation.allium`’s, mirrored in `src/lib/config.ts`.'
   ].join('\n');
 
   const { Story } = defineMeta({

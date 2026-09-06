@@ -45,8 +45,8 @@ prints its output whole, and asserts what the contract actually says: every modu
 an empty `diagnostics` array and an empty `findings` array. A diagnostic may be waived
 only where the checker itself is wrong, on the terms in
 [Work with the specifications](../how-to/work-with-the-specs.md); a finding cannot be
-waived at all. `docs/specs/` holds one module today, `appearance.allium`, and both gates
-report empty on it.
+waived at all. `docs/specs/` holds three modules — `appearance.allium`, `operation.allium` and
+`play-surfaces.allium` — and both gates report empty on each.
 
 One check is still deliberately missing from the table. `check-links-online` needs the
 network, and a check that can fail because a third party is down is not a gate. It is

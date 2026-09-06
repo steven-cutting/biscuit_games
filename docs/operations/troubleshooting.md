@@ -84,8 +84,9 @@ checker resolved no module at all, which is a gate that read nothing rather than
 passed. allium exits with its own no-inputs status and the wrapper says so in words rather
 than passing a bare number through, and it names the modules it did read against the ones
 `docs/specs/` holds, so a module dropped in silence cannot pass inside a reassuring count.
-This repository has exactly one module, `docs/specs/appearance.allium`. Restore it rather
-than teaching the gate to accept an empty directory. See
+This repository has three modules: `docs/specs/appearance.allium`,
+`docs/specs/operation.allium` and `docs/specs/play-surfaces.allium`. Restore whichever is
+missing rather than teaching the gate to accept a short count. See
 [Work with the specifications](../how-to/work-with-the-specs.md).
 
 ## `svelte-check` reports an unused CSS selector

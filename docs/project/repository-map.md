@@ -66,10 +66,10 @@ recipe's own exit code is read.
 | `src/lib/components/` | Rendering and interaction. Components take callbacks as props and hold no application state of their own. Eight today — the lockup, the icon renderer and the six platform primitives — and nothing lands here without a test and a story. |
 | `src/lib/domain/` | The three derivations `appearance.allium`'s `Appearance` surface states, as pure functions, and the `ThemeChoice` type. |
 | `src/lib/ports/` | The preferences port: what the reader asked their operating system for, read through `matchMedia` and watched, with the fake a test injects. |
-| `src/lib/config.ts` | The two contrast floors, mirrored from the specification for the contrast test to read. Not exported. |
+| `src/lib/config.ts` | The six figures the three modules state, mirrored for the contrast test and the story plays to read. Not exported. |
 | `src/routes/` | Assembling components into pages, and the only place a store would be built. Prerendered, so nothing here may assume a request. |
 | `tests/` | Vitest suites named for what they cover, not for the file they mirror. |
-| `stories/` | Every state of a component, as something that can be looked at, and the token sheet. Rendered in Chromium with axe over each; `fixtures.ts` holds the two figures the plays measure against. |
+| `stories/` | Every state of a component, as something that can be looked at, and the token sheet. Rendered in Chromium with axe over each; the figures a play measures against come from `src/lib/config.ts`, which mirrors the specification that states them. |
 | `static/` | Copied verbatim into the build. It holds `.nojekyll` and nothing else, and that one file is what keeps the directory in Git: `.storybook/main.ts` names `../static` in `staticDirs`, and Storybook treats a listed static directory that does not exist as an error. Nothing publishes the file today. |
 | `scripts/` | `validate_docs.py`, `validate_agents.py`, `run_project_check.py`, `run_ripsecrets_redacted.py`, `install_allium.py`, `run_allium.py`, `check_playwright_browsers.js` and `initialize.sh`. |
 | `docs/specs/` | The Allium specifications. Shared behaviour is decided here, not in code. One module today, `appearance.allium`, and it imports nothing. |

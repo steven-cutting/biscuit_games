@@ -22,6 +22,33 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the token sheet. The play-surface primitives stay in Poodl. See
   [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md).
 
+- Two more specifications, and the figures they state. `docs/specs/operation.allium` says how
+  a Biscuit Games surface is *worked* — every operation reachable from the keyboard with
+  visible focus, what a surface owes when it replaces the control a reader is standing on,
+  what a dialog owes on the way in and on the way out, `minimum_touch_target` at 44 and
+  `narrowest_supported_width` at 320, the four `DirectManipulation` invariants a finger is
+  owed, and what a surface owes when it claims bare key presses for itself.
+  `docs/specs/play-surfaces.allium` says what a surface *played on* owes: `PlayMark` with
+  `unmarked`, `exact`, `present` and `absent`, named after the tokens that paint them; that a
+  mark is never conveyed by colour alone and never drawn without the game's own words for it;
+  and `minimum_state_separation` at 3.0 and `minimum_mark_separation` at 2.0. Both are root
+  modules importing nothing, both ship at `@steven-cutting/biscuit-games/specs/*.allium`, and
+  both report empty diagnostics and empty findings with no waiver.
+
+  `src/lib/config.ts` mirrors the four new figures and `stories/fixtures.ts` is deleted, so a
+  play now measures against the specification rather than beside it. `tests/operation.test.ts`
+  reads `src/app.css` and `src/app.html` from disk and measures what these rules resolve to on
+  a real control — twelve of its fourteen cases passed on arrival, because every rule was
+  already in the stylesheet and nothing here had ever asserted one. `tests/contrast.test.ts`
+  measures a state separation for the first time, which is the block
+  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md) declined to port
+  while the figures were a game's, and gains two pairs the play surface newly renders — the
+  absent glyph on the page, and the hue results as text where the dark themes leave them
+  unfilled. No guarantee in `appearance.allium` is amended; only its header changes. This
+  closes the gap `docs/explanation/accessibility.md` had carried since the port as "the next
+  specification question this repository owes an answer to". See
+  [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md).
+
 - A published package. `@steven-cutting/biscuit-games` on GitHub Packages carries the token
   vocabulary, the shared components and the icons they draw, the preferences port and the
   appearance derivations, the two committed typefaces and

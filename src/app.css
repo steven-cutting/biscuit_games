@@ -515,11 +515,11 @@ body {
  * stylesheet rather than in any one component. Over there they are measured by
  * `tests/directManipulation.test.ts` and by the width stories in
  * `stories/Keyboard.stories.svelte`. Neither the module nor that test came
- * here, and the contract is stated by no specification of this repository's —
- * `docs/explanation/accessibility.md` names that gap. What did come is the
- * controls the rules apply to, `Button`, `IconButton` and `HeaderBar`, whose
- * stories measure a rendered control against the figures in
- * `stories/fixtures.ts`. The rules themselves are held by reading.
+ * here. The contract is `docs/specs/operation.allium`'s now, and
+ * `tests/operation.test.ts` reads this file from disk and measures what these
+ * rules resolve to on a real control — so they are held by a gate rather than
+ * by reading. What only a layout engine can answer stays with the stories,
+ * which measure a rendered control against `src/lib/config.ts`.
  *
  * ATapDoesOnlyWhatTheControlDoes. `manipulation` declines the platform's guess
  * at what a second tap meant, which is what makes fast repeated tapping on the
@@ -578,11 +578,11 @@ textarea {
 
 /*
  * EveryControlIsAComfortableTarget, top to bottom, where every control meets the
- * figure outright. 44px is `config.minimum_touch_target` in Poodl's
- * `game.allium`; here it is `MINIMUM_TOUCH_TARGET` in `stories/fixtures.ts`,
- * which the Button, IconButton and HeaderBar plays measure a rendered control
- * against, and which is a story fixture rather than a `src/lib/config.ts` value
- * because no specification in this repository states the figure yet.
+ * figure outright. 44px is `config.minimum_touch_target`, stated in
+ * `docs/specs/operation.allium` and mirrored as `MINIMUM_TOUCH_TARGET` in
+ * `src/lib/config.ts`, which `tests/operation.test.ts` asserts this floor
+ * against and which the Button, IconButton and HeaderBar plays measure a
+ * rendered control against.
  * `IconButton` takes its width from that same number and its height from this
  * rule.
  *

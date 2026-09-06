@@ -3,7 +3,7 @@
   import { expect, fn, userEvent, within } from 'storybook/test';
 
   import IconButton from '../src/lib/components/IconButton.svelte';
-  import { MINIMUM_TOUCH_TARGET } from './fixtures';
+  import { MINIMUM_TOUCH_TARGET } from '../src/lib/config';
 
   const onclick = fn();
 
@@ -15,8 +15,8 @@
     'asks for the word, and these are exactly the controls a shape alone would leave unnamed.',
     '',
     'It is a comfortable target both ways, and the play below measures that here because jsdom',
-    'has no layout engine. The figure is a story fixture rather than a `config.ts` value: no',
-    'specification in this repository states it yet, and `stories/fixtures.ts` says so. The',
+    'has no layout engine. The figure is `operation.allium`’s `config.minimum_touch_target`,',
+    'mirrored in `src/lib/config.ts`, which is what the play reads. The',
     "pressed ring is `app.css`'s and deliberately not asserted."
   ].join('\n');
 

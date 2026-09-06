@@ -46,7 +46,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { MINIMUM_BOUNDARY_CONTRAST, MINIMUM_TEXT_CONTRAST } from '../src/lib/config';
+import {
+  MINIMUM_BOUNDARY_CONTRAST,
+  MINIMUM_MARK_SEPARATION,
+  MINIMUM_STATE_SEPARATION,
+  MINIMUM_TEXT_CONTRAST
+} from '../src/lib/config';
 
 // Read from disk rather than imported: Vite claims `.css` and hands back a
 // module whose default export is the empty string, which would assert against
@@ -205,12 +210,36 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
           MINIMUM_TEXT_CONTRAST
         );
 
+        /*
+         * Absent has no fill in any theme, so a marked cell puts its dimmed
+         * glyph straight on the page — a ground this ink is not measured on
+         * anywhere above, which reaches it only on a scored key and on a dialog
+         * surface. The pair arrives with the play surfaces: nothing rendered it
+         * before.
+         */
+        expect(ratio(token('--result-absent-text'), token('--background'))).toBeGreaterThanOrEqual(
+          MINIMUM_TEXT_CONTRAST
+        );
+
         // The fills are light-only: the dark themes stay fill-free, the
         // tokens resolve to `transparent` there, and `token()` would rightly
         // refuse to measure a colour that is not one.
         if (combination.theme === 'light') {
           for (const result of HUE_RESULTS) {
             expect(ratio(token(result), token(`${result}-fill`))).toBeGreaterThanOrEqual(
+              MINIMUM_TEXT_CONTRAST
+            );
+          }
+        } else {
+          /*
+           * The other side of that carve-out, and the reason it is an `else`
+           * rather than a second `if`. Where a hue result has no fill its glyph
+           * and its marker bar sit on the page itself, so the ink owes the text
+           * floor against `--background` — which the block above measures only
+           * at the boundary bar, against a different figure.
+           */
+          for (const result of HUE_RESULTS) {
+            expect(ratio(token(result), token('--background'))).toBeGreaterThanOrEqual(
               MINIMUM_TEXT_CONTRAST
             );
           }
@@ -330,6 +359,65 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
         ] as const) {
           expect(ringEdge(token(ground))).toBeGreaterThanOrEqual(MINIMUM_BOUNDARY_CONTRAST);
         }
+      });
+    });
+  }
+});
+
+describe('AnUnmarkedCellStandsOffAMarkedOne', () => {
+  /*
+   * The block decision 0014 deliberately left in Poodl, because the figures
+   * were a game's then. `play-surfaces.allium` states them now, so the two
+   * separation windows the `app.css` header pins — `--n-65` and `--n-75` — are
+   * held at both ends here rather than at one end here and one in a game.
+   *
+   * These pass on arrival: the palette has satisfied them since decision 0010,
+   * and the figures quoted in the stylesheet's comments say so. What changes is
+   * that they can no longer move here unnoticed.
+   */
+  for (const combination of COMBINATIONS) {
+    describe(combination.name, () => {
+      beforeEach(() => {
+        apply(combination);
+      });
+
+      /*
+       * The pair with no hue and no bar on either side, which is why lightness
+       * alone must carry it: an unmarked cell and an absent one are both a
+       * bordered glyph, and the glyphs are what differ. This is the wall the
+       * `app.css` header names — 3.28 against 3.0 in the dark themes — and the
+       * figure `--n-75`'s constraint window exists to hold.
+       */
+      it('holds the unmarked glyph apart from the absent glyph', () => {
+        expect(ratio(token('--text'), token('--result-absent-text'))).toBeGreaterThanOrEqual(
+          MINIMUM_STATE_SEPARATION
+        );
+      });
+
+      // A hue result answers with its ink — glyph, border and marker bar
+      // together — standing off the ground an unmarked cell hugs, which is the
+      // page.
+      it('holds each hue result off the ground an unmarked cell hugs', () => {
+        for (const result of HUE_RESULTS) {
+          expect(ratio(token(result), token('--key-untried-bg'))).toBeGreaterThanOrEqual(
+            MINIMUM_STATE_SEPARATION
+          );
+        }
+      });
+
+      /*
+       * Absent against exact, and that pair only, carried by the border each of
+       * the two draws. The pair is nameable by the platform because it is fixed
+       * by the marks rather than by any game's meanings: absent is the one mark
+       * with no hue and exact the strongest that has one, so they are the pair a
+       * reader without hue has least to go on with. A distance, not a
+       * direction: absent's border is the lighter of the pair in dark and the
+       * darker in light, and the symmetric ratio is indifferent to which.
+       */
+      it('holds absent apart from exact by the border each draws', () => {
+        expect(ratio(token('--result-absent'), token('--result-exact'))).toBeGreaterThanOrEqual(
+          MINIMUM_MARK_SEPARATION
+        );
       });
     });
   }

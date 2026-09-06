@@ -8,6 +8,16 @@ requires: []
 
 # Decision 0014: The hub holds the design system
 
+> **Narrowed on 2026-09-05 by
+> [Decision 0016](0016-the-play-surface-is-the-platforms.md).** The play-surface primitives
+> named below are here now: `Tile`, `Key`, `Keyboard`, `PhysicalKeyboard` and `Explainer`
+> came across generalised, on the precedent this record set with `HeaderBar` and `Notice`.
+> `Board` and `DistributionChart` stay with the game. Everything this record decided about
+> the platform primitives, the icon set, the contrast test, the port and the rule for adding
+> a component stands unchanged, and its reasoning is what 0016 applies rather than what 0016
+> contradicts. The third reopener below is **overruled rather than carried out**: no second
+> game exists, and 0016 says why a second game was the wrong trigger.
+
 ## Context
 
 [Decision 0011](0011-skeleton-not-a-second-application.md) shipped the toolchain whole and
@@ -158,6 +168,13 @@ nobody renders, and 0011's argument returns with the evidence on its side.
 
 A second game wanting the play-surface primitives, which is 0010's trigger and is unchanged
 by this record: they move here when Pawjong renders the same shape, and not before.
+
+**Overruled on 2026-09-05.** [Decision 0016](0016-the-play-surface-is-the-platforms.md)
+moved them with no second game. Not *carried out*: nothing this paragraph planned happened,
+and the trigger was replaced rather than met. What decides these shapes is the palette, and
+the palette is already decided here and already measured here, so waiting for a second game
+was waiting for evidence this repository's own stylesheet had been carrying since decision
+0010.
 
 ## Related pages
 

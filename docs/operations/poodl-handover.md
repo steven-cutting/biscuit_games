@@ -276,10 +276,63 @@ and `accessibility.md`'s "Every figure here is inherited, not measured" are each
 the figures are measured"; and `port-a-design-system-component.md`'s "When to port, and
 when to restyle in place" is now "What is ported, and what stays a game's".
 
+And two more, renamed by [decision 0015](../decisions/0015-operation-and-play-are-specified-here.md):
+`accessibility.md`'s "What the stylesheet carries and the specification does not" is now
+"What the specifications carry beyond appearance", because the gap it named is closed; and
+`specifications.md`'s "What the module is" is now "What the modules are". Both are in the
+class no version number describes, and both are written here before the rename lands rather
+than after somebody notices.
+
 **The version is the thing to record.** Whatever Poodl installs, it installs exactly — no
 caret, no tilde, matching its own pinning rule — and the page Poodl gains says which version its
 copies were retired at. A game sitting on an old release is behind rather than protected, and
 the only thing that will ever say so is Poodl's own gate after a bump.
+
+**The `DirectManipulation` contract and the `GameBoard` separations in
+`docs/specs/game.allium`.** This is the second worked example of the hazard the `Appearance`
+copy already demonstrates, and it is worse than the first, because it is now three files
+rather than two and because four of the duplicated things are *numbers*.
+`docs/specs/operation.allium` states what Poodl's `DirectManipulation` contract states, by
+the same four invariant names, and carries `minimum_touch_target` at 44 and
+`narrowest_supported_width` at 320 — the same two figures Poodl's own `config` block
+declares. `docs/specs/play-surfaces.allium` states what
+`GameBoard.@guarantee ResultsAreNeverConveyedByColourAlone` and
+`AnUntriedKeyIsDistinguishableFromAScoredOne` state, and carries
+`minimum_state_separation` at 3.0 and `minimum_mark_separation` at 2.0.
+
+Poodl deletes none of it, and **it cannot delete the four config entries even if it wanted
+to**: its own clauses cite them from inside `game.allium`, so removing the entries while the
+clauses stand draws `allium.config.undefinedReference` and fails Poodl's own `check-specs`,
+which refuses any diagnostic at all. The item is keep and cite — the entries stay, with a
+comment naming the hub module each originates in.
+
+What Poodl does instead is widen the check the `Appearance` item above asks for, so that it
+reads all three shipped modules rather than one and asserts, for each name in a register
+written down here: either Poodl does not state that name at all, or Poodl's clause body is
+textually identical. Anything else fails. It must assert the four config values equal as
+well, because nothing anywhere else would ever notice them diverging, and it must assert that
+the path it resolved contains `node_modules`, for the reason the stylesheet item gives. That
+check was already the single most valuable item on this page; it has just tripled in reach.
+
+**`tests/contrast.test.ts`'s state-separation block, and `tests/directManipulation.test.ts`.**
+The item above says the separation block "stays, because it is the only thing in the platform
+that measures those figures". That stopped being true on 2026-09-05.
+`play-surfaces.allium` states the two figures, `src/lib/config.ts` mirrors them, and this
+repository's `tests/contrast.test.ts` measures the pairs behind `--n-65` and `--n-75` in all
+four combinations. So the block is redundant in the same way the thirteen shared cases are,
+and may be retired on the same trigger and not before: after Poodl's test reads the stylesheet
+from `node_modules` and asserts the resolved path says so. Retire it in a change of its own,
+never in the same change as the deletion of `src/app.css` — losing the only measurement of a
+figure to a path change would still be the worst outcome available, and it is only slightly
+less bad now that a second measurement exists a repository away.
+
+`tests/directManipulation.test.ts` is not retired and does not move. It measures what a
+rendered control does under a finger over Poodl's own surfaces, and this repository renders
+none of them. What changes is what it cites: the rules it holds are `operation.allium`'s now
+rather than `game.allium`'s `DirectManipulation`, so each comment naming that contract is
+repointed at the packaged module. This repository has written its own counterpart,
+`tests/operation.test.ts`, over the same stylesheet — so the rules are now measured on both
+sides of the boundary, and Poodl's copy is the one that measures them on a real game.
 
 **And the thing that must not be done.** Poodl's `settings.allium` keeps its own `Appearance`
 surface. Deleting it in favour of the packaged module is not possible, for the reasons above.

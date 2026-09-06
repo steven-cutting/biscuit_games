@@ -32,9 +32,13 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
 
 1. **The specifications are the source of truth for shared behaviour.** No rule,
    threshold or wording that `docs/specs/` states is re-decided in code, here or
-   in a game repository. `appearance.allium` is the first shared surface; where a
-   game restates one of its guarantees, this one is the original and the game's
-   is the copy. When the code needs to differ, change the spec first and say why.
+   in a game repository. Three modules state them: `appearance.allium` says how a
+   surface looks, `operation.allium` how it is worked, and `play-surfaces.allium`
+   what a surface played on owes. Where a game restates one of their guarantees,
+   the module here is the original and the game's is the copy — and nothing
+   compares the two, which is why a change to `docs/specs/` is not finished until
+   the Poodl handover carries it. When the code needs to differ, change the spec
+   first and say why.
 2. **Svelte 5 runes only.** `$props`, `$state`, `$derived`, `$effect`. No legacy
    reactive statements and no `createEventDispatcher`; child-to-parent
    communication passes callbacks as props. Enforced by review and by
@@ -104,7 +108,8 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
   and name — never by class or test id.
 - Stories live in `stories/` at the repository root, as `*.stories.svelte` in
   Svelte CSF, one file per component, plus `Foundations.stories.svelte`, the
-  token sheet, and `fixtures.ts` for the figures the plays measure against. The
+  token sheet. A play measures a rendered control against `src/lib/config.ts`,
+  which mirrors the specification that states the figure. The
   hub has one route, and it mounts none of the primitives yet, so the workshop
   is not a convenience here: it is the only way to see a component at all. A new
   component lands with its test and its story in the same change.
@@ -219,10 +224,15 @@ Deliberate deviations from Poodl, each recorded in
   script, and no `BASE_PATH` set anywhere: the domain root stays with Poodl for
   now. The workshop is published, the package is ready to publish, and the site
   is neither.
-- One Allium module rather than five. `docs/specs/appearance.allium` carries the
-  shared surface lifted from Poodl's `settings.allium`, and imports nothing, so
-  the device preferences are stated as named givens rather than behind an
-  external entity a root module has no governing import for.
+- Three Allium modules rather than five, and none of them a game's.
+  `docs/specs/appearance.allium` carries the shared surface lifted from Poodl's
+  `settings.allium`; `operation.allium` and `play-surfaces.allium` carry what
+  decision 0015 lifted out of Poodl's `game.allium` — how a surface is worked, and
+  what a surface played on owes. All three are root modules and none imports
+  another, because they are peers rather than layers, so the device preferences
+  are stated as named givens rather than behind an external entity a root module
+  has no governing import for. What did not come across is Poodl's rules: the
+  words, the guessing, the marking, the daily, the sharing and the statistics.
 - No word lists, no obfuscation and no rules reducer. Poodl's decisions on each
   are Poodl's and were not ported.
 - The decision series restarts at 0001. Ported entries say so and keep the topic

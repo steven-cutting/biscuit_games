@@ -26,12 +26,19 @@
 --     the colours have to clear is not the same as choosing them: this module
 --     says how far apart two things must be, never what either one is.
 --     src/app.css is what answers it.
---   - Anything a particular game does with the result. A game states its own
---     states and any separation those states need between them.
+--   - Anything a particular game does with the result. A game states what its
+--     own states mean and supplies the words that say so.
+--     docs/specs/play-surfaces.allium states the marks every play surface wears
+--     and the separations between those, because the figures are the platform's
+--     palette's rather than any one game's; a game that adds a state outside
+--     that vocabulary states it, and any separation it needs, itself.
 --
 -- Dependencies
---   None. This is the platform's root module, and it imports nothing so that
---   a game can inherit the surface below rather than restate it.
+--   None. This is one of the platform's root modules, and it imports nothing so
+--   that a game can inherit the surface below rather than restate it.
+--   operation.allium and play-surfaces.allium are the others; none of the three
+--   imports another, because they are peers describing different aspects of the
+--   same surfaces rather than layers.
 
 ------------------------------------------------------------
 -- Given

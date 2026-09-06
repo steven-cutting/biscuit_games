@@ -33,10 +33,14 @@ that test measures here, in this palette, on every run of `just check`.
 What it measures is the stylesheet's declarations, not the surfaces this repository renders.
 The result and key tokens are a game's to spend, and they are measured here anyway because
 the palette is decided here: a token that fails this test fails on a board this repository
-has never seen. What it deliberately does not measure is any separation between two of a
-game's own states — how far an untried key sits from a scored one — because
-`appearance.allium` leaves that figure to the game, and Poodl's gate holds it against Poodl's
-own specification.
+has never seen. It measures the platform's own separations too, since
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md):
+`play-surfaces.allium`'s `config.minimum_state_separation` and
+`config.minimum_mark_separation` are the windows `--n-65` and `--n-75` were pinned by, so the
+token and the figure that pins it are held in the same repository at last. What it still does
+not measure is a separation between two of a game's *own* states, beyond the four marks the
+platform names — a game that adds one owes a distance and states that figure itself, which is
+what `appearance.allium`'s legibility clause has always said and what it still says.
 
 The consequences are worth stating plainly.
 
@@ -63,10 +67,13 @@ combination of the settings: every state a colour helps to show also carries a s
 or both, and every one has an accessible name that says it in words. This holds in every
 theme and in both palettes.
 
-The platform states the rule and stops there. What discharges it belongs to whoever has the
-states. Poodl's marker bars, and the separations Poodl declares between one key state and
-another, are Poodl's answer to this clause rather than the platform's — as is every figure
-those separations are stated in. `appearance.allium` says so twice: a game that adds states of
+The platform states the rule and now discharges part of it. The marker bar on a cell and on a
+key is the platform's answer — a bar on `exact`, a shorter one on `present`, none on
+`absent`, drawn in `currentColor` so the bar is always the ink of the glyph and the border —
+and `play-surfaces.allium`'s `AMarkIsNeverOnlyAColour` is the clause it answers, together with
+the two separations beside it. What still belongs to whoever has the states is any state
+beyond those four, and the sentence each mark is read out as: "in the word, wrong place" is
+one game's rule spoken aloud, and it arrives at the call site rather than being inferred. `appearance.allium` says so twice: a game that adds states of
 its own inherits the obligation and states how it meets them, and a game that puts two of its
 own states side by side owes a distance between them and states that figure itself. Two games
 will never agree on what a state is. They can agree that a state is never only a colour.
@@ -151,16 +158,20 @@ failing to reach it. Axe declines to judge a disabled control — `is_disabled_d
 contrast rule — and a label whose own control is disabled, which is the shape of what is
 exempt.
 
-## What the stylesheet carries and the specification does not
+## What the specifications carry beyond appearance
 
-Three obligations came across with the tokens and answer to no clause in `appearance.allium`.
-In Poodl they were stated in the game's own modules — a direct-manipulation contract, two
-config values this repository holds only as story fixtures, and a keyboard clause repeated
-on every surface that provides an operation. They are kept as standing rules — in
-`src/app.css`, in `stories/fixtures.ts`, and in the `accessibility-review` skill — because
-the stylesheet and the platform's controls spend them and because they are platform habits
-rather than one game's. Where they are finally stated is not yet decided, and it is the
-next specification question this repository owes an answer to.
+Three obligations came across with the tokens and answered to no clause in
+`appearance.allium` for as long as this page said so. They are stated now.
+[`operation.allium`](../specs/operation.allium) carries all three — `FullyKeyboardOperable`,
+`EveryControlIsAComfortableTarget` with `config.minimum_touch_target` at 44 and
+`config.narrowest_supported_width` at 320, and the four `DirectManipulation` invariants — and
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md) is the record.
+`src/lib/config.ts` mirrors the two figures and the stories read them from it rather than
+from a fixture beside them, so a play measures against the specification rather than beside
+it, and `tests/operation.test.ts` measures the rest against the stylesheet that spends them.
+
+What follows is what each obligation now obliges, and what still answers to nobody, which is
+a shorter list than it was.
 
 **Everything is keyboard operable.** Every operation a surface provides can be reached and
 invoked from the keyboard alone, with visible focus. `:focus-visible` in `src/app.css` draws a
@@ -187,21 +198,20 @@ surface that changes something without moving focus owes an announcement through
 two; the platform states which shapes, and a game states which sentences.
 
 **Every control is big enough to hit.** 44px, in both directions, down to the 320px viewport
-that is the narrowest supported width. Both figures are inherited — Poodl's
-`config.minimum_touch_target` and `config.narrowest_supported_width` — and `appearance.allium`
-declares neither. That is a gap rather than a settled omission. A threshold every game inherits
-is shared behaviour, and the first invariant puts shared behaviour in `docs/specs/` rather than
-in a stylesheet; which module should state it is the open part, since `appearance.allium`'s
-scope is how a surface looks and a target size is how it is operated. It is the next
-specification question this repository owes an answer to. What spends the figures today is in
+that is the narrowest supported width. Both figures are stated here now, in
+`operation.allium`'s `config` block, and that module exists because a target size is how a
+surface is *operated* rather than how it looks — which is `appearance.allium`'s scope and the
+reason it was the wrong home. Poodl's `game.allium` states the same two figures and will keep
+its copy until a check in Poodl's own gate compares the two, which is a handover item rather
+than something a version bump settles. What spends the figures is in
 `src/app.css`: a `min-block-size` floor on buttons and text controls, and a 34rem shell rather
 than the design system's 480px, because a 480px shell caps a key in a ten-across row at about
 40px on a screen with room for 44. Across is
 deliberately not declared, since a floor in that direction would be wrong for a dense row and
 would have to be fought back wherever it applied. A game that genuinely cannot meet the figure
 in both directions says so in its own specification and states what the width of the screen is
-allowed to take away. `stories/fixtures.ts` holds both figures for the plays that measure
-a rendered control: `Button`'s and `IconButton`'s boxes against the 44, and `HeaderBar` laid
+allowed to take away. `src/lib/config.ts` holds both figures, mirrored from the module that
+states them, for the plays that measure a rendered control: `Button`'s and `IconButton`'s boxes against the 44, and `HeaderBar` laid
 out at 320px with nothing scrolling sideways and every target whole. `IconButton` sets its
 own 44px width and takes its height from the stylesheet's floor.
 
@@ -260,7 +270,8 @@ file pins dark, and dark high contrast where the look inverts. See
 [Decision 0008](../decisions/0008-component-workshop.md).
 
 **A gate's silence is not a pass.** Axe skips what it cannot attribute and declines to judge
-what it cannot compute, and both blind spots fall exactly where a game's play surface lives.
+what it cannot compute, and both blind spots fall exactly on the play surface — which is here
+now, which is why the contrast test grew rather than the axe run.
 
 - Anything behind `aria-hidden` is never checked for contrast, at any opacity. A decorative
   mark, a bar or an icon is invisible to the rule.

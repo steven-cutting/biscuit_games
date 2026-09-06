@@ -31,7 +31,8 @@ behaviour.
 
 | Term | Meaning |
 | --- | --- |
-| Specification | An `.allium` file under `docs/specs/`. Decides behaviour. There is exactly one today, `appearance.allium`, and it decides how everything here looks. |
+| Specification | An `.allium` file under `docs/specs/`. Decides behaviour. Three today: `appearance.allium` decides how a surface looks, `operation.allium` how it is worked, and `play-surfaces.allium` what a surface played on owes. |
+| Mark | What a play surface has made of one cell: `exact`, `present`, `absent`, or `unmarked` for a cell nothing is known about yet. The platform names the four and paints them; a game says what each one is claiming, and supplies the sentence a reader hears. `play-surfaces.allium` decides them. |
 | Surface | A boundary in a specification: what is exposed, what operations are provided, and what is guaranteed. |
 | Guarantee | A named prose assertion on a surface. Acceptance criteria, not aspiration. |
 | Port | The interface a side effect sits behind, with a real adapter and an in-memory fake beside it. `src/lib/ports/preferences.ts` is the first: the device's preferences, read through `matchMedia`. |

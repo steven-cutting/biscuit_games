@@ -43,11 +43,16 @@ paraphrased, because paraphrase is where the meaning goes.
 That the specifications win on *what*, and `AGENTS.md` wins on *how*, is
 [decision 0004](../decisions/0004-specs-are-the-source-of-truth.md).
 
-## What the module is
+## What the modules are
 
-One module, `docs/specs/appearance.allium`, covering how every Biscuit Games surface
-looks: theme, high contrast and animations, how each negotiates with a preference the
-operating system has already expressed, and the legibility the result has to reach.
+Three, and they are peers rather than layers. Each covers one aspect of the same surfaces,
+none imports another, and a game inherits all three whole rather than entering a hierarchy
+at the top.
+
+### `appearance.allium` — how a surface looks
+
+Theme, high contrast and animations, how each negotiates with a preference the operating
+system has already expressed, and the legibility the result has to reach.
 
 - A `given` block naming the three device preferences as booleans —
   `prefers_dark_colour_scheme`, `prefers_reduced_motion` and `prefers_more_contrast`.
@@ -69,9 +74,23 @@ operating system has already expressed, and the legibility the result has to rea
   `MoreContrastFromTheDeviceTurnsHighContrastOn`, `AppearanceNeverCarriesMeaningAlone`,
   `EveryCombinationMeetsTheLegibilityFloor` and `AnUnavailableControlIsExempt`.
 
-It imports nothing, and that is the point rather than an accident of being first. A root
-module is one a game can inherit whole instead of restating, so the dependency runs one
-way: a game's own modules may import this one, and nothing here will ever import a
+### `operation.allium` — how a surface is worked
+
+Keyboard operability of every operation a surface provides, focus and what a surface owes
+when it replaces the control a reader is standing on, what a dialog owes, the comfortable
+touch target and the narrowest supported width, the `DirectManipulation` contract a finger
+is owed, and what a surface owes when it claims bare key presses for itself.
+
+### `play-surfaces.allium` — what a surface played on owes
+
+The four marks a play cell wears, the non-colour indication each carries, the game's words
+for each, and the two separations the marks sit at. It owns one cell and says nothing about
+how cells are arranged: a board, a grid and a rack are a game's.
+
+None of the three imports anything, and that is the point rather than an accident of being
+first. A root module is one a game can inherit whole instead of restating, so the dependency
+runs one way: a game's own modules may import one of these, and nothing here will ever
+import a
 game's.
 
 `just check-specs` and `just analyse-specs` both report an empty `diagnostics` array and

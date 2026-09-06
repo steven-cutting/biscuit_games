@@ -38,18 +38,20 @@ pair the palette declares against the two floors `appearance.allium` states —
 `minimum_text_contrast = 4.5` and `minimum_boundary_contrast = 3.0`, mirrored in
 `src/lib/config.ts`. That is `EveryCombinationMeetsTheLegibilityFloor` run rather than
 read, in every combination and not the one a change was looked at in. The test came from
-Poodl by [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), minus the
-block that measured Poodl's own state separations, which `appearance.allium` assigns to the
-game; [Testing](../reference/testing.md) says what it holds.
+Poodl by [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), and the block
+that measures the state separations followed it under
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md), once
+`play-surfaces.allium` stated the two figures it needs;
+[Testing](../reference/testing.md) says what it holds.
 
 Most of the figures quoted in the file's comments — 4.89 and 5.20 for the absent letter on
 the scored ground, 6.93 for the warm pair, 17.04 for the focus ring — are what that test
 measures, written beside the tokens so the reasoning can be read without running it. There
 the test is the evidence and the comment is the provenance: when a value moves, the test
-fails before the comment is wrong. The two exceptions are 3.69 and 3.28, the distances
-`--n-65` and `--n-75` hold from the untried letter beside them. Those are separations
-between two of a game's states, so this test does not measure them and Poodl's does; they
-stay inherited claims here, and the raw-palette section below says what pins them.
+fails before the comment is wrong. That now includes 3.69 and 3.28, the distances `--n-65`
+and `--n-75` hold from the unmarked glyph beside them: they are separations between two of
+the platform's own marks since decision 0015, so this test measures them here rather than
+leaving them as inherited claims, and the raw-palette section below says what pins them.
 
 Two consequences follow, and neither is optional.
 
