@@ -29,10 +29,10 @@ repository and in Poodl is byte-identical in every declaration: 110 custom prope
 each side, none unique to either. Among them are `--result-exact`, `--result-present`,
 `--result-absent`, `--key-untried-bg`, `--key-untried-rule`, `--key-scored-bg`, `--gap-tile`,
 `--gap-key`, `--radius-tile`, `--radius-key`, `--font-board`, `--fs-board` and
-`--track-board`. This repository's own stylesheet header says why they are here: "The result
-and key tokens below are the game surface's, and they are carried here whole rather than
-pruned: this file is the system, and a hub copy missing half of it would make a game's the
-superset." `tests/contrast.test.ts` measures every one of them, in all four combinations, on
+`--track-board`. This repository's own stylesheet header said why they were here, before
+this record gave them a renderer: "The result and key tokens below are the game surface's,
+and they are carried here whole rather than pruned: this file is the system, and a hub copy
+missing half of it would make a game's the superset." `tests/contrast.test.ts` measures every one of them, in all four combinations, on
 every run of `just check`. And two of the platform's own controls — `Button`'s secondary
 variant and `HeaderBar`'s chip — draw their boundary in `--key-untried-rule`, a token named
 for a game's keyboard, because it is the one hairline in the palette that clears the

@@ -17,6 +17,14 @@ requires: []
 > a component stands unchanged, and its reasoning is what 0016 applies rather than what 0016
 > contradicts. The third reopener below is **overruled rather than carried out**: no second
 > game exists, and 0016 says why a second game was the wrong trigger.
+>
+> **Narrowed on 2026-09-05 by
+> [Decision 0015](0015-operation-and-play-are-specified-here.md).** Two figures this record
+> settles are settled differently now. The constraint windows behind `--n-65` and `--n-75`
+> are no longer held at one end here and the other in Poodl: `play-surfaces.allium` states
+> both separations, so `tests/contrast.test.ts` holds both ends. And the 44px target and the
+> 320px width are no longer story fixtures: `operation.allium` states them, and
+> `src/lib/config.ts` mirrors them exactly as it already did for the two contrast floors.
 
 ## Context
 

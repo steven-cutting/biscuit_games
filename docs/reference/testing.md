@@ -164,7 +164,7 @@ the HTML specification rather than on a gate.
 
 v8 provider, measured over `src/lib/**`, with a 90% floor on branches, functions, lines
 and statements. Below the floor the run fails. That glob matches every component, the icon
-map, the barrel, the port, the domain and `config.ts`; a file landing under `src/lib/`
+map, the barrel, the ports, the domain and `config.ts`; a file landing under `src/lib/`
 without a test is reported at zero and drags the figure down, and
 [Test and debug](../how-to/test-and-debug.md) works that case through. One arm is dead by
 construction and accepted: `Icon`'s `size` interpolation compiles to a nullish fallback no

@@ -17,19 +17,21 @@
  * figure was chosen on the near-black page and the light values answer to it.
  * One shape governs all four combinations of theme and high contrast.
  *
- * The result and key tokens below are the game surface's, and they are carried
- * here whole rather than pruned: this file is the system, and a hub copy
- * missing half of it would make a game's the superset. They are measured
- * values: `tests/contrast.test.ts` reads this file from disk, drives all four
- * combinations through the root attributes and recomputes every pair against
- * the floors `appearance.allium`'s config block states, which
+ * The result and key tokens below are the play surface's, and `Tile` and `Key`
+ * spend them here since decision 0016. They were carried whole rather than
+ * pruned before anything here rendered them: this file is the system, and
+ * a hub copy missing half of it would make a game's the superset. They are
+ * measured values: `tests/contrast.test.ts` reads this file from disk, drives
+ * all four combinations through the root attributes and recomputes every pair
+ * against the floors `appearance.allium`'s config block states, which
  * `src/lib/config.ts` mirrors. Nearly every figure quoted in the comments below
  * is what that test measures, written down so the reasoning beside a token can
  * be read without running it; there the test, not the comment, is the evidence.
- * The exceptions are the two separation windows pinning `--n-65` and `--n-75`
- * immediately below. A separation between two of a game's own states is the
- * game's figure to state and to measure — `appearance.allium` says so — and
- * only Poodl's gate holds those two.
+ * That now includes the two separation windows pinning `--n-65` and `--n-75`
+ * immediately below: a separation between two of a game's own states is still
+ * the game's figure to state and to measure, but those two sit between the
+ * platform's own marks, which `play-surfaces.allium` states and this gate
+ * holds.
  */
 /*
  * Committed latin-subset variable fonts, per decision 0010. Extracted from the
@@ -510,16 +512,18 @@ body {
 }
 
 /*
- * Poodl's `game.allium` — contract DirectManipulation. Ten surfaces fulfil it
- * there and not one of them owns it, which is why the rules sit in the
- * stylesheet rather than in any one component. Over there they are measured by
- * `tests/directManipulation.test.ts` and by the width stories in
- * `stories/Keyboard.stories.svelte`. Neither the module nor that test came
- * here. The contract is `docs/specs/operation.allium`'s now, and
- * `tests/operation.test.ts` reads this file from disk and measures what these
- * rules resolve to on a real control — so they are held by a gate rather than
- * by reading. What only a layout engine can answer stays with the stories,
- * which measure a rendered control against `src/lib/config.ts`.
+ * `docs/specs/operation.allium` — contract DirectManipulation. No one surface
+ * owns it, which is why the rules sit in the stylesheet rather than in any one
+ * component. `tests/operation.test.ts` reads this file from disk and measures
+ * what these rules resolve to on a real control, so they are held by a gate
+ * rather than by reading; what only a layout engine can answer stays with the
+ * stories, which measure a rendered control against `src/lib/config.ts`.
+ *
+ * The contract came from Poodl's `game.allium`, where ten surfaces fulfil it.
+ * That module did not come here: the hub states the contract itself, under the
+ * same four invariant names, so that the two texts stay comparable. Poodl's
+ * `tests/directManipulation.test.ts` did come, as `tests/operation.test.ts`,
+ * which is why the evidence reads a stylesheet rather than a component.
  *
  * ATapDoesOnlyWhatTheControlDoes. `manipulation` declines the platform's guess
  * at what a second tap meant, which is what makes fast repeated tapping on the
@@ -586,13 +590,16 @@ textarea {
  * `IconButton` takes its width from that same number and its height from this
  * rule.
  *
- * Across is deliberately not declared. A game's on-screen keyboard is the one
- * place the figure cannot be met in that direction, so a floor here would be
- * wrong for a key and would have to be fought back inside the keyboard — the
- * fight that, lost, is the sideways scroll this rule exists alongside. Every
- * other control carries a label that takes it past the figure on its own, or
- * sets its own width as `IconButton` does, and the story run measures that
- * rather than assuming it.
+ * Across is deliberately not declared. An on-screen keyboard is the one place
+ * the figure cannot be met in that direction, so a floor here would be wrong
+ * for a key and would have to be fought back inside `Keyboard` — the fight
+ * that, lost, is the sideways scroll this rule exists alongside. That is the
+ * exemption `operation.allium` states inside
+ * `EveryControlIsAComfortableTarget`, and the width stories in
+ * `stories/Keyboard.stories.svelte` measure what it gives instead. Every other
+ * control carries a label that takes it past the figure on its own, or sets its
+ * own width as `IconButton` does, and the story run measures that rather than
+ * assuming it.
  *
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite

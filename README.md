@@ -5,9 +5,9 @@ the games, and the source of truth for everything the games share — the design
 shared components, the character, and every cross-cutting decision.
 
 **Status: bootstrapped, packaged, and holding the design system.** The toolchain, the token
-vocabulary, the icon set, the platform components, the preferences port and the contrast test
-that measures the palette are all in place. What a game installs — the tokens, the
-components, the icons, the typefaces, the port and the specification — is packaged as
+vocabulary, the icon set, the platform and play-surface components, both ports and the
+contrast test that measures the palette are all in place. What a game installs — the tokens,
+the components, the icons, the typefaces, the ports and the specifications — is packaged as
 `@steven-cutting/biscuit-games` for GitHub Packages; see
 [decision 0013](docs/decisions/0013-shared-material-travels-as-a-package.md) and
 [Published artefacts](docs/reference/published-artefacts.md), which says what a release carries
@@ -58,8 +58,8 @@ just check    # every gate, read-only, proving the worktree is unchanged
 src/app.css          The platform's design tokens, measured by tests/contrast.test.ts
 src/lib/components/  Shared Svelte 5 components, runes only, and the icon map
 src/lib/assets/      The two committed typefaces and the icon set, with their licences
-src/lib/ports/       The preferences port: interface, adapter, fake
-src/lib/domain/      The appearance derivations the specification states
+src/lib/ports/       The preferences and keys ports: interface, adapter, fake
+src/lib/domain/      The appearance derivations, and what a bare key press means
 src/routes/          The prerendered front door
 docs/                The handbook
 docs/specs/          Allium specifications — the shared behaviour every game inherits

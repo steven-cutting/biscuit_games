@@ -37,7 +37,7 @@ game — cites it rather than restating it, and a page that restates it is the b
 The site itself is deliberately small: one route, which is the part of
 [decision 0011](../decisions/0011-skeleton-not-a-second-application.md) that stands. What
 this repository owns it holds as code where the subject is code — the stylesheet, the
-platform primitives, the port, the contrast test — and as prose and a specification where
+platform primitives, the ports, the contrast test — and as prose and specifications where
 it is not. [Decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) is why the
 components live here rather than in the first game that rendered them.
 

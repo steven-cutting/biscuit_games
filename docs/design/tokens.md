@@ -24,8 +24,10 @@ but only for a consumer that takes the bump, so
 means before you make one.
 
 The hub's route and the platform components spend most of the semantic vocabulary between
-them. The result and key groups, which only a game's play surface spends, are carried whole
-rather than pruned. That is deliberate: this file is the system, and a hub copy missing half
+them, and `Tile` and `Key` spend the result and key groups since
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md). Those two groups
+were carried whole rather than pruned before anything here rendered them, and that
+was deliberate: this file is the system, and a hub copy missing half
 of it would leave a game's copy as the superset, which is exactly the arrangement
 [decision 0001](../decisions/0001-biscuit-games-is-the-source-of-truth.md) exists to
 prevent.

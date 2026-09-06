@@ -68,7 +68,7 @@ Never lower the threshold in `vite.config.ts`.
 Read a red coverage gate here as arithmetic before reading it as a missing branch. The
 floor is 90% of branches, functions, lines and statements over `src/lib/**`, and the
 measured glob matches every `.ts` and `.svelte` file under it — the components, `icons.ts`,
-the port, the domain, `config.ts` and the barrel; the SVGs and fonts beside them are
+the ports, the domain, `config.ts` and the barrel; the SVGs and fonts beside them are
 neither. A file added under `src/lib/` without a test is reported at zero and drags the
 figure down. So the usual cause is a file landing without its test — the case the floor
 exists to catch — or a ported suite that left an arm dead, which

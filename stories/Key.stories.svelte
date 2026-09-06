@@ -50,8 +50,10 @@
   });
 </script>
 
-<!-- A key nothing is known about. It hugs the page, and its border is the one
-     hairline that pays a control's boundary floor in the dark themes. -->
+<!--
+  A key nothing is known about. It hugs the page, and its border is the one
+  hairline that pays a control's boundary floor in the dark themes.
+-->
 <Story
   name="Untried"
   play={async ({ canvasElement }) => {
