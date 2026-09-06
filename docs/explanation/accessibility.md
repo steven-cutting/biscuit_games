@@ -234,9 +234,10 @@ below refuses.
 
 **A tap does only what the control does, and says that it landed.** Touch is the primary way
 these games are played, and a gesture the platform interprets for itself is a gesture that did
-not reach the game. Every control declines the platform's guess: `touch-action: manipulation`,
-so a second fast tap is a second action rather than a zoom; no text selection on a label; no
-callout under a held finger. What is declined is the platform's guess and never the reader's
+not reach the game. Every control the stylesheet names declines the platform's guess —
+the same set the floor above reaches, because the two rules answer to one contract and were
+briefly out of step: `touch-action: manipulation`, so a second fast tap is a second action
+rather than a zoom; no text selection on a label; no callout under a held finger. What is declined is the platform's guess and never the reader's
 intent — `manipulation` keeps the pinch, and the viewport meta in `src/app.html` has never
 carried `user-scalable=no` or a `maximum-scale`, both of which would satisfy the first half of
 this by breaking the second.

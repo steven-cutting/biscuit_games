@@ -164,6 +164,48 @@ describe('ATapDoesOnlyWhatTheControlDoes', () => {
   });
 
   /*
+   * And every control the floor rule names, which is what "owed to every control
+   * alike" has to mean if the two rules answer to the same invariant. The floor
+   * was widened to a select, a disclosure summary and every input but three, and
+   * these rules were left naming the shapes they always had — so a second fast
+   * tap on a `<summary>` still opened the disclosure once and then zoomed the
+   * page, which is the sentence this invariant is written in.
+   */
+  it.each([
+    ['a select', 'select'],
+    ['a disclosure summary', 'summary'],
+    ['a number input', 'input[type="number"]'],
+    ['a search input', 'input[type="search"]'],
+    ['a submit drawn as an input', 'input[type="submit"]'],
+    ['an input written with no type at all', '#typeless']
+  ])('sends a tap on %s to the control too', (_what, selector) => {
+    expect(resolved(selector, 'touch-action')).toBe('manipulation');
+  });
+
+  /*
+   * And the same split the file already makes, over the wider set. A control
+   * whose words are a label loses the callout and the selection; a control whose
+   * words are the reader's own text keeps both, because text a reader copies by
+   * hand has to stay selectable. A number and a search box are text controls; a
+   * select, a summary and a submit are labels.
+   */
+  it.each([
+    ['a select', 'select'],
+    ['a disclosure summary', 'summary'],
+    ['a submit drawn as an input', 'input[type="submit"]']
+  ])('does not select the label on %s', (_what, selector) => {
+    expect(resolved(selector, 'user-select')).toBe('none');
+  });
+
+  it.each([
+    ['a number input', 'input[type="number"]'],
+    ['a search input', 'input[type="search"]'],
+    ['an input written with no type at all', '#typeless']
+  ])('leaves the text in %s selectable', (_what, selector) => {
+    expect(resolved(selector, 'user-select')).not.toBe('none');
+  });
+
+  /*
    * The label included, not only the control: where a checkbox is wrapped in
    * one the row is the target, so the row is where a held finger would
    * otherwise start selecting text.

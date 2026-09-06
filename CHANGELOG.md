@@ -329,8 +329,11 @@ no version moves and no consumer took any of them.
   that is not a text one stood at whatever height the user agent chose. The input half is
   written as an exclusion rather than a list, so a type nobody has heard of yet is still a
   control — and so is an `<input>` with no `type` attribute, which is a text field to the
-  browser and was matched by no selector here before. The checkbox and the radio stay excluded
-  because the invariant grants them the label that contains them instead.
+  browser and was matched by no selector here before. It reaches the widget and replaced types
+  too: `range`, `color`, `file` and `image`, and the last of those is replaced, so the floor
+  re-resolves its width through its aspect ratio and it grows in both directions rather than
+  one. The checkbox and the radio stay excluded because the invariant grants them the label
+  that contains them instead.
 
 And one clause reworded rather than repaired, because the specification was wrong:
 
@@ -346,6 +349,44 @@ And one clause reworded rather than repaired, because the specification was wron
   is not exempt is measured across rather than left unmeasured, and
   [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md) carries a dated
   amendment retracting the arithmetic it recorded.
+
+An adversarial pass over the answer above found six more, five of them in the repairs
+themselves. Worth having, and the same shape as the round before it.
+
+- The dense-row exemption counts the extra width a turn-ending control takes. The reworded
+  clause asked for the figure and the gaps and stopped there, which is exact only for a row of
+  all builders: `Key` gives a key that ends a turn half as much again, so a row carrying two of
+  them has that much less to divide. QWERTY's bottom row was declared unexempted at a 480px
+  shell and renders 41.4px there — the width
+  [Accessibility](docs/explanation/accessibility.md) already names as too narrow for a
+  ten-across row. A story at that width is the evidence, and it fails against the arithmetic it
+  replaced.
+- The tap rules reach the same controls the floor does. `ATapDoesOnlyWhatTheControlDoes` is
+  stated over every control with no exemption list of its own, and widening the floor alone
+  left a `<select>`, a `<summary>`, a number box and a submit drawn as an input as controls
+  that did not decline the platform's guess at a second tap — a fast double tap on a disclosure
+  opened it once and then zoomed the page. The split the file already made is kept: a control
+  whose words are a label loses the callout and the selection too, and a text control keeps
+  both.
+- `Tile` names a cell whose content is a blank as an empty one. It decided blankness with
+  `content === ''` while `drawnMark` and the new `keyName` trim, so the rack blank tile that
+  prompted the key fix reached a reader as nothing at all when it was on show rather than
+  pressed. Blankness is one rule in this domain now.
+- `EveryKeyIsAControl` says what a layout that supplies no words at all is owed. The previous
+  entry settled that in a doc comment and a test — the platform draws the key and leaves it
+  unnamed — which is a shared-behaviour decision taken outside the module that owns it. The
+  guarantee carries it, and says why dropping the key would be worse.
+- `markFor` has no dead arm. `Object.hasOwn(…) ? (marks[value] ?? null) : null` needs the `??`
+  to compile under `noUncheckedIndexedAccess` and can never take it, which is the second
+  unreachable branch in a repository whose
+  [quality philosophy](docs/explanation/quality-philosophy.md) says an unreachable branch is
+  code that should not exist — and both that page and [Testing](docs/reference/testing.md)
+  count the unreachable ones. Asking whether an entry is there and whether it is the game's own
+  are two questions, and both answers occur.
+- The prototype tests have their positive case. Rendering only unmarked prototype-named keys is
+  satisfied by refusing those four names outright, which would silently drop the mark from a
+  game that keys a tile `constructor` on purpose. A key that *is* marked under such a name is
+  what makes `Object.hasOwn` the only implementation that passes.
 
 ### Deliberately not included
 

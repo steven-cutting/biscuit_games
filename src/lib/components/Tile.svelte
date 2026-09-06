@@ -44,9 +44,16 @@
    * `Empty` is the platform's word, and it is capitalised because it stands
    * alone as the whole name. Where the caller has placed the cell its own
    * sentence leads, so the word joins mid-name and is lowercase.
+   *
+   * Blank counts as empty, and `content === ''` did not say so: a rack's blank
+   * tile is `content: ' '`, which passed straight through as the whole name and
+   * left the cell reaching a reader as nothing at all. It is the same test
+   * `drawnMark` applies to a mark's sentence and `keyName` applies to a key's
+   * fields, and blankness is one rule in this domain rather than three.
    */
   const name = $derived.by(() => {
-    const parts = [label, content === '' ? (label === undefined ? 'Empty' : 'empty') : content];
+    const empty = content.trim() === '';
+    const parts = [label, empty ? (label === undefined ? 'Empty' : 'empty') : content];
     if (shown !== null) {
       parts.push(shown.description);
     }

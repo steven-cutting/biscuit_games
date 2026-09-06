@@ -504,10 +504,29 @@ user agent chose while the invariant said they did not. The rule is now
 written as an exclusion on the input half so a type nobody has heard of yet is still a control.
 **What this costs Poodl is a rendered change wherever it draws one of the newly-named shapes**:
 a `<select>` in a settings row, a `<summary>` on a "how to play" disclosure, a number or a date
-input. One is easy to miss — an `<input>` written with no `type` attribute is a text field to
+input. Two are easy to miss. An `<input>` written with no `type` attribute is a text field to
 the browser and was never matched by `input[type='text']` as a selector, so a bare `<input>`
-grows here too. Each grows to 44px if it was shorter, and none moves if it was already taller.
-Poodl's copy of the stylesheet carries the three-selector rule until it takes the package. The two
+grows here too; and the exclusion reaches the widget and replaced types as well — `range`,
+`color`, `file` and `image`. Each grows to 44px in the block direction if it was shorter, and
+none moves if it was already taller, **with one exception**: `input[type='image']` is a
+replaced element with an intrinsic aspect ratio, so a floor in the block direction re-resolves
+its used width through that ratio and it grows in both. A settings row carrying one moves
+sideways as well as down. Poodl's copy of the stylesheet carries the three-selector rule until
+it takes the package.
+
+**And the tap rules were widened with it, in a second change**, because the first widened the
+floor alone. `ATapDoesOnlyWhatTheControlDoes` is stated over every control with no exemption
+list of its own, and `touch-action: manipulation` reached `button`, `label`, the checkbox and
+the radio in one rule and `input[type='text']` and `textarea` in another — so a `<select>`, a
+`<summary>`, a number or a search box, and a submit drawn as an input each became a control
+this stylesheet answers for and none of them declined the platform's guess at a second tap. A
+fast double tap on a disclosure opened it once and then zoomed the page. **Poodl gets a
+rendered behaviour change on touch wherever it draws one of those**: the zoom guess stops, and
+a `<select>`, a `<summary>` and a button-shaped input additionally lose the callout and the
+text selection on their labels, because their words are a label rather than the reader's own
+text. A number and a search box keep both, for the reason a text input always has. The
+tap-highlight rule is deliberately untouched: it and the pressed ring have to stay the same
+control set, and widening one without the other is the inversion the previous round fixed. The two
 excluded input types are excluded deliberately and must stay so: the invariant grants a
 checkbox and a radio the label that contains them, and a floor on the native box would size the
 thing the finger is not aimed at.

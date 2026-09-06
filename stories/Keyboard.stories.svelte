@@ -142,6 +142,16 @@
    * them do not, so a rack's row was left unexempted and unmeasurable at once.
    * The room is what the row is actually given — a keyboard inside a page's
    * gutters has less than the viewport — and the gaps are counted with the keys.
+   *
+   * And so is the extra share a key that ends a turn takes. `Key` gives one
+   * half as much again as a key that builds one, so a row needs 44px for each
+   * builder *and* that multiple of 44 for each action before it can meet the
+   * figure. Counting every key as one share declared QWERTY's bottom row
+   * unexempted at a 480px shell, where it renders 41.4px — the width
+   * `docs/explanation/accessibility.md` already names as the one a ten-across
+   * row cannot survive. The share is read from what was rendered rather than
+   * written down here, because the ratio is the component's and this file is not
+   * where it is decided.
    */
   async function divides(canvasElement: HTMLElement, layout: KeyboardLayout): Promise<boolean[]> {
     const frame = frameOf(canvasElement);
@@ -154,7 +164,12 @@
     for (const row of keyRows(canvasElement, layout)) {
       const builders = row.filter((key) => !key.action).map((key) => key.box.width);
       const gaps = gapsOf(row);
-      const needed = row.length * MINIMUM_TOUCH_TARGET + gaps.reduce((all, one) => all + one, 0);
+      const narrowest = builders.length > 0 ? Math.min(...builders) : null;
+      const shares = row.reduce(
+        (all, key) => all + (narrowest === null || !key.action ? 1 : key.box.width / narrowest),
+        0
+      );
+      const needed = shares * MINIMUM_TOUCH_TARGET + gaps.reduce((all, one) => all + one, 0);
 
       exempt.push(needed > room);
 
@@ -321,6 +336,28 @@
 >
   {#snippet template(args)}
     <div data-frame style="inline-size: {SHELL_WIDTH}; padding-inline: {SHELL_GUTTER}">
+      <Keyboard {...args} />
+    </div>
+  {/snippet}
+</Story>
+
+<!--
+  The width that caught the arithmetic. A 480px shell is the one
+  `docs/explanation/accessibility.md` names as too narrow for a ten-across row,
+  and it is where counting every key as one share went wrong: the top row is
+  exempt, the home row is nine builders and meets the figure, and the bottom row
+  carries two keys that end a turn — so it needs 480px of room and has 448, and
+  is exempt. Counting the shares as nine declared it a row that had to meet the
+  figure, and it renders 41.4px.
+-->
+<Story
+  name="At the shell a ten-across row outgrows"
+  play={async ({ canvasElement }) => {
+    await expect(await divides(canvasElement, QWERTY)).toEqual([true, false, true]);
+  }}
+>
+  {#snippet template(args)}
+    <div data-frame style="inline-size: 480px; padding-inline: {SHELL_GUTTER}">
       <Keyboard {...args} />
     </div>
   {/snippet}

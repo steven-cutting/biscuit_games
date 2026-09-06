@@ -62,6 +62,19 @@ describe('Tile', () => {
     ).toBeInTheDocument();
   });
 
+  /*
+   * Blank is empty, decided the way `drawnMark` and `keyName` decide it. A rack's
+   * blank tile is `content: ' '`, and `content === ''` let the space through as
+   * the whole name — a cell reaching a reader as nothing at all, which is what
+   * `ACellReadsAsOneThing` refuses. Three rules for blankness in one domain was
+   * the other half of the defect.
+   */
+  it('names a cell whose content is a blank as an empty one', () => {
+    render(Tile, { content: ' ' });
+
+    expect(screen.getByRole('img', { name: 'Empty' })).toBeInTheDocument();
+  });
+
   it('names an empty cell the caller has placed', () => {
     render(Tile, { label: 'Position 5' });
 
@@ -247,6 +260,22 @@ describe('Keyboard', () => {
   );
 
   /*
+   * And the other half, which is what makes `Object.hasOwn` the only
+   * implementation that passes. Refusing those four names outright would satisfy
+   * the cases above and silently drop the mark from a game that keys a tile
+   * `constructor` on purpose — the whole point of the lookup being open is that
+   * a game names its own values.
+   */
+  it('reads the mark a game did key by a name JavaScript has already used', () => {
+    render(Keyboard, {
+      layout: [[{ value: 'constructor', content: 'X', label: 'Wild' }]],
+      marks: { constructor: EXACT }
+    });
+
+    expect(screen.getByRole('button', { name: 'Wild, correct' })).toBeInTheDocument();
+  });
+
+  /*
    * A key is never nameless. The label is what a key drawn as a glyph must
    * supply, and where a key draws its own words those words are already the
    * name — so the fallback runs content, then value, and a layout that says
@@ -285,10 +314,12 @@ describe('Keyboard', () => {
 
   /*
    * And the end of the chain, which is a key the layout gave no words at all.
-   * The platform has nothing to name it with and will not invent one, so the key
-   * is drawn and left unnamed: dropping it would change how many keys the row
-   * has, which is a worse answer than a control the layout's own author can see
-   * is missing its word.
+   * `EveryKeyIsAControl` names this as the one case it does not reach: the
+   * platform has nothing to name the key with and will not invent one, so the
+   * key is drawn and left unnamed. Dropping it would change how many keys the
+   * row has, which is a worse answer than a control the layout's own author can
+   * see is missing its word. The clause carries that, not this test — a product
+   * decision pinned only by an assertion is a decision taken in the wrong place.
    */
   it('draws a key its layout named with nothing, and invents no name for it', () => {
     render(Keyboard, { layout: [[{ value: ' ', content: ' ' }]] });

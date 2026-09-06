@@ -118,17 +118,23 @@ contract DirectManipulation {
     @invariant EveryControlIsAComfortableTarget
         -- Every control is at least config.minimum_touch_target across, in both
         -- directions. Two shapes cannot be. The first is a row of like controls
-        -- sharing the full width, where the figure and the gaps between them
-        -- together ask for more room than the row is given.
+        -- sharing the full width, where what the row would need is more room
+        -- than it is given: the figure for every control that builds a turn,
+        -- the gaps between them all, and whatever more a control that ends a
+        -- turn is given over one that builds one.
         --
-        -- How many controls are in the row is not the test, and stating it as
-        -- one was wrong. Seven controls at that figure fit inside
-        -- config.narrowest_supported_width and the six gaps between them do
-        -- not, so a row this invariant declined to exempt could not meet the
-        -- figure either — a rack of seven tiles is the shape that found it. The
-        -- gaps are counted with the controls, and the room is what the row is
+        -- Three terms, and each was left out of a wrong version of this clause.
+        -- How many controls are in the row is not the test on its own: seven
+        -- controls at that figure fit inside config.narrowest_supported_width
+        -- and the six gaps between them do not, so a row this invariant
+        -- declined to exempt could not meet the figure either — a rack of seven
+        -- tiles is the shape that found it. The room is what the row is
         -- actually given rather than the whole viewport, because a row inside a
-        -- page's margins has less than the screen it is drawn on.
+        -- page's margins has less than the screen it is drawn on. And the extra
+        -- a turn-ending control takes is counted rather than assumed away: the
+        -- clause below grants it, so a row carrying two of them has that much
+        -- less to divide among the rest, and leaving the term out declared a
+        -- ten-share row unexempted at a width that renders it below the figure.
         --
         -- There the row meets the figure top to bottom, divides its width
         -- equally among the controls that build a turn, and keeps a gap between

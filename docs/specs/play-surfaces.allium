@@ -230,6 +230,20 @@ surface EntryKeyboard {
         -- Each key is a real control with an accessible name. A key showing a
         -- glyph and no words says its action in words instead, and a key
         -- carrying a mark says the mark with it.
+        --
+        -- The name comes from whichever of the layout's own fields has a word
+        -- in it, and a field holding nothing but spaces has none. A blank is
+        -- the shape a rack's blank tile takes, and a phrase game's space bar
+        -- after it, so reading one as a name is how a key arrives with no name
+        -- at all — the same test Marking applies to a mark's sentence, applied
+        -- to a key's fields.
+        --
+        -- One case this guarantee does not reach, stated rather than left for
+        -- an empty name to be discovered in. Where the layout supplies no words
+        -- anywhere, the platform draws the key and leaves it unnamed: it will
+        -- not invent a word for a key, and dropping the key instead would
+        -- change what the row is, which is a worse answer than a control whose
+        -- own author can see it is missing its word.
 
     @guarantee TheKeyboardIsCompleteOnItsOwn
         -- Every operation the surface offers through a bare key it has claimed

@@ -56,9 +56,18 @@
    * had nothing to refuse, and `drawnMark` threw reading `description` off a
    * function. A game names its own key values, and nothing stops one of them
    * being a word JavaScript has already used.
+   *
+   * Written so neither arm is dead. `Object.hasOwn(…) ? (marks[value] ?? null)`
+   * needs the `??` to compile under `noUncheckedIndexedAccess` and can never
+   * take it, which is a branch the coverage run reports and
+   * `docs/explanation/quality-philosophy.md` says should not exist. Asking
+   * whether an entry is there and whether it is the game's own are two
+   * questions, and both answers occur.
    */
   function markFor(value: string): Mark | null {
-    return Object.hasOwn(marks, value) ? (marks[value] ?? null) : null;
+    const supplied = marks[value];
+
+    return supplied !== undefined && Object.hasOwn(marks, value) ? supplied : null;
   }
 </script>
 

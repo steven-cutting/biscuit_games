@@ -84,8 +84,15 @@ export function latinLetters(key: string): string | null {
  * `Object.prototype` carries as well: `constructor`, `toString`, `valueOf` and
  * the rest each came back as a function, `??` had nothing to refuse, and the
  * caller was handed something the declared `string | null` says cannot arrive.
- * A word game reaches those keys by spelling them, so this is a press a real
- * surface takes rather than one only a test could make.
+ *
+ * How a press with such a name arrives is worth being exact about, because the
+ * first telling of this was not. A browser's `KeyboardEvent.key` is never
+ * `constructor`, so the adapter does not produce one — but `claimKey`,
+ * `KeyPress` and `KeyBindings` are all exported, a game writes its own bindings
+ * and may call the rule over its own presses, and `Keyboard`'s sibling lookup
+ * over `marks` is reached by an ordinary game naming a key value. The guard is
+ * here because the signature promises it, not because the platform's own adapter
+ * would trip it.
  */
 export function claimKey(press: KeyPress, bindings: KeyBindings): string | null {
   if (press.modified || press.inTextEntry) {

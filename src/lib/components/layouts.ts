@@ -51,9 +51,11 @@ export type KeyboardLayout = readonly KeyboardRow[];
  * mark with no words.
  *
  * A layout that gives all three nothing gets `value` back and is left unnamed.
- * The platform will not invent a word for a key, and dropping the key instead
- * would change how many keys the row has — a worse answer than a control whose
- * own author can see it is missing its word.
+ * That is the one case `EveryKeyIsAControl` does not reach, and the guarantee
+ * says so itself rather than leaving it to this comment: the platform will not
+ * invent a word for a key, and dropping the key instead would change how many
+ * keys the row has — a worse answer than a control whose own author can see it
+ * is missing its word.
  *
  * Not exported from the package: what the platform calls a key is the platform's
  * to decide, as the icon map and the marker bar are.

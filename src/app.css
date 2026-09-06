@@ -537,11 +537,25 @@ body {
  * both in one rule took the platform's acknowledgement from a bare checkbox that
  * no rule below gives one back to, and ATouchIsAcknowledged is precisely about
  * not doing that.
+ *
+ * "Every control alike" is the same set the floor rule names, and this rule and
+ * the text-control one below it were left at three shapes when that rule was
+ * widened. A `<select>`, a `<summary>` and a submit drawn as an input each
+ * became a control the stylesheet answers for and none of them declined the
+ * platform's guess, so a second fast tap on a disclosure opened it once and then
+ * zoomed the page — which is the sentence ATapDoesOnlyWhatTheControlDoes is
+ * written in. They are here rather than below because their words are a label
+ * rather than the reader's own text, which is the only thing the split turns on.
  */
 button,
 label,
+select,
+summary,
 input[type='checkbox'],
-input[type='radio'] {
+input[type='radio'],
+input[type='submit'],
+input[type='button'],
+input[type='reset'] {
   touch-action: manipulation;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -591,8 +605,17 @@ label input[type='radio'] {
  * Leaving the tap highlight alone is the same decision seen from the other side:
  * nothing here removes the platform's acknowledgement, so nothing here owes a
  * replacement, and the caret and the focus outline arrive on contact anyway.
+ *
+ * Written as an exclusion for the reason the floor rule is: `input[type='text']`
+ * named one text control out of a dozen, so a number, a search box, a date and
+ * an `<input>` with no `type` attribute at all took the platform's guess at
+ * their second tap. What is excluded here is what the rule above already claims
+ * — the checkbox, the radio and the three button-shaped inputs — plus the hidden
+ * input, which is not a control.
  */
-input[type='text'],
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not(
+    [type='button']
+  ):not([type='reset']),
 textarea {
   touch-action: manipulation;
 }
