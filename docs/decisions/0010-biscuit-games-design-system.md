@@ -15,6 +15,19 @@ requires: []
 > primitives, the contrast test and the preferences port are here now, ported from Poodl.
 > What this record decided about the tokens, the typefaces, the deviations and their
 > provenance stands unchanged, and the ledger of deviations below is still the ledger.
+>
+> **Narrowed on 2026-09-05 by
+> [Decision 0016](0016-the-play-surface-is-the-platforms.md) and
+> [Decision 0015](0015-operation-and-play-are-specified-here.md).** The play surface this
+> record excludes is partly here now: `Tile`, `Key`, `Keyboard`, `PhysicalKeyboard` and
+> `Explainer` came across generalised, while a board, a rack and a grid are not here,
+> because an arrangement encodes a rule. The separations this record
+> assigns to a game are the platform's where the marks are the platform's:
+> `play-surfaces.allium` states them, so `tests/contrast.test.ts` now holds both ends of the
+> `--n-65` and `--n-75` windows rather than one end here and one in Poodl. The second game
+> named below as the trigger is **overruled rather than met** — none exists, and 0016 says
+> why it was the wrong test. The tokens, the typefaces and the ledger of deviations stand
+> unchanged.
 
 ## Context
 

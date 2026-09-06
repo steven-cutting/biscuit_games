@@ -47,8 +47,10 @@ jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.t
 the binding delivered, because `bind:` is template syntax that a `.test.ts` has none of, and
 a component is the shape the consumer carrying focus across a swap actually writes. The
 `include` glob is `tests/**/*.test.ts`, so both are loaded and neither is collected.
-`stories/fixtures.ts` is the same arrangement on the story side: the two figures the plays
-measure a control against, imported by the stories that need them and never a story.
+On the story side the figures a play measures a control against come from
+`src/lib/config.ts`, which mirrors the module that states them — so a play is held to the
+specification rather than to a number beside it, and raising the figure in one place cannot
+leave the other behind.
 
 ## Conventions
 
@@ -72,6 +74,34 @@ matches an element's **own** text nodes rather than everything inside it, so
 around it — which means it finds them whether or not the mark beside them is hidden.
 Anchoring does not repair that. The mark's silence is a separate claim and takes a separate
 assertion, and without it deleting `aria-hidden` leaves the suite green.
+
+**A decoration that discharges a guarantee is the other exception, and the marker bar is
+it.** The bar that carries `play-surfaces.allium`'s `AMarkIsNeverOnlyAColour` is
+`aria-hidden` by construction: it has no role and no accessible name *because* the name
+beside it already says the same thing in the game's words, and giving the bar one would have
+a reader hear the mark twice. So the role-and-name convention cannot reach it, and it is
+queried by `[data-marker]`.
+
+The exception is bounded three ways, and a hook that fails any of them is a test id by
+another name. It sits on an element that is `aria-hidden` because the guarantee it discharges
+is the *visual* half of a claim whose spoken half is carried elsewhere. It is reached only
+from inside an element already found by role and name —
+`getByRole('img', { name }).querySelector('[data-marker]')`, never a bare document query. And
+it is named for the guarantee rather than for the component, so `Tile` and `Key` are queried
+the same way and a third surface that draws one inherits the query.
+
+What is not granted is a hook for state. A mark's own name is in the accessible name and the
+element is found by it, so nothing here needs `data-mark` to locate one — the attribute
+exists because CSS selects the paint by it, and a test that reached for it would be asserting
+the implementation rather than the promise.
+
+This extends a position the page already takes rather than opening a new one. An accessible
+name is not evidence that a bar was drawn: the description is the game's words arriving
+through a prop, so asserting the name ends in them proves the prop was plumbed and nothing
+more — an implementation that drew no bar at all would keep every name-based assertion green.
+And axe cannot stand in either, because it "skips what it cannot attribute, including anything
+behind `aria-hidden`". jsdom holds the bar's presence; Chromium holds its length, because
+only a layout engine can measure a width.
 
 **Inject fakes; never stub a global.** `src/lib/ports/preferences.ts` is the first port:
 an interface, a real adapter that takes its host object as a defaulted argument, and an
@@ -97,7 +127,7 @@ addon's test mode to error; the addon's own default only reports. Play functions
 same pass, which is where a guarantee about interaction becomes executable rather than
 described.
 
-Thirty-eight stories across nine files. `Wordmark`'s **Dark theme** is the one every other
+Seventy-three stories across fourteen files. `Wordmark`'s **Dark theme** is the one every other
 dark pin rests on: it asserts that `data-theme` reached `document.documentElement`, which is
 the element every palette in `src/app.css` is keyed on — an attribute written onto a wrapper
 instead would satisfy no selector in that file. The plays that carry a guarantee about
@@ -134,7 +164,7 @@ the HTML specification rather than on a gate.
 
 v8 provider, measured over `src/lib/**`, with a 90% floor on branches, functions, lines
 and statements. Below the floor the run fails. That glob matches every component, the icon
-map, the barrel, the port, the domain and `config.ts`; a file landing under `src/lib/`
+map, the barrel, the ports, the domain and `config.ts`; a file landing under `src/lib/`
 without a test is reported at zero and drags the figure down, and
 [Test and debug](../how-to/test-and-debug.md) works that case through. One arm is dead by
 construction and accepted: `Icon`'s `size` interpolation compiles to a nullish fallback no
@@ -163,7 +193,10 @@ should be deleted rather than covered; see
 | `contrast.test.ts` | Every pair the stylesheet declares against the two floors, in all four combinations; the palette's shape; the two dark blocks and the two high-contrast sets held equal. |
 | `preferences.test.ts` | The port: the three queries, change subscription and its end, the fake, and the absent-`matchMedia` fallback reached by argument and by default. |
 | `appearance.test.ts` | The three derivations, clause by clause. |
-| `package-surface.test.ts` | Every runtime export by name, a render through the barrel, and the type exports held at compile time. |
+| `package-surface.test.ts` | Every runtime export by name — the components, the two ports, the appearance derivations, the claiming rule and the platform layout — a render through the barrel, and the type exports held at compile time by being written against rather than merely imported. |
+| `operation.test.ts` | `operation.allium` over the stylesheet: a tap reaching the control rather than the platform, text a reader selects left alone, the viewport never refusing to be zoomed, the 44px floor on every native control the stylesheet names — a select, a disclosure summary and every input but a checkbox, a radio and a hidden one — and on the label row that carries it for a checkbox, the same control set declining the platform's tap guess with the label half and the text half split, the link in a sentence the invariant exempts, both config figures, and the pressed ring on exactly the controls whose platform flash was suppressed — the two lists compared outright rather than by asking whether each mentions a label. |
+| `play.test.ts` | `Tile`, `Key`, `Keyboard` and `Explainer`: the name a caller composes and the one the platform falls back to, the three marks and none, the bar present on two of them and absent on the third, the press, the disabled key that keeps its bar and its name, a layout the component has never seen, a layout with no keys in it drawing no keyboard at all, a mark whose words are blank or absent drawn as no mark, a cell and a key whose only words are a blank named as though they had none, a key its layout named with nothing drawn and left unnamed, a key valued `constructor` reading no mark off `Object.prototype` and still reading the one the game keyed there, and the sentences carrying an explanation whose examples are silent — including two rows that say the same thing. |
+| `typing.test.ts` | `claimKey`'s guards one at a time with no DOM at all; `latinLetters` naming the twenty-six and refusing the two that Unicode case folding once let through; the adapter reading a real event down to a `KeyPress` — each shortcut modifier on its own, Shift not among them, a focused `<summary>` as something the browser activates, and a press that began at no element; `QWERTY` and `QWERTY_BINDINGS` held equal, which is the gate `layouts.ts` cited before it existed; and that unmounting `PhysicalKeyboard` leaves no listener behind. |
 
 ## The contrast test
 

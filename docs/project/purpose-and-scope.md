@@ -31,13 +31,16 @@ game, is intended and not yet built.
 - **The Biscuit character.** Her look, her registers and her voice are settled here, once,
   rather than drifting apart in each game that uses her.
 - **Shared components.** The platform primitives — `Wordmark`, `Icon`, `IconButton`,
-  `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` — each with its test and its
-  story. A component earns a place here by being a shape every game would render
+  `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` for the chrome, and `Tile`,
+  `Key`, `Keyboard`, `PhysicalKeyboard` and `Explainer` for the play surface — each with its
+  test and its story. A component earns a place here by being a shape every game would render
   unchanged, not by being written well; see
   [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md).
-- **The shared specification.** `docs/specs/` holds one Allium module,
-  `appearance.allium`, which decides how theme, contrast and motion behave across the
-  platform.
+- **The shared specifications.** `docs/specs/` holds three Allium modules.
+  `appearance.allium` decides how theme, contrast and motion behave; `operation.allium`
+  decides what a surface owes to being worked — the keyboard, a dialog, the comfortable
+  target, the finger; and `play-surfaces.allium` decides what a surface played on owes, from
+  the marks a cell wears to how far apart two of them sit.
 - **The cross-cutting decisions.** Every choice a game inherits is written down in
   [Architecture decisions](../decisions/README.md), so that a game can cite one instead of
   arguing it again.

@@ -100,9 +100,11 @@ high contrast.
 
 ## Values the specifications decide
 
-`docs/specs/` holds one module, `appearance.allium`, and it declares one `config` block.
-These are not tunables: they are the two WCAG 2.2 AA bars, and the specification is the
-only place they are declared.
+`docs/specs/` holds three modules, and each declares a `config` block.
+`appearance.allium` states the two WCAG 2.2 AA bars, `operation.allium` the comfortable
+touch target and the narrowest supported width, and `play-surfaces.allium` the two
+separations a play surface's marks sit at. None of them is a tunable, and the
+specification is the only place any of them is declared.
 
 | Entry | Value | Bounds |
 | --- | --- | --- |

@@ -45,7 +45,9 @@ nothing uploads it, and the domain root stays with Poodl — that is
 | `@steven-cutting/biscuit-games` | The shared components as Svelte 5 source, the icon set they draw, the preferences port, the three appearance derivations, and every type a consumer writes against, with generated declarations. |
 | `@steven-cutting/biscuit-games/app.css` | The token vocabulary, the theme and contrast palettes, and the `@font-face` blocks. |
 | `@steven-cutting/biscuit-games/assets/fonts/*` | The two typefaces and their OFL texts. |
-| `@steven-cutting/biscuit-games/specs/appearance.allium` | The shared specification module, as text. |
+| `@steven-cutting/biscuit-games/specs/appearance.allium` | How a surface looks, as text. |
+| `@steven-cutting/biscuit-games/specs/operation.allium` | How a surface is worked, as text. |
+| `@steven-cutting/biscuit-games/specs/play-surfaces.allium` | What a surface played on owes, as text. |
 
 Components ship as Svelte source rather than compiled output, which is what `svelte-package`
 produces and what a consumer's own compiler expects. Svelte is a peer dependency, declared as

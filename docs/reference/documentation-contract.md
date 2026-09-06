@@ -70,8 +70,9 @@ Beyond the fields:
   without linking it in fails, even when everything else is correct.
 - Nothing under `docs/` may exist unregistered, and nothing registered may be absent.
 
-Only `docs/**/*.md` is in scope. The one Allium module, `docs/specs/appearance.allium`, is
-not Markdown, so the contract does not see it; it is still a valid link target.
+Only `docs/**/*.md` is in scope. The Allium modules under `docs/specs/` are not Markdown, so
+the contract does not see them; each is still a valid link target, and a link to one is held
+to the same exact-case existence rule as any other relative target.
 
 ## Outside the contract
 

@@ -3,7 +3,7 @@
   import { expect, fn, userEvent, within } from 'storybook/test';
 
   import Button from '../src/lib/components/Button.svelte';
-  import { MINIMUM_TOUCH_TARGET } from './fixtures';
+  import { MINIMUM_TOUCH_TARGET } from '../src/lib/config';
 
   const onclick = fn();
 

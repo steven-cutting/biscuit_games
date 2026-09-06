@@ -17,19 +17,21 @@
  * figure was chosen on the near-black page and the light values answer to it.
  * One shape governs all four combinations of theme and high contrast.
  *
- * The result and key tokens below are the game surface's, and they are carried
- * here whole rather than pruned: this file is the system, and a hub copy
- * missing half of it would make a game's the superset. They are measured
- * values: `tests/contrast.test.ts` reads this file from disk, drives all four
- * combinations through the root attributes and recomputes every pair against
- * the floors `appearance.allium`'s config block states, which
+ * The result and key tokens below are the play surface's, and `Tile` and `Key`
+ * spend them here since decision 0016. They were carried whole rather than
+ * pruned before anything here rendered them: this file is the system, and
+ * a hub copy missing half of it would make a game's the superset. They are
+ * measured values: `tests/contrast.test.ts` reads this file from disk, drives
+ * all four combinations through the root attributes and recomputes every pair
+ * against the floors `appearance.allium`'s config block states, which
  * `src/lib/config.ts` mirrors. Nearly every figure quoted in the comments below
  * is what that test measures, written down so the reasoning beside a token can
  * be read without running it; there the test, not the comment, is the evidence.
- * The exceptions are the two separation windows pinning `--n-65` and `--n-75`
- * immediately below. A separation between two of a game's own states is the
- * game's figure to state and to measure — `appearance.allium` says so — and
- * only Poodl's gate holds those two.
+ * That now includes the two separation windows pinning `--n-65` and `--n-75`
+ * immediately below: a separation between two of a game's own states is still
+ * the game's figure to state and to measure, but those two sit between the
+ * platform's own marks, which `play-surfaces.allium` states and this gate
+ * holds.
  */
 /*
  * Committed latin-subset variable fonts, per decision 0010. Extracted from the
@@ -510,16 +512,18 @@ body {
 }
 
 /*
- * Poodl's `game.allium` — contract DirectManipulation. Ten surfaces fulfil it
- * there and not one of them owns it, which is why the rules sit in the
- * stylesheet rather than in any one component. Over there they are measured by
- * `tests/directManipulation.test.ts` and by the width stories in
- * `stories/Keyboard.stories.svelte`. Neither the module nor that test came
- * here, and the contract is stated by no specification of this repository's —
- * `docs/explanation/accessibility.md` names that gap. What did come is the
- * controls the rules apply to, `Button`, `IconButton` and `HeaderBar`, whose
- * stories measure a rendered control against the figures in
- * `stories/fixtures.ts`. The rules themselves are held by reading.
+ * `docs/specs/operation.allium` — contract DirectManipulation. No one surface
+ * owns it, which is why the rules sit in the stylesheet rather than in any one
+ * component. `tests/operation.test.ts` reads this file from disk and measures
+ * what these rules resolve to on a real control, so they are held by a gate
+ * rather than by reading; what only a layout engine can answer stays with the
+ * stories, which measure a rendered control against `src/lib/config.ts`.
+ *
+ * The contract came from Poodl's `game.allium`, where ten surfaces fulfil it.
+ * That module did not come here: the hub states the contract itself, under the
+ * same four invariant names, so that the two texts stay comparable. Poodl's
+ * `tests/directManipulation.test.ts` did come, as `tests/operation.test.ts`,
+ * which is why the evidence reads a stylesheet rather than a component.
  *
  * ATapDoesOnlyWhatTheControlDoes. `manipulation` declines the platform's guess
  * at what a second tap meant, which is what makes fast repeated tapping on the
@@ -528,16 +532,64 @@ body {
  * `touch-action: none`, which would take the pinch as well —
  * DeliberateZoomIsNeverTakenAway says the first invariant is not licence for
  * that, and `app.html` leaves the viewport scalable for the same reason.
+ *
+ * Owed to every control alike, which is why the flash is not removed here. Doing
+ * both in one rule took the platform's acknowledgement from a bare checkbox that
+ * no rule below gives one back to, and ATouchIsAcknowledged is precisely about
+ * not doing that.
+ *
+ * "Every control alike" is the same set the floor rule names, and this rule and
+ * the text-control one below it were left at three shapes when that rule was
+ * widened. A `<select>`, a `<summary>` and a submit drawn as an input each
+ * became a control the stylesheet answers for and none of them declined the
+ * platform's guess, so a second fast tap on a disclosure opened it once and then
+ * zoomed the page — which is the sentence ATapDoesOnlyWhatTheControlDoes is
+ * written in. They are here rather than below because their words are a label
+ * rather than the reader's own text, which is the only thing the split turns on.
  */
 button,
 label,
+select,
+summary,
 input[type='checkbox'],
-input[type='radio'] {
+input[type='radio'],
+input[type='submit'],
+input[type='button'],
+input[type='reset'] {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/*
+ * The debt, taken on deliberately and only where the next rule pays it. Removing
+ * the platform's flash is what creates it, so this list and the list below have
+ * to be the same controls: a button, the row a preference is set from, and the
+ * native box inside that row, which shares the row's ring rather than carrying
+ * one of its own.
+ *
+ * Two controls are deliberately off it. A checkbox nobody wrapped in a label has
+ * no ring of ours to fall back on, and neither has a label bound by `for` to a
+ * control outside it — `:has()` reaches a descendant and nothing else, so such a
+ * label matches no rule below. Both keep the platform's own flash and read as
+ * alive under a finger, and everything the rule above gives them still stands,
+ * which is the whole of what ATapDoesOnlyWhatTheControlDoes asks for.
+ *
+ * The qualifier on `label` is the whole of that: an unqualified `label` here
+ * suppressed the flash on every label on the page while the ring below reached
+ * only the ones wrapping a control, which is the same inversion this split
+ * exists to end, one element over. `tests/operation.test.ts` now decides it by
+ * asking each control in a fixture whether it matches each rule, rather than by
+ * comparing selector strings — two lists that mention a label for unrelated
+ * reasons compare equal as text and differ as element sets, and that is exactly
+ * how this went unnoticed.
+ */
+button,
+label:has(input),
+label input[type='checkbox'],
+label input[type='radio'] {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /*
@@ -553,8 +605,17 @@ input[type='radio'] {
  * Leaving the tap highlight alone is the same decision seen from the other side:
  * nothing here removes the platform's acknowledgement, so nothing here owes a
  * replacement, and the caret and the focus outline arrive on contact anyway.
+ *
+ * Written as an exclusion for the reason the floor rule is: `input[type='text']`
+ * named one text control out of a dozen, so a number, a search box, a date and
+ * an `<input>` with no `type` attribute at all took the platform's guess at
+ * their second tap. What is excluded here is what the rule above already claims
+ * — the checkbox, the radio and the three button-shaped inputs — plus the hidden
+ * input, which is not a control.
  */
-input[type='text'],
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='submit']):not(
+    [type='button']
+  ):not([type='reset']),
 textarea {
   touch-action: manipulation;
 }
@@ -578,36 +639,106 @@ textarea {
 
 /*
  * EveryControlIsAComfortableTarget, top to bottom, where every control meets the
- * figure outright. 44px is `config.minimum_touch_target` in Poodl's
- * `game.allium`; here it is `MINIMUM_TOUCH_TARGET` in `stories/fixtures.ts`,
- * which the Button, IconButton and HeaderBar plays measure a rendered control
- * against, and which is a story fixture rather than a `src/lib/config.ts` value
- * because no specification in this repository states the figure yet.
+ * figure outright. 44px is `config.minimum_touch_target`, stated in
+ * `docs/specs/operation.allium` and mirrored as `MINIMUM_TOUCH_TARGET` in
+ * `src/lib/config.ts`, which `tests/operation.test.ts` asserts this floor
+ * against and which the Button, IconButton and HeaderBar plays measure a
+ * rendered control against.
  * `IconButton` takes its width from that same number and its height from this
  * rule.
  *
- * Across is deliberately not declared. A game's on-screen keyboard is the one
- * place the figure cannot be met in that direction, so a floor here would be
- * wrong for a key and would have to be fought back inside the keyboard — the
- * fight that, lost, is the sideways scroll this rule exists alongside. Every
- * other control carries a label that takes it past the figure on its own, or
- * sets its own width as `IconButton` does, and the story run measures that
- * rather than assuming it.
+ * Across is deliberately not declared. An on-screen keyboard is the one place
+ * the figure cannot be met in that direction, so a floor here would be wrong
+ * for a key and would have to be fought back inside `Keyboard` — the fight
+ * that, lost, is the sideways scroll this rule exists alongside. That is the
+ * exemption `operation.allium` states inside
+ * `EveryControlIsAComfortableTarget`, and the width stories in
+ * `stories/Keyboard.stories.svelte` measure what it gives instead. Every other
+ * control carries a label that takes it past the figure on its own, or sets its
+ * own width as `IconButton` does, and the story run measures that rather than
+ * assuming it.
  *
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite
  * reason — text a reader copies by hand has to stay selectable.
+ *
+ * "Every other control" is every other control this stylesheet can name, and the
+ * list used to name three. A `<select>` is a control `Modal.svelte`'s own
+ * focusable list already recognises, a `<summary>` is one the browser activates
+ * exactly as it activates a button, and an `<input>` is not only `type='text'` —
+ * a number, a date, a search box and a submit drawn as an input are each a
+ * control a game will put on a page, and each stood at whatever height the user
+ * agent chose while the invariant said outright that it did not. So the input
+ * half is written as an exclusion rather than a list: a type this stylesheet has
+ * never heard of is still a control, and a list is a rule that goes out of date
+ * every time the platform adds one.
+ *
+ * Three shapes are excluded, each for a stated reason. A checkbox and a radio
+ * are granted the label that contains them instead — a floor on the native box
+ * would size the thing the finger is not aimed at — and the rule below this one
+ * is where they meet the figure. A hidden input is not a control at all.
+ *
+ * A link is deliberately absent, and that is the invariant's second exemption
+ * rather than an omission: a link inside a sentence takes its size from the text
+ * around it, so a floor here would break the line it sits in. The hub's own route
+ * has one, in the list of games.
+ *
+ * A control a surface builds out of a generic element — a `[role='button']`, a
+ * `[tabindex]` — is absent for the reason a `for`-bound label is: this stylesheet
+ * cannot see that it is a control. The invariant says so outright and hands it to
+ * the surface that wrote it, rather than leaving the shape to fall through with
+ * nothing saying whose it was.
  */
 button,
-input[type='text'],
+select,
+summary,
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
 textarea {
   min-block-size: 44px;
 }
 
 /*
- * ATouchIsAcknowledged. The rule above removes the platform's own tap flash, and
- * removing it without replacing it leaves a control that reads as dead under
- * exactly the finger this contract exists for.
+ * The same figure, on the control that cannot carry it itself. A native checkbox
+ * is thirteen pixels and no stylesheet makes it forty-four, so the invariant
+ * grants it the label instead: a label bound to its control activates it across
+ * the whole of its area, so the row is what the finger is aimed at and the row is
+ * what has to answer. The rule below this one has said so in prose since it was
+ * written, and declared no floor — a target the reader was promised and never
+ * given, which is what `EveryControlIsAComfortableTarget` now states outright
+ * rather than leaving to be inferred.
+ *
+ * `inline-flex` is part of the floor rather than decoration. `min-block-size`
+ * does not apply to a non-replaced inline element, and a `<label>` is one, so the
+ * figure alone would be a declaration that did nothing. Inline rather than block,
+ * because this is a global element rule in a stylesheet a game takes whole and
+ * `flex` would stack two rows a consumer had laid side by side.
+ *
+ * And `gap` comes with it rather than after it. Flex wraps the label's text run
+ * in an anonymous item and trims the white space at its edges, so the word-space
+ * that used to sit between the native box and its words disappears the moment
+ * this rule applies. A declared gap is what puts it back, and a floor that
+ * silently closed that space would be a worse row than the short one it fixed.
+ *
+ * Only the wrapping form. `:has()` reaches a descendant, so a label bound by
+ * `for` to a control outside it matches nothing here — which is why the
+ * invariant names the label that *contains* the control rather than any label
+ * bound to one. A surface that binds by `for` sizes its own row, and keeps the
+ * platform's tap flash to acknowledge it, because the rule above leaves it
+ * alone.
+ */
+label:has(input[type='checkbox']),
+label:has(input[type='radio']) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-4);
+  min-block-size: 44px;
+}
+
+/*
+ * ATouchIsAcknowledged. The flash rule above removes the platform's own tap
+ * feedback, and removing it without replacing it leaves a control that reads as
+ * dead under exactly the finger this contract exists for. This is the
+ * replacement, and the two lists are the same controls on purpose.
  *
  * The page's own ink drawn inside the control, backed by its own paper. Two
  * tones rather than one because no single tone stands off every ground a
@@ -630,14 +761,15 @@ textarea {
  * `Button` and `IconButton` each say so — so the cue is not something a
  * control can override by accident.
  *
- * Two selectors, because the first rule in this block suppresses the platform's
- * flash on four kinds of control and a replacement owed to one of them is owed
- * to all. The row rather than the box: a settings row makes the `<label>` the
- * 44px target precisely because a label bound to its control activates it across
- * its whole area, so the row is what the finger is aimed at and the row is what
- * has to answer. A ring drawn on the native box instead would be a cue on the
- * 13px thing nobody is aiming at, and inset shadow on a native checkbox is the
- * platform's to paint or ignore.
+ * Two selectors for four suppressed controls, because a native box inside a row
+ * shares that row's ring rather than carrying one of its own. The row rather
+ * than the box: a settings row is the 44px target precisely because a label
+ * bound to its control activates it across its whole area, so the row is what
+ * the finger is aimed at and the row is what has to answer — which is now what
+ * `EveryControlIsAComfortableTarget` says, and what the rule above declares. A
+ * ring drawn on the native box instead would be a cue on the 13px thing nobody
+ * is aiming at, and inset shadow on a native checkbox is the platform's to paint
+ * or ignore.
  *
  * `:has(input:not(:disabled))` is the same carve-out `:not(:disabled)` makes on
  * the button half: a disabled preference row must not report a touch that does

@@ -161,8 +161,11 @@ produce at all.
 Component behaviour is expressed in two places: an assertion in `tests/` and a fixture in
 `stories/`. They can disagree, and when they do neither is the arbiter — the specification
 is. Each story cites the surface and the `@guarantee` clauses it stands for by name.
-`appearance.allium` is the only module here, so most components cite it for their
-theme and contrast states and for nothing else; where nothing governs — `Wordmark` is brand
+`appearance.allium` is the module most components cite, for their
+theme and contrast states and for nothing else — `operation.allium` and
+`play-surfaces.allium` joined it with
+[decision 0015](0015-operation-and-play-are-specified-here.md), and the play surface's
+stories cite those; where nothing governs — `Wordmark` is brand
 rather than behaviour — the story says so and names
 [Design direction](../design/direction.md) as the authority it does answer to. Either way a
 story says which authority governs it rather than becoming one.

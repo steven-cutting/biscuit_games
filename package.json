@@ -42,6 +42,8 @@
     "./app.css": "./src/app.css",
     "./assets/fonts/*": "./src/lib/assets/fonts/*",
     "./specs/appearance.allium": "./docs/specs/appearance.allium",
+    "./specs/operation.allium": "./docs/specs/operation.allium",
+    "./specs/play-surfaces.allium": "./docs/specs/play-surfaces.allium",
     "./package.json": "./package.json"
   },
   "scripts": {

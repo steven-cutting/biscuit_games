@@ -19,8 +19,57 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `DeviceAnswers`; `tests/contrast.test.ts`, which measures every pair the stylesheet
   declares in all four combinations of theme and high contrast against the floors
   `src/lib/config.ts` mirrors from the specification; and `stories/Foundations.stories.svelte`,
-  the token sheet. The play-surface primitives stay in Poodl. See
+  the token sheet. See
   [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md).
+
+- The play surface. `Tile` and `Key` are the two units every game renders and no game renders
+  differently — a cell that is read and a cell that is pressed, same paint and the same marker
+  bar. `Keyboard` lays keys out from data the caller supplies, with `QWERTY` as a default
+  rather than a rule and one callback carrying the pressed key's value, because a rack needs
+  shuffle, recall, play, pass and exchange and two named callbacks cannot express five.
+  `PhysicalKeyboard` wires the device's own keyboard to a surface over `keys.ts`, the second
+  port, whose guards are a pure predicate in `typing.ts`. `Explainer` is the shape a "how to
+  play" turns out to be, with the words left to whoever is explaining themselves.
+
+  A mark is `exact`, `present` or `absent`, after `--result-exact`, `--result-present` and
+  `--result-absent` — the tokens this repository has declared and measured since decision
+  0010, which is the argument for the move and why it did not wait for a second game. A mark
+  arrives with the game's own sentence for it, and a mark whose sentence is blank is drawn as
+  no mark at all — `play-surfaces.allium`'s `EveryMarkIsNamedInWords` says the platform draws
+  no state it has no words for, and `drawnMark` is where it declines. A game whose vocabulary
+  says `correct` maps at its call site.
+
+  `tests/play.test.ts` and `tests/typing.test.ts` are the evidence, five story files are the
+  specimens, and `docs/reference/testing.md` grants this repository's first structural-hook
+  exception — `[data-marker]`, on stated terms, for `aria-hidden` decoration alone. See
+  [decision 0016](docs/decisions/0016-the-play-surface-is-the-platforms.md).
+
+- Two more specifications, and the figures they state. `docs/specs/operation.allium` says how
+  a Biscuit Games surface is *worked* — every operation reachable from the keyboard with
+  visible focus, what a surface owes when it replaces the control a reader is standing on,
+  what a dialog owes on the way in and on the way out, `minimum_touch_target` at 44 and
+  `narrowest_supported_width` at 320, the four `DirectManipulation` invariants a finger is
+  owed, and what a surface owes when it claims bare key presses for itself.
+  `docs/specs/play-surfaces.allium` says what a surface *played on* owes: `PlayMark` with
+  `unmarked`, `exact`, `present` and `absent`, named after the tokens that paint them; that a
+  mark is never conveyed by colour alone and never drawn without the game's own words for it;
+  and `minimum_state_separation` at 3.0 and `minimum_mark_separation` at 2.0. Both are root
+  modules importing nothing, both ship at `@steven-cutting/biscuit-games/specs/*.allium`, and
+  both report empty diagnostics and empty findings with no waiver.
+
+  `src/lib/config.ts` mirrors the four new figures and `stories/fixtures.ts` is deleted, so a
+  play now measures against the specification rather than beside it. `tests/operation.test.ts`
+  reads `src/app.css` and `src/app.html` from disk and measures what these rules resolve to on
+  a real control — twelve of its fourteen cases passed on arrival, because every rule was
+  already in the stylesheet and nothing here had ever asserted one. `tests/contrast.test.ts`
+  measures a state separation for the first time, which is the block
+  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md) declined to port
+  while the figures were a game's, and gains two pairs the play surface newly renders — the
+  absent glyph on the page, and the hue results as text where the dark themes leave them
+  unfilled. No guarantee in `appearance.allium` is amended; only its header changes. This
+  closes the gap `docs/explanation/accessibility.md` had carried since the port as "the next
+  specification question this repository owes an answer to". See
+  [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md).
 
 - A published package. `@steven-cutting/biscuit-games` on GitHub Packages carries the token
   vocabulary, the shared components and the icons they draw, the preferences port and the
@@ -171,6 +220,174 @@ Two gaps in the evidence rather than in the code, found by the same review:
   handle `Modal` says a child carries focus across its own swap by, and deleting the binding
   left the whole suite green.
 
+Eight defects the automated reviewers on pull request 4 found in the play surface and the
+specifications that arrived with it, and three gates that were cited but never written. Again
+nothing is released, so no version moves and no consumer took any of them.
+
+- `latinLetters` no longer claims two keys it does not name. `/^[a-z]$/iu` folds case under
+  Unicode, which also matches U+017F, the long s, and U+212A, the Kelvin sign — and the long s
+  lowercases to itself, so the platform's default alphabet handed a game back a character no
+  game has a letter for. The cases are enumerated instead, as `/^[a-zA-Z]$/u`.
+- The keys port reads a focused `<summary>` as something the browser activates. Enter opens a
+  disclosure, so a surface claiming keys was taking Enter from one and calling
+  `preventDefault()` on it — `AClaimNeverReachesAFocusedControl` broken on a native control
+  `Modal`'s own focusable list already named. Poodl's copy of the guard carries it too.
+- `Explainer` keys its rows by position rather than by the sentence in them. Nothing asks two
+  of a game's explanations to differ, so two rows saying the same thing collided and threw
+  `each_key_duplicate` instead of rendering — the same defect, and the same cause, as
+  `HeaderBar`'s labels on the review before this one.
+- A mark with no words is not drawn. `{ name, description }` makes the pair what a caller
+  passes; it does not make a wordless mark unrepresentable, because `description` is a
+  `string` and `''` type-checks. Left there, a blank sentence painted the cell, drew the bar
+  and said nothing about either, which is the exact failure `EveryMarkIsNamedInWords` names.
+  `drawnMark` decides it once for `Tile` and `Key` both, and trims, because "supplied no words
+  for" is what a run of spaces is.
+- A layout with no keys draws no keyboard. `ALayoutIsSuppliedRatherThanFixed` says as much and
+  `Keyboard` had drawn a named, empty group instead. The empty layout stays type-valid on
+  purpose: a game builds its rows with `map`, and a non-empty tuple would stop type-checking
+  exactly there.
+- The row a preference is set from carries the 44px floor it had been promised in prose. A
+  native checkbox is thirteen pixels and no stylesheet makes it forty-four, so
+  `EveryControlIsAComfortableTarget` now states outright that such a control meets the figure
+  in the label that *contains* it — and `src/app.css` declares it, with the `inline-flex` that
+  makes `min-block-size` apply to a `<label>` at all and the `gap` that puts back the
+  word-space flex would otherwise trim. A label bound by `for` to a control outside it is
+  reached by no rule here, and the invariant says so: that row is the surface's own to size.
+- The tap-highlight suppression reaches only the controls that get a replacement. It was one
+  rule with the callout suppression, so a bare checkbox lost the platform's own flash and no
+  rule gave one back: `ATouchIsAcknowledged` inverted on the control least likely to be looked
+  at. `touch-action`, the callout and the selection suppression stay on all four kinds. The
+  `label` in the flash list is qualified as `label:has(input)`, because an unqualified one
+  reaches every label on the page while both paying rules reach only the wrapping ones — the
+  same inversion, one element over.
+- A focused control keeps every key that activates it, not only Enter, and through both
+  channels. `claimKey` surrendered Enter alone and only where a binding was declared as an
+  action, which held for `QWERTY_BINDINGS` and for nothing a game might write: a surface
+  binding Space took it from every focused button and summary, and a browser fires that
+  activation on the keyup only when the keydown was not cancelled, so the control went quiet
+  rather than firing late.
+- `Key`'s padding names `--s-5` and `--s-1`. Padding is spacing, not the coincident-literal
+  carve-out a control's own dimension takes. The spacing scale is in pixels, so the padding now
+  moves with the scale and no longer with a reader's text size — a behaviour change, and the
+  trade the token rule makes everywhere. `Tile`'s 3rem *is* in the carve-out and now carries
+  the comment the rule asks for, stating the difference from `Button`'s 48px rather than
+  claiming to be identical to it: 48px coincides with `--s-11` at every root size, 3rem only
+  at the 16px one, and the unit is deliberate because a cell holds a letter sized in rem.
+
+And three gates named in a comment, in a claim, or in nothing at all:
+
+- `tests/typing.test.ts` holds `QWERTY` and `QWERTY_BINDINGS` equal. `layouts.ts` said
+  `tests/package-surface.test.ts` did, and it did not: the drawn keys and the typed ones could
+  have come to name different operations with every gate green.
+- `tests/package-surface.test.ts` asserts the play surface's runtime exports and writes against
+  its types. A game that could import `Keyboard` and not `QWERTY` has a keyboard it cannot lay
+  out, and removing either from the barrel left the whole suite green.
+- `tests/typing.test.ts` drives the real adapter with each modifier flag. The `claimKey` table
+  hands `modified` in already computed, so only `ctrlKey` had ever reached the adapter's own
+  short-circuit. Green on arrival, and now driven rather than assumed.
+
+Three clauses were reworded rather than repaired, because the specification was wrong or
+could not say what the code had to do:
+
+- `EveryControlIsAComfortableTarget` names its second exemption: a control inside a line of
+  running text takes its size from the text around it. This repository's only route has a link
+  in a sentence, so the invariant as first written was false of the hub itself on the day it
+  was published.
+- `AModifiedKeyIsNeverClaimed` names Control, Meta and Alt rather than "a platform modifier".
+  Shift is not one of them: it carries no shortcut of its own, so a shifted letter is still the
+  reader typing a letter — which is what `latinLetters` had always assumed, and what the loose
+  wording contradicted. The test is the shortcut and not the composing, and the clause says so:
+  Alt composes too, on macOS it is the compose key, and it is on the list anyway because it
+  also carries shortcuts. What that costs — a letter composed with Alt not arriving as a bare
+  key press — is named in the clause rather than left to be found.
+- `EveryMarkIsNamedInWords` says that a sentence of nothing but spaces is no words. The field
+  beside it, `is_told_in_words`, compares against the empty string and has no way to say
+  "blank", so the invariant carries that half and the comment on the field says which governs.
+  Written down because `drawnMark` trims, and a threshold decided in code rather than in the
+  specification is the thing invariant 1 exists to stop — including when the code is right.
+
+Four more the same reviewers found in the round after that, and again nothing is released, so
+no version moves and no consumer took any of them.
+
+- Two lookups no longer read the prototype every plain object carries. `claimKey` indexed
+  `bindings.actions` by the pressed key's own name and `Keyboard` indexed `marks` by the key's
+  value, so `constructor`, `toString` and `valueOf` each came back as a built-in function:
+  `claimKey` returned one to a caller its own signature promises `string | null`, and
+  `Keyboard` handed one to `drawnMark`, which threw reading `description` off a function and
+  took the whole keyboard down. A word game reaches those names by spelling them. Both ask
+  `Object.hasOwn` first now.
+- A key is named from the first of its fields that has a word in it. `label ?? content ??
+  value` is a nullish chain and a blank is not nullish, so a rack's blank tile —
+  `{ value: 'blank', content: ' ' }` — drew a control whose accessible name was empty, which is
+  what `EveryKeyIsAControl` exists to refuse. `keyName` in `src/lib/components/layouts.ts`
+  decides it, the way `drawnMark` decides whether a mark has words, and a layout that gives all
+  three fields nothing is left unnamed rather than given an invented word or dropped from its
+  row.
+- The 44px floor reaches every native control `src/app.css` can name. It was `button`, a text
+  input and a textarea, while `EveryControlIsAComfortableTarget` says every control outside its
+  two exempt shapes meets the figure outright — so a `<select>`, a `<summary>` and every input
+  that is not a text one stood at whatever height the user agent chose. The input half is
+  written as an exclusion rather than a list, so a type nobody has heard of yet is still a
+  control — and so is an `<input>` with no `type` attribute, which is a text field to the
+  browser and was matched by no selector here before. It reaches the widget and replaced types
+  too: `range`, `color`, `file` and `image`, and the last of those is replaced, so the floor
+  re-resolves its width through its aspect ratio and it grows in both directions rather than
+  one. The checkbox and the radio stay excluded because the invariant grants them the label
+  that contains them instead.
+
+And one clause reworded rather than repaired, because the specification was wrong:
+
+- `EveryControlIsAComfortableTarget` earns its dense-row exemption from the room the row is
+  actually given, with the gaps counted alongside the controls, rather than from a count of
+  controls against the narrowest supported width. Counting ignores the gaps: seven keys at 44px
+  fit inside 320 and the six gaps between them do not, so the seven-tile rack in
+  `stories/Keyboard.stories.svelte` was a row the exemption refused and the figure could not
+  reach — 36.8px across, measured in Chromium, with nothing looking. The same invariant also
+  says now that a control a surface builds out of a generic element is that surface's own to
+  size, for the reason a `for`-bound label is: no shared rule can tell it from ordinary
+  content. Each width story asserts row by row which rows the exemption reaches, so a row that
+  is not exempt is measured across rather than left unmeasured, and
+  [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md) carries a dated
+  amendment retracting the arithmetic it recorded.
+
+An adversarial pass over the answer above found six more, five of them in the repairs
+themselves. Worth having, and the same shape as the round before it.
+
+- The dense-row exemption counts the extra width a turn-ending control takes. The reworded
+  clause asked for the figure and the gaps and stopped there, which is exact only for a row of
+  all builders: `Key` gives a key that ends a turn half as much again, so a row carrying two of
+  them has that much less to divide. QWERTY's bottom row was declared unexempted at a 480px
+  shell and renders 41.4px there — the width
+  [Accessibility](docs/explanation/accessibility.md) already names as too narrow for a
+  ten-across row. A story at that width is the evidence, and it fails against the arithmetic it
+  replaced.
+- The tap rules reach the same controls the floor does. `ATapDoesOnlyWhatTheControlDoes` is
+  stated over every control with no exemption list of its own, and widening the floor alone
+  left a `<select>`, a `<summary>`, a number box and a submit drawn as an input as controls
+  that did not decline the platform's guess at a second tap — a fast double tap on a disclosure
+  opened it once and then zoomed the page. The split the file already made is kept: a control
+  whose words are a label loses the callout and the selection too, and a text control keeps
+  both.
+- `Tile` names a cell whose content is a blank as an empty one. It decided blankness with
+  `content === ''` while `drawnMark` and the new `keyName` trim, so the rack blank tile that
+  prompted the key fix reached a reader as nothing at all when it was on show rather than
+  pressed. Blankness is one rule in this domain now.
+- `EveryKeyIsAControl` says what a layout that supplies no words at all is owed. The previous
+  entry settled that in a doc comment and a test — the platform draws the key and leaves it
+  unnamed — which is a shared-behaviour decision taken outside the module that owns it. The
+  guarantee carries it, and says why dropping the key would be worse.
+- `markFor` has no dead arm. `Object.hasOwn(…) ? (marks[value] ?? null) : null` needs the `??`
+  to compile under `noUncheckedIndexedAccess` and can never take it, which is the second
+  unreachable branch in a repository whose
+  [quality philosophy](docs/explanation/quality-philosophy.md) says an unreachable branch is
+  code that should not exist — and both that page and [Testing](docs/reference/testing.md)
+  count the unreachable ones. Asking whether an entry is there and whether it is the game's own
+  are two questions, and both answers occur.
+- The prototype tests have their positive case. Rendering only unmarked prototype-named keys is
+  satisfied by refusing those four names outright, which would silently drop the mark from a
+  game that keys a tile `constructor` on purpose. A key that *is* marked under such a name is
+  what makes `Object.hasOwn` the only implementation that passes.
+
 ### Deliberately not included
 
 - Any deployment. There is no Pages workflow, no `site-root/`, no staging script and no
@@ -178,10 +395,12 @@ Two gaps in the evidence rather than in the code, found by the same review:
   move rather than an addition. See
   [decision 0012](docs/decisions/0012-the-domain-root-stays-with-poodl.md).
 
-- The play-surface primitives — `Tile`, `Board`, `Keyboard`, `PhysicalKeyboard`,
-  `DistributionChart` and `HowToPlay` — and the block of Poodl's contrast test that measures
-  Poodl's own state separations. Both are a game's, and
-  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md) says why.
+- `Board` and `DistributionChart`, and a game's rules with them. An arrangement of cells
+  encodes a rule — six rows of five is one game's — and a distribution chart draws a game's
+  own data, so both stay where they are rendered.
+  [Decision 0016](docs/decisions/0016-the-play-surface-is-the-platforms.md) refuses each on
+  the same test that admitted the pieces they are built from, rather than by leaving them
+  out.
 
 - Poodl's own edits. This repository records what Poodl has to change in
   `docs/operations/poodl-handover.md`; it does not change it.

@@ -1,0 +1,337 @@
+-- allium: 3
+--
+-- Biscuit Games — operation
+--
+-- Scope
+--   How every Biscuit Games surface is worked: reached and invoked from a
+--   keyboard, sized and spaced for a finger, acknowledged when it is touched,
+--   and told to a reader who is not looking at it. appearance.allium says how a
+--   surface looks; this says how it is operated.
+--
+-- Includes
+--   - Keyboard operability of every operation a surface provides, a focus
+--     indication that arrives without being asked for, and what a surface owes
+--     when it replaces the control a reader is standing on.
+--   - What a dialog owes: focus in when it opens, Escape out, Tab held inside,
+--     and focus returned to whatever opened it.
+--   - The comfortable target and the narrowest supported width, the two shapes
+--     that cannot meet the target in both directions and what each does
+--     instead, and where a control meets the figure in the label that
+--     activates it rather than in its own box.
+--   - Touch: a tap doing the control's action and nothing else, deliberate zoom
+--     kept, and a touch acknowledged from the moment of contact.
+--   - A change nobody is looking at being said in words.
+--   - What a surface owes when it claims bare key presses for itself, and what
+--     dropping that claim has to leave behind.
+--
+-- Excludes
+--   - Colour, contrast, motion and the legibility floors. appearance.allium
+--     states those, and an unavailable control's exemption from them is stated
+--     there too.
+--   - Which operations a surface has, and what any of them do. This module
+--     states that an operation is reachable; it never states what the
+--     operations are. Enter meaning "submit this word" is a game's.
+--   - Markup, event handling, focus-management mechanics, and how a dialog is
+--     drawn. This module says what is owed, never what listens.
+--   - What a play surface's marks are and how far apart they sit.
+--     play-surfaces.allium states those, and states on-screen keys as a surface
+--     made of them; the size of one of those keys and its place in its row are
+--     this module's, under EveryControlIsAComfortableTarget.
+--   - How a surface binds a label to the control it names. The invariant says
+--     which shape the platform answers for and which the surface answers for
+--     itself, and says nothing about how either is written.
+--   - Where the switch is that stops a surface claiming bare keys, and whether
+--     there is one. A control that changes a setting belongs to the product
+--     that owns it, as it does in appearance.allium; the open question at the
+--     end records what is still undecided about that.
+--
+-- Dependencies
+--   None. This is one of the platform's root modules, and it imports nothing so
+--   that a game can inherit these obligations whole rather than restate them.
+--   appearance.allium and play-surfaces.allium are the others; none of the
+--   three imports another, because they are peers describing different aspects
+--   of the same surfaces rather than layers.
+
+------------------------------------------------------------
+-- Given
+------------------------------------------------------------
+
+given {
+    -- How wide the surface has to lay out in, in CSS pixels. The device decides
+    -- it and Biscuit Games only ever lays out to it.
+    viewport_width: Integer
+
+    -- Whether the surface in front of the reader is claiming bare key presses
+    -- for itself.
+    --
+    -- Something outside this module decides it — a game's setting, a mode, a
+    -- surface that claims only while it is being played — and this module
+    -- deliberately never says which. It is not config, because it changes while
+    -- the reader is there rather than being a fixed threshold; it is not a
+    -- stored setting, because nothing here stores one; and it is not left
+    -- entirely to a game, because the obligations that attach to claiming and
+    -- to dropping the claim are the platform's and need something to be stated
+    -- against.
+    typed_keys_are_claimed: Boolean
+}
+
+------------------------------------------------------------
+-- Config
+------------------------------------------------------------
+
+config {
+    -- CSS pixels across a control, in both directions, for the invariant that
+    -- names it. A dense row of like controls is the one place this cannot be
+    -- met in both, which is why that invariant says what happens instead rather
+    -- than stating a size alone.
+    minimum_touch_target: Integer = 44
+
+    -- CSS pixels. The narrowest viewport every promise in this module survives
+    -- without scrolling sideways, and the width every target and spacing figure
+    -- has to hold at.
+    narrowest_supported_width: Integer = 320
+}
+
+------------------------------------------------------------
+-- Contracts
+------------------------------------------------------------
+
+-- Every surface with a control a reader can tap fulfils this, which is why it
+-- lives here rather than on any one of them. Touch is the primary way these
+-- games are played, and a gesture the platform interprets for itself is a
+-- gesture that did not reach the game.
+contract DirectManipulation {
+    @invariant ATapDoesOnlyWhatTheControlDoes
+        -- A tap on a control performs that control's action and nothing
+        -- besides. The label is not selected, no callout or magnifier is raised
+        -- by holding, and tapping the same control twice in quick succession
+        -- performs it twice rather than zooming the page. Repeated fast tapping
+        -- on a row of keys is ordinary use, not a gesture.
+
+    @invariant DeliberateZoomIsNeverTakenAway
+        -- What the previous invariant removes is the platform's guess, never
+        -- the reader's intent. Pinch-zoom still magnifies the page, and the
+        -- page stays usable when the operating system or the browser is already
+        -- magnifying it. Refusing to be zoomed at all would satisfy the first
+        -- invariant and fail this one; the first is not licence for it.
+
+    @invariant EveryControlIsAComfortableTarget
+        -- Every control is at least config.minimum_touch_target across, in both
+        -- directions. Two shapes cannot be. The first is a row of like controls
+        -- sharing the full width, where what the row would need is more room
+        -- than it is given: the figure for every control that builds a turn,
+        -- the gaps between them all, and whatever more a control that ends a
+        -- turn is given over one that builds one.
+        --
+        -- Three terms, and each was left out of a wrong version of this clause.
+        -- How many controls are in the row is not the test on its own: seven
+        -- controls at that figure fit inside config.narrowest_supported_width
+        -- and the six gaps between them do not, so a row this invariant
+        -- declined to exempt could not meet the figure either — a rack of seven
+        -- tiles is the shape that found it. The room is what the row is
+        -- actually given rather than the whole viewport, because a row inside a
+        -- page's margins has less than the screen it is drawn on. And the extra
+        -- a turn-ending control takes is counted rather than assumed away: the
+        -- clause below grants it, so a row carrying two of them has that much
+        -- less to divide among the rest, and leaving the term out declared a
+        -- ten-share row unexempted at a width that renders it below the figure.
+        --
+        -- There the row meets the figure top to bottom, divides its width
+        -- equally among the controls that build a turn, and keeps a gap between
+        -- them, so what such a control gives up is bounded by the width of the
+        -- screen and by nothing else. A control in that row that ends a turn
+        -- rather than builds one may be wider than the others, and never
+        -- narrower: those are the last place to save width.
+        --
+        -- The second is a control inside a line of running text, a link in a
+        -- sentence being the one that occurs: its size is set by the text around
+        -- it, and a control given the figure there would break the line it sits
+        -- in. A surface owes such a control a reading distance from the words
+        -- beside it, and owes it nothing else. Where the same destination is
+        -- also offered away from the prose, that offer meets the figure like any
+        -- other control.
+        --
+        -- Every other control meets the figure outright, and a control the
+        -- reader activates by pressing a label that contains it meets the figure
+        -- in that label rather than in its own box: the label is what the finger
+        -- is aimed at, so the label is what has to answer, and the words beside
+        -- the control are part of the target rather than next to it.
+        --
+        -- A label bound to a control it does not contain is the surface's own to
+        -- size. The platform cannot see that binding from the label — it is a
+        -- name matched against an identifier elsewhere in the document — so a
+        -- surface that binds that way answers for the row itself. Stated rather
+        -- than left out, because the shape is legal, common, and would otherwise
+        -- fall through the figure with nothing saying whose it was.
+        --
+        -- A control a surface builds out of a generic element is the surface's
+        -- own to size for the same reason: an element the platform cannot tell
+        -- from ordinary content is one no shared rule can reach. What the
+        -- platform answers for is what it can name — every native control the
+        -- two shapes above do not exempt, and the label that contains one — and
+        -- it answers for all of those rather than for the few a stylesheet
+        -- happened to list. A link in a sentence is named as easily as any of
+        -- them and is still exempt, because the exemption is about where the
+        -- control sits rather than about whether it can be reached.
+        --
+        -- All of this holds down to config.narrowest_supported_width, at which
+        -- the surface is usable without scrolling sideways.
+
+    @invariant ATouchIsAcknowledged
+        -- A control shows that it was touched, from the moment of contact,
+        -- whatever the platform's own tap feedback is doing. Suppressing that
+        -- feedback without replacing it leaves a control that reads as dead
+        -- under exactly the finger this contract exists for. The
+        -- acknowledgement is a change the eye catches without motion, so it owes
+        -- nothing to whether animations are running — and it is not a dimming of
+        -- the control, because a control that carries a mark would lose the mark
+        -- along with the light.
+}
+
+------------------------------------------------------------
+-- Surfaces
+------------------------------------------------------------
+
+-- What every Biscuit Games surface owes to being worked, whatever it is for.
+surface Operation {
+    let within_supported_width = viewport_width >= config.narrowest_supported_width
+
+    exposes:
+        within_supported_width
+
+    contracts:
+        fulfils DirectManipulation
+
+    @guarantee FullyKeyboardOperable
+        -- Every operation a surface provides can be reached and invoked from
+        -- the keyboard alone, and the state of the control focus lands on is
+        -- reported as well as drawn. This holds whatever else the surface is
+        -- doing with the keyboard: a surface that claims bare keys for itself
+        -- claims none that a control already needs, which is TypedInput below.
+
+    @guarantee FocusIsVisibleWhereverItLands
+        -- Focus is drawn on every control that can take it, in an indication a
+        -- control inherits rather than asks for, so a control cannot be added
+        -- without one. A control that draws no boundary of its own still shows
+        -- focus.
+
+    @guarantee AControlThatDisappearsHandsFocusOn
+        -- A surface that replaces the control the reader is standing on carries
+        -- focus across the swap. Nothing downstream can repair this after the
+        -- fact: a removed element reports no departure, so focus falls to the
+        -- page and a reader who was working by keyboard resumes from the top.
+        -- The obligation is the replacing surface's, at the moment it replaces.
+
+    @guarantee AChangeNobodyIsLookingAtIsAnnounced
+        -- A surface that changes something without moving focus says so in
+        -- words, and says it again when it happens again — the same thing twice
+        -- over is heard twice. The platform states that an announcement is owed
+        -- and what carries it; which sentence is said belongs to whatever had
+        -- something to say.
+
+    @guarantee EveryPromiseHereHoldsAtTheNarrowestWidth
+        -- Every clause in this module holds down to
+        -- config.narrowest_supported_width, at which nothing scrolls sideways
+        -- and no operation has become unreachable. Above it there is more room
+        -- and nothing to relax.
+}
+
+-- A panel that takes the reader's whole attention while it is open. Stated here
+-- rather than in a game because the shell is the platform's, and a contract for
+-- a shared component's keyboard behaviour that lived in one game's
+-- specification would be the copy governing the original.
+surface Dialog {
+    exposes:
+        within_supported_width
+
+    contracts:
+        fulfils DirectManipulation
+
+    @guarantee FocusEntersTheDialogWhenItOpens
+        -- Opening a dialog puts focus inside its panel rather than leaving it
+        -- behind on the page.
+
+    @guarantee EscapeClosesTheDialog
+        -- Escape closes it, from anywhere inside it, and closing is the same act
+        -- however it is reached.
+
+    @guarantee TabIsHeldInsideTheDialog
+        -- Tab cycles over the stops the panel's contents really make and never
+        -- wanders out to what is behind. A dialog that has declared itself modal
+        -- over the page and then lets Tab leave has broken the declaration. The
+        -- stops are the ones the keyboard genuinely lands on, which is not the
+        -- same as everything that looks like a control: a group of exclusive
+        -- choices is one stop rather than several, a control the layout does not
+        -- draw is none at all, and a disclosure's own summary is one that is
+        -- easily missed.
+
+    @guarantee FocusReturnsToWhateverOpenedIt
+        -- On the way out, focus goes back to the control that opened the dialog
+        -- if it is still on the page. This is the clause easiest to leave out
+        -- and invisible until someone tries it.
+}
+
+-- Bare key presses reaching a surface directly, rather than reaching whichever
+-- control has focus. The one channel a surface can decline entirely.
+surface TypedInput {
+    -- A surface that is not claiming keys is indistinguishable, from the
+    -- keyboard's side, from one that never could.
+    let keys_reach_the_reader = not typed_keys_are_claimed
+
+    exposes:
+        keys_reach_the_reader
+
+    @guarantee AClaimNeverReachesAFocusedControl
+        -- While focus is on a control, that control's own keys stay its own:
+        -- the key that activates it activates it, and somewhere the reader is
+        -- typing keeps every key. A claim on bare keys is a claim on keys
+        -- nothing else has asked for.
+
+    @guarantee AModifiedKeyIsNeverClaimed
+        -- A key pressed together with a shortcut modifier — Control, Meta or
+        -- Alt — belongs to the browser and the operating system, and is never
+        -- taken. Those three and not every modifier the keyboard has: Shift
+        -- carries no shortcut of its own on any platform this runs on, so a
+        -- shifted letter is still the reader typing a letter and a surface that
+        -- claims letters claims that one. A surface deciding what its alphabet
+        -- is is free to case-fold or not; this clause says only that Shift is
+        -- not what takes a key away from it.
+        --
+        -- The test is the shortcut and not the composing. Alt composes as well
+        -- as it addresses — on macOS it is the compose key, where a reader types
+        -- a Nordic or accented letter with it — and it is on the list anyway,
+        -- because it also carries shortcuts a surface must not swallow. The cost
+        -- is real and named here rather than discovered: a game whose alphabet
+        -- includes a letter composed with Alt does not receive it as a bare key
+        -- press, and reaches it through a control the reader can operate.
+
+    @guarantee DroppingTheClaimIsTotal
+        -- Not claiming means not intercepting, rather than intercepting and
+        -- then ignoring. A surface that has dropped the claim handles no key
+        -- press at all, so bare keys reach the reader's own software and the key
+        -- that activates a control activates whichever control has focus. This
+        -- is what the claim is worth stopping for: a reader who navigates by
+        -- single letter loses that navigation entirely to an application that
+        -- swallows those keys, and only they can know they are doing it.
+
+    @guarantee TypedKeysAnswerTheSameOperationsAsTheKeysOnScreen
+        -- Where a surface offers an operation both through a claimed key and
+        -- through a key drawn on screen, the two are the same operation under
+        -- the same name. Which operations those are is not this module's to
+        -- say.
+}
+
+------------------------------------------------------------
+-- Open Questions
+------------------------------------------------------------
+
+-- That a surface which claims bare keys owes a way to stop is not the same as
+-- owing the reader a switch. The accessibility case for one is strong: a reader
+-- who navigates by single letter is the person the claim costs, and only they
+-- know they are doing it. But appearance.allium excludes the controls that
+-- change a setting on the ground that a panel belongs to the product that owns
+-- it, and this module follows it — so the platform can require that the claim be
+-- droppable without being able to say who offers the reader the means. Nobody
+-- has decided which of the two it is, and answering it in code would let
+-- whichever repository draws a settings panel first decide it.
+open question "Dropping the claim - does the platform owe the reader a way to stop a surface claiming bare keys, or only that dropping it costs nothing?"

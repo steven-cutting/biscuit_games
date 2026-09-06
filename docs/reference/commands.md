@@ -102,7 +102,8 @@ Both spec recipes go through `scripts/run_allium.py`, which reads the JSON rathe
 trusting the exit code — `allium check` exits 0 on an `info` diagnostic and `allium
 analyse` ignores diagnostics altogether. Both need the pinned binary, so a worktree that
 has not run `just initialize` must run `just install-allium` first. `docs/specs/` currently
-holds one module, `appearance.allium`, and both recipes must come back empty.
+holds three modules — `appearance.allium`, `operation.allium` and
+`play-surfaces.allium` — and both recipes must come back empty on each.
 
 ## Publish
 

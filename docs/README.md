@@ -16,9 +16,11 @@ This repository is two things at once: the Biscuit Games hub site, and the sourc
 for everything the platform's games share. [What the hub owns](project/what-the-hub-owns.md)
 draws that boundary, and it is the page to read before adding anything here.
 
-Shared behaviour is specified separately, in Allium, under `docs/specs/` — one module,
-[`appearance.allium`](specs/appearance.allium). It is not part of this handbook; it is its
-subject. Start at [Specifications](explanation/specifications.md) to understand how the two
+Shared behaviour is specified separately, in Allium, under `docs/specs/` — three modules:
+[`appearance.allium`](specs/appearance.allium), how a surface looks;
+[`operation.allium`](specs/operation.allium), how it is worked; and
+[`play-surfaces.allium`](specs/play-surfaces.allium), what a surface played on owes. None is
+part of this handbook; they are its subject. Start at [Specifications](explanation/specifications.md) to understand how the two
 relate.
 
 ## Start here

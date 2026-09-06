@@ -44,9 +44,9 @@
 
 <style>
   /*
-   * 44px matches no token, and is not meant to: it is the comfortable touch
-   * target, which `stories/fixtures.ts` holds and the story measures both
-   * ways. Only the width is set here. The height is `app.css`'s, whose shared
+   * 44px matches no token, and is not meant to: it is
+   * `operation.allium`'s `config.minimum_touch_target`, mirrored in
+   * `src/lib/config.ts` and measured by the story both ways. Only the width is set here. The height is `app.css`'s, whose shared
    * rule gives every button that same minimum, so the two figures agree by
    * being the same figure and the control comes out square.
    */

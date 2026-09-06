@@ -106,7 +106,7 @@ is `ReducedMotionOverridesTheAnimationSetting`.
 
 ```svelte
 <script lang="ts">
-  import { Button, HeaderBar, Icon } from '@steven-cutting/biscuit-games';
+  import { Button, HeaderBar, Icon, Keyboard, QWERTY, Tile } from '@steven-cutting/biscuit-games';
 
   const openSettings = () => {};
   const play = () => {};
@@ -136,10 +136,12 @@ colour, with no error anywhere. The two imports go together.
 
 ## 6. Take the specification as given, and keep proving it
 
-`docs/specs/appearance.allium` ships, at
-`@steven-cutting/biscuit-games/specs/appearance.allium`. Allium has no cross-repository import,
-and putting the module inside `node_modules` does not give it one: a game's own module still
-cannot reference it.
+All three modules ship, at
+`@steven-cutting/biscuit-games/specs/appearance.allium`,
+`@steven-cutting/biscuit-games/specs/operation.allium` and
+`@steven-cutting/biscuit-games/specs/play-surfaces.allium`. Allium has no cross-repository
+import, and putting a module inside `node_modules` does not give it one: a game's own module
+still cannot reference any of them.
 
 What the package does is put the authoritative text where the game's own gate can read it. That
 is worth taking, and it is the only thing that would ever compare the two files. A test in the

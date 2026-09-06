@@ -1,0 +1,312 @@
+-- allium: 3
+--
+-- Biscuit Games — play surfaces
+--
+-- Scope
+--   The surfaces a Biscuit Games game is played on, as far as they are the
+--   platform's: the cell that carries one unit of play and says what is known
+--   about it, the keyboard of cells a reader presses to enter one, and the
+--   primer that explains what the marks mean. The vocabulary of marks each cell
+--   wears, the words a game supplies for them, and how far apart two of those
+--   marks have to sit.
+--
+-- Includes
+--   - The four marks a play cell can wear, named by the platform, and the
+--     non-colour indication each one carries.
+--   - That a game supplies the words for each mark and the platform never does,
+--     because two games will not mean the same thing by one.
+--   - The separations between those marks, as ratios rather than as colours:
+--     between an unmarked cell and a marked one, and between the mark that
+--     carries no hue and the strongest one that does.
+--   - The on-screen keyboard as a surface of cells that are controls: a layout
+--     supplied by whoever mounts it, keys that are real controls with names, and
+--     completeness on its own.
+--   - The primer that explains the marks, shown in the marks' own ink and
+--     reachable again rather than shown once and lost.
+--
+-- Excludes
+--   - Every arrangement. A board, a grid, a rack, a row and a ladder are
+--     arrangements a game chooses; this module states what one cell owes and
+--     never how many there are or where they sit.
+--   - What any mark means. The platform names four; a game says what each one
+--     is claiming, and supplies the sentence a reader hears.
+--   - Colour values, palettes, markup and animation mechanics. Naming a
+--     separation is not choosing an ink: this module says how far apart two
+--     marks must be, never what either one is. src/app.css is what answers it.
+--   - The legibility floors every surface owes the page, the exemption an
+--     unavailable control carries, and how motion defers to the reader.
+--     appearance.allium states all three, and a mark clears them as well as the
+--     separations here.
+--   - How a surface is operated. operation.allium states that, including the
+--     size of a key and its place in its row, what a dialog owes, and which
+--     bare keys a surface may claim from a physical keyboard.
+--
+-- Dependencies
+--   None. This is one of the platform's root modules, and it imports nothing so
+--   that a game can inherit these obligations whole rather than restate them.
+--   appearance.allium and operation.allium are the others; none of the three
+--   imports another, because they are peers describing different aspects of the
+--   same surfaces rather than layers.
+
+------------------------------------------------------------
+-- Given
+------------------------------------------------------------
+
+given {
+    -- One cell of the surface in front of the reader. A play surface is made of
+    -- these, and this module never says how many or how they are arranged. It is
+    -- declared rather than created because nothing here brings one into being,
+    -- and every obligation below is owed of each one that exists.
+    cell: PlayCell
+}
+
+------------------------------------------------------------
+-- Enumerations
+------------------------------------------------------------
+
+-- What a surface has made of a cell's contents. Named for how strongly each
+-- reads rather than for what any game means by it: the meaning is the game's and
+-- arrives as words.
+enum PlayMark {
+    -- Nothing is known about this cell yet, or nothing has been put in it. Every
+    -- play surface has this mark and every one starts in it, which is why it is
+    -- named here rather than left as the absence of a mark: the separation below
+    -- is a distance from it, and a figure cannot be stated about something the
+    -- module will not name.
+    unmarked
+    -- The strongest claim a game makes about a cell. Carries a hue and the
+    -- fullest non-colour indication of the three.
+    | exact
+    -- A claim that holds in part: what the cell carries counts for something,
+    -- and not for this. Carries a second hue and a lesser indication.
+    | present
+    -- What the cell carries is out of play. The one mark with no hue and no
+    -- indication of its own, which is why its absence is itself the indication
+    -- and why the second separation below names it.
+    | absent
+}
+
+------------------------------------------------------------
+-- Entities and Variants
+------------------------------------------------------------
+
+entity PlayCell {
+    -- What the surface is saying about whatever this cell carries.
+    mark: PlayMark
+
+    -- The words the game supplies for that mark, heard by anyone reading by ear
+    -- rather than by eye. The platform names the marks and never the meanings:
+    -- two games will not agree on what one of them is claiming, and both owe the
+    -- reader a sentence.
+    description: String
+
+    is_marked: mark != unmarked
+
+    -- A mark with no words is a colour on its own, which the contract below
+    -- forbids outright. Stated as a field so it is a property of the cell rather
+    -- than a hope about whoever drew it.
+    --
+    -- This is the mechanical form of the test and not the whole of it: the
+    -- expression can compare against the empty string and has no way to say
+    -- "blank", so a sentence of nothing but spaces satisfies it and is not words.
+    -- EveryMarkIsNamedInWords carries that half, and governs where the two
+    -- differ.
+    is_told_in_words: description != ""
+}
+
+------------------------------------------------------------
+-- Config
+------------------------------------------------------------
+
+config {
+    -- How far a cell nothing is known about has to sit from one that has been
+    -- marked. No standard supplies this figure, because standards ask a colour
+    -- to stand off its background rather than off another state, and a play
+    -- surface's marks sit side by side.
+    minimum_state_separation: Decimal = 3.0
+
+    -- How far absent has to sit from exact. That pair and no other: present is
+    -- left to its hue and its own indication, because it is the mark a reader
+    -- sees least and the range is already spent. Lower than the figure above,
+    -- and deliberately so: separating four marks by 3 to one each would need a
+    -- range of 27 to one, which no palette has, and forcing it drives absent —
+    -- the mark most of a played surface is in — to whichever extreme is left.
+    -- This bar is what the range can afford once the one above is paid for, and
+    -- it does not stand alone: these two are the pair a reader without hue has
+    -- least to go on with, so the non-colour indication the contract below
+    -- requires is doing the rest of the work here rather than merely confirming
+    -- it. Whoever tunes a palette should satisfy the high-contrast palettes
+    -- first, because pushing a mark further from the page for contrast's sake
+    -- spends the same lightness range this separation is paid from.
+    minimum_mark_separation: Decimal = 2.0
+}
+
+------------------------------------------------------------
+-- Contracts
+------------------------------------------------------------
+
+-- Every surface made of marked cells fulfils this, whether the cells are read or
+-- pressed, which is why it is stated once here rather than on each of them.
+contract Marking {
+    @invariant AMarkIsNeverOnlyAColour
+        -- Every mark carries a non-colour indication that distinguishes it from
+        -- every other mark on the surface, and not merely from the page: exact
+        -- the fullest, present a lesser one that differs from it at a glance,
+        -- absent none at all, with the absence read together with its dimmed
+        -- contents. This asks more than appearance.allium's clause about colour
+        -- alone, which asks a state to be distinguishable at all; marks that sit
+        -- side by side have to be distinguishable from each other, which is a
+        -- bar no standard sets and no automated check can see.
+
+    @invariant EveryMarkIsNamedInWords
+        -- Every marked cell carries the game's own sentence for its mark, so
+        -- what the shape says to the eye is said to a reader in words. A mark
+        -- the game supplied no words for is not a mark the platform will draw.
+        --
+        -- A sentence of nothing but spaces is no words. It reaches a reader as
+        -- silence exactly as the empty one does, and the two arrive by the same
+        -- accidents — an interpolation that found nothing, a translation key
+        -- with no entry, a join over an empty list — so the platform declines
+        -- them alike. is_told_in_words above cannot say this, which is why it is
+        -- said here: a cell is told in words when its sentence has a word in
+        -- it, and drawing the mark is what the platform does only then.
+
+    @invariant AnUnmarkedCellStandsOffAMarkedOne
+        -- A cell nothing is known about hugs the page: the page's own ground, a
+        -- drawn boundary, the page's ink. A marked cell answers in the way its
+        -- mark affords, at least config.minimum_state_separation off the ground
+        -- the unmarked cell hugs; and absent, which has no hue and no indication
+        -- to speak for it, holds its contents at least that far from the
+        -- unmarked contents. Every figure holds by lightness and not by hue
+        -- alone, because the distinction a reader consults to know what is still
+        -- open must survive a screen dimmed far enough to take the hues with it.
+
+    @invariant AbsentStandsOffExact
+        -- Absent stands off exact by at least config.minimum_mark_separation,
+        -- carried by the boundary each of the two draws. The pair is the
+        -- platform's to name because it is fixed by the marks rather than by any
+        -- game's meanings: absent is the one mark with no hue and exact the
+        -- strongest that has one. A distance, not a direction — which of the two
+        -- is the lighter is the theme's to decide.
+}
+
+------------------------------------------------------------
+-- Surfaces
+------------------------------------------------------------
+
+-- Cells that are read.
+surface PlaySurface {
+    exposes:
+        cell.mark
+        cell.description
+        cell.is_marked
+        cell.is_told_in_words
+
+    contracts:
+        fulfils Marking
+
+    @guarantee ACellReadsAsOneThing
+        -- A cell reaches assistive technology as a single named thing carrying
+        -- its contents and its mark together, rather than as a character with a
+        -- decoration announced beside it. Its indication is not separately
+        -- announced, and a cell with nothing in it is still named.
+
+    @guarantee TheArrangementIsTheGamesAndTheCellIsThePlatforms
+        -- This module owns one cell and nothing about where cells sit. A grid, a
+        -- row, a rack and a ladder are arrangements a game chooses, and each of
+        -- them owes what is stated here of every cell it contains.
+}
+
+-- Cells that are pressed.
+surface EntryKeyboard {
+    exposes:
+        cell.mark
+        cell.description
+
+    contracts:
+        fulfils Marking
+
+    @guarantee EveryKeyIsAControl
+        -- Each key is a real control with an accessible name. A key showing a
+        -- glyph and no words says its action in words instead, and a key
+        -- carrying a mark says the mark with it.
+        --
+        -- The name comes from whichever of the layout's own fields has a word
+        -- in it, and a field holding nothing but spaces has none. A blank is
+        -- the shape a rack's blank tile takes, and a phrase game's space bar
+        -- after it, so reading one as a name is how a key arrives with no name
+        -- at all — the same test Marking applies to a mark's sentence, applied
+        -- to a key's fields.
+        --
+        -- One case this guarantee does not reach, stated rather than left for
+        -- an empty name to be discovered in. Where the layout supplies no words
+        -- anywhere, the platform draws the key and leaves it unnamed: it will
+        -- not invent a word for a key, and dropping the key instead would
+        -- change what the row is, which is a worse answer than a control whose
+        -- own author can see it is missing its word.
+
+    @guarantee TheKeyboardIsCompleteOnItsOwn
+        -- Every operation the surface offers through a bare key it has claimed
+        -- from the physical keyboard is offered here as well, so the claim can
+        -- always be dropped without taking anything away.
+
+    @guarantee ALayoutIsSuppliedRatherThanFixed
+        -- The arrangement of keys — how many rows, which cells sit in each, and
+        -- which of them end a turn rather than build one — is supplied by
+        -- whoever mounts the keyboard, and this module names no key. What holds
+        -- whatever the layout is: every key is reachable by keyboard and by
+        -- finger, the keys that end a turn are identifiable as such so the row
+        -- rule knows which of them may be wider, and a layout with no keys is
+        -- not a keyboard.
+}
+
+-- The explanation of what the marks mean.
+surface Primer {
+    exposes:
+        cell.mark
+        cell.description
+
+    contracts:
+        fulfils Marking
+
+    @guarantee TheMarksAreShownInTheirOwnInk
+        -- The example beside each sentence is the surface's own cell, wearing
+        -- the mark it is explaining, in every theme and both palettes — not a
+        -- picture of one. An explanation drawn separately is one that can come
+        -- to disagree with the surface it describes. The examples are hidden
+        -- from assistive technology, because the sentences beside them are the
+        -- content and the cell's own name read out first would be noise.
+
+    @guarantee TheExplanationIsReachableAgain
+        -- However a reader first meets the explanation, it is reachable again
+        -- afterwards rather than shown once and lost. Where it is reached as a
+        -- dialog it owes everything operation.allium's Dialog states.
+
+    @guarantee TheWordsAreTheGamesAndTheFrameIsThePlatforms
+        -- The platform supplies the shape — a sentence per mark, each beside its
+        -- own cell — and never a sentence. The words are the game's and are the
+        -- same words wherever the explanation appears, so a reader who saw it on
+        -- arrival and opens it again reads what they read before.
+}
+
+------------------------------------------------------------
+-- Open Questions
+------------------------------------------------------------
+
+-- Three marks and unmarked is what the palette can afford: the separations above
+-- spend most of the lightness range, and the reasoning for the second figure
+-- says plainly that four marks three to one apart would need a range of 27 to
+-- one. So a game whose play needs a fourth mark cannot simply be given one. What
+-- it may do instead — collapse two of its states onto one mark, carry the fourth
+-- on shape alone with no separation promised, or force a wider range at some
+-- other cost — has not been decided, and the first game to need one should not
+-- decide it by shipping.
+open question "A fourth mark - what does the platform owe a game whose play needs more marks than the three stated here?"
+
+-- Until now a game chose its own separations, so this could not arise. The
+-- platform states them now, and a game that finds one of these figures wrong for
+-- what it renders has nowhere to say so: there is no sanctioned form for "the
+-- platform's figure, except here", and no gate would notice one being taken. The
+-- same question is open about a token in docs/project/what-the-hub-owns.md, and
+-- the two should be answered together or not at all.
+open question "Forking a figure - may a game state a separation of its own in place of one stated here, and how would it say so?"

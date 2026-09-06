@@ -24,8 +24,10 @@ but only for a consumer that takes the bump, so
 means before you make one.
 
 The hub's route and the platform components spend most of the semantic vocabulary between
-them. The result and key groups, which only a game's play surface spends, are carried whole
-rather than pruned. That is deliberate: this file is the system, and a hub copy missing half
+them, and `Tile` and `Key` spend the result and key groups since
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md). Those two groups
+were carried whole rather than pruned before anything here rendered them, and that
+was deliberate: this file is the system, and a hub copy missing half
 of it would leave a game's copy as the superset, which is exactly the arrangement
 [decision 0001](../decisions/0001-biscuit-games-is-the-source-of-truth.md) exists to
 prevent.
@@ -38,18 +40,20 @@ pair the palette declares against the two floors `appearance.allium` states —
 `minimum_text_contrast = 4.5` and `minimum_boundary_contrast = 3.0`, mirrored in
 `src/lib/config.ts`. That is `EveryCombinationMeetsTheLegibilityFloor` run rather than
 read, in every combination and not the one a change was looked at in. The test came from
-Poodl by [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), minus the
-block that measured Poodl's own state separations, which `appearance.allium` assigns to the
-game; [Testing](../reference/testing.md) says what it holds.
+Poodl by [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md), and the block
+that measures the state separations followed it under
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md), once
+`play-surfaces.allium` stated the two figures it needs;
+[Testing](../reference/testing.md) says what it holds.
 
 Most of the figures quoted in the file's comments — 4.89 and 5.20 for the absent letter on
 the scored ground, 6.93 for the warm pair, 17.04 for the focus ring — are what that test
 measures, written beside the tokens so the reasoning can be read without running it. There
 the test is the evidence and the comment is the provenance: when a value moves, the test
-fails before the comment is wrong. The two exceptions are 3.69 and 3.28, the distances
-`--n-65` and `--n-75` hold from the untried letter beside them. Those are separations
-between two of a game's states, so this test does not measure them and Poodl's does; they
-stay inherited claims here, and the raw-palette section below says what pins them.
+fails before the comment is wrong. That now includes 3.69 and 3.28, the distances `--n-65`
+and `--n-75` hold from the unmarked glyph beside them: they are separations between two of
+the platform's own marks since decision 0015, so this test measures them here rather than
+leaving them as inherited claims, and the raw-palette section below says what pins them.
 
 Two consequences follow, and neither is optional.
 
@@ -149,10 +153,12 @@ What a component names. Each row lists tokens that move together between palette
 | Brand | `--brand-warm`, `--brand-warm-ink` | The rationed warm pair, pinned once |
 | Scrim | `--scrim` | The dialog backdrop, `rgba(0, 0, 0, 0.72)` |
 
-The result and key groups are the game surface's. Nothing in the hub renders a mark or a
-key, and that is not a reason to delete them: the palette is decided here, so
-`tests/contrast.test.ts` measures them here, and `--key-untried-rule` is the boundary of two
-platform controls — `Button`'s secondary and `HeaderBar`'s chip. `--key-untried-bg` and
+The result and key groups are the play surface's, and the hub renders one since
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md): `Tile` and `Key`
+spend every token in both groups, and `tests/contrast.test.ts` measures them against the
+floors and against each other. That the palette was decided here while the markup lived in a
+game is the inversion 0016 exists to end. `--key-untried-rule` is also the boundary of two
+chrome controls — `Button`'s secondary and `HeaderBar`'s chip. `--key-untried-bg` and
 `--key-scored-bg` are derived once on bare `:root` from `--background` and
 `--surface-raised`, so they follow the theme through the tokens they name rather than
 being restated per palette.

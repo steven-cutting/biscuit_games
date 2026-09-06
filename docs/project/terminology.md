@@ -23,7 +23,7 @@ behaviour.
 | Hub | The static site this repository builds: one route that says what Biscuit Games is and links out to each game. It is the front door, and the site itself is published nowhere. |
 | Shared surface | Material this repository is authoritative for on every game's behalf — a token, a shared component, a specification surface, a decision record. Changing one changes every game, which is why what counts is enumerated in [What the hub owns](what-the-hub-owns.md) rather than assumed. Narrower than it sounds: the Allium `surface` below is one boundary in one module. |
 | Token | A named value in `src/app.css`: a colour, a space, a type step, a duration, a font face. Components name tokens. They do not write the values. |
-| Primitive | A shared component with no game in it. Eight exist here; the rest are ported one at a time, and a platform-shaped one is ported ahead of its second consumer — see [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md). |
+| Primitive | A shared component with no game in it. Thirteen exist here — eight of chrome, and five of the play surface since [decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md); the rest are ported one at a time, and a platform-shaped one is ported ahead of its second consumer. |
 | Consumer | Whatever takes a shared surface and uses it — a game repository, the hub's own route, a story, a test. A shape only one game could ever render is not shared material, however many consumers it has. |
 | Break | The single deliberate warm exception the operating rule allows: perfect, broken once, on purpose, and the break is always Biscuit. A decision with none is cold; a decision with two is noise. See [Design direction](../design/direction.md). |
 
@@ -31,7 +31,8 @@ behaviour.
 
 | Term | Meaning |
 | --- | --- |
-| Specification | An `.allium` file under `docs/specs/`. Decides behaviour. There is exactly one today, `appearance.allium`, and it decides how everything here looks. |
+| Specification | An `.allium` file under `docs/specs/`. Decides behaviour. Three today: `appearance.allium` decides how a surface looks, `operation.allium` how it is worked, and `play-surfaces.allium` what a surface played on owes. |
+| Mark | What a play surface has made of one cell: `exact`, `present`, `absent`, or `unmarked` for a cell nothing is known about yet. The platform names the four and paints them; a game says what each one is claiming, and supplies the sentence a reader hears. `play-surfaces.allium` decides them. |
 | Surface | A boundary in a specification: what is exposed, what operations are provided, and what is guaranteed. |
 | Guarantee | A named prose assertion on a surface. Acceptance criteria, not aspiration. |
 | Port | The interface a side effect sits behind, with a real adapter and an in-memory fake beside it. `src/lib/ports/preferences.ts` is the first: the device's preferences, read through `matchMedia`. |

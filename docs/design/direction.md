@@ -245,8 +245,9 @@ records how. The second also changes the lightness scheme
 `src/app.css` documents at length — a key nothing is known about hugs the page, a scored key
 steps away from it. That scheme is what telling an untried key from a scored one costs, and
 it survives a dimmed screen that takes the hues with it. The guarantee naming that
-distinction belongs to the game that owns the board; `appearance.allium` states only the
-floors every surface owes. Neither change is made without the specification and
+distinction is `play-surfaces.allium`'s `AnUnmarkedCellStandsOffAMarkedOne`, stated here
+since [decision 0015](../decisions/0015-operation-and-play-are-specified-here.md), and
+`appearance.allium` still states only the floors every surface owes the page. Neither change is made without the specification and
 accessibility work that [Testing](../reference/testing.md) and
 [Accessibility](../explanation/accessibility.md) describe.
 

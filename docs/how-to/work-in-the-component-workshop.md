@@ -54,9 +54,10 @@ installs the system libraries Chromium links against.
 
 ## Where stories live
 
-Stories live in `stories/` at the repository root, one file per component, plus
-`stories/fixtures.ts` for the two figures the plays measure against. The layout rule and
-what the story run proves are in [Testing](../reference/testing.md).
+Stories live in `stories/` at the repository root, one file per component. The figures a
+play measures against come from `src/lib/config.ts`, which mirrors the specification that
+states them. The layout rule and what the story run proves are in
+[Testing](../reference/testing.md).
 
 `stories/Foundations.stories.svelte` is the one exception to one-file-per-component, and it
 is recorded here as one: it documents the palette, the type ramp, the spacing scale and the
@@ -111,9 +112,11 @@ Four rules on top of the format:
 1. **Name the states the surface names.** Where a surface governs the component, a story
    set is a reading of the specification, so cover the states `docs/specs/` says the
    surface has, and say which surface and which `@guarantee` clauses it stands for. Cite
-   them by name; the words live in one place. `appearance.allium` is the only module here,
-   so most components will cite it for their theme and contrast states and for nothing
-   else. Where nothing governs — `Wordmark` is brand rather than behaviour — say so in the
+   them by name; the words live in one place. Three modules are here, so a component cites
+   the one that governs it: `appearance.allium` for theme and contrast states,
+   `operation.allium` where a story proves a control's size or its keyboard reach, and
+   `play-surfaces.allium` where a story proves a mark reads without its hue. Most chrome
+   still cites the first and nothing else. Where nothing governs — `Wordmark` is brand rather than behaviour — say so in the
    story's description and name the authority it does answer to, which is
    [Design direction](../design/direction.md). The shells govern nothing of their own
    either: `Modal`, `Notice` and `Announcer` each say which kind of product guarantee they
