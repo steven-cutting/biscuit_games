@@ -116,6 +116,16 @@ producer is the shape they land on, and the generalisation was reachable in pros
 with more controls in it than the figure divides into the narrowest width. Worth trying once
 the binary is in hand and the shape can be measured.
 
+> Amended on 2026-09-06, answering the review on pull request 4. That arithmetic was wrong,
+> and the section below headed *What would reopen this* had already named the shape that
+> would find it. Counting controls against the narrowest width ignores the gaps between them:
+> seven keys at 44px fit inside 320 and the six gaps do not, so the seven-tile rack this
+> repository's own story renders was a row the exemption refused and the figure could not
+> reach — 36.8px across, measured in Chromium, with no gate looking. The clause now earns the
+> exemption from the room the row is actually given, gaps counted with the controls, and
+> `stories/Keyboard.stories.svelte` asserts row by row which rows are exempt rather than
+> leaving it to be inferred from what was never measured.
+
 ## Consequences
 
 `src/lib/config.ts` stops mirroring one module and starts mirroring three, gaining
@@ -158,7 +168,7 @@ copies still state the same guarantee names and the same texts.
 
 One open question is inherited rather than settled. Poodl's `EveryControlIsAComfortableTarget`
 grants its exemption on a ten-across row; the generalised clause earns it by arithmetic
-instead — a row with more controls than the figure divides into the narrowest width — but
+instead — the figure and the gaps together asking for more room than the row is given — but
 what a nine- or thirteen-across row is owed beyond that is not claimed.
 
 ## What would reopen this

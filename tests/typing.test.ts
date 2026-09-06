@@ -45,6 +45,21 @@ describe('claimKey', () => {
     expect(claimKey(press('Backspace'), WIRING)).toBe('delete');
   });
 
+  /*
+   * And claims nothing off the prototype every plain object carries. `actions`
+   * is a record a game writes, so a bare index answers for `constructor`,
+   * `toString` and the rest whether the game wrote them or not — and the answer
+   * is a function, which `??` does not refuse and which the declared
+   * `string | null` says cannot come back. A surface whose alphabet names one of
+   * those words is not exotic: a word game reaches `constructor` by spelling it.
+   */
+  it.each(['constructor', 'toString', 'valueOf', 'hasOwnProperty'])(
+    'reads no action off %s, which the surface never bound',
+    (key) => {
+      expect(claimKey(press(key), WIRING)).toBeNull();
+    }
+  );
+
   // `AModifiedKeyIsNeverClaimed`.
   it.each(['ctrl', 'meta', 'alt'])('leaves the browser its own shortcuts (%s)', () => {
     expect(claimKey(press('a', { modified: true }), WIRING)).toBeNull();

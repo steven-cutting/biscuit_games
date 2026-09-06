@@ -488,6 +488,59 @@ surface. Deleting it in favour of the packaged module is not possible, for the r
 The package makes the two comparable, not merged. Anyone who reads this section as permission
 to delete one of them has read it backwards.
 
+## What the third round of that review added
+
+Four more, and again none of them is a new promise. Two are lookups that could hand a caller
+something its own type said could not arrive, one is a name a reader would never hear, and one
+is a rule the stylesheet stated for three controls and the specification stated for all of
+them.
+
+**`src/app.css`'s touch-target floor reaches every native control it can name.** It was
+`button, input[type='text'], textarea`, and `EveryControlIsAComfortableTarget` says every
+control that is not in one of its two exempt shapes meets the figure outright — so a
+`<select>`, a `<summary>`, and every input that is not a text one stood at whatever height the
+user agent chose while the invariant said they did not. The rule is now
+`button, select, summary, input:not([type='checkbox']):not([type='radio']):not([type='hidden']), textarea`,
+written as an exclusion on the input half so a type nobody has heard of yet is still a control.
+**What this costs Poodl is a rendered change wherever it draws one of the newly-named shapes**:
+a `<select>` in a settings row, a `<summary>` on a "how to play" disclosure, a number or a date
+input. Each grows to 44px if it was shorter, and none moves if it was already taller. Poodl's
+copy of the stylesheet carries the three-selector rule until it takes the package. The two
+excluded input types are excluded deliberately and must stay so: the invariant grants a
+checkbox and a radio the label that contains them, and a floor on the native box would size the
+thing the finger is not aimed at.
+
+**And one shape the invariant now hands back in as many words.** A control a surface builds out
+of a generic element — a `[role='button']`, a `[tabindex]` — is the surface's own to size, for
+the reason a `for`-bound label is: no shared rule can tell it from ordinary content. If Poodl
+draws a control that way, the package gives it nothing here.
+
+**The dense-row exemption is arithmetic over the room the row is given, not a count of the
+controls in it.** The clause said "more of them in it than that figure divides into
+`config.narrowest_supported_width`", which ignores the gaps between them: seven keys at 44px fit
+inside 320 and the six gaps do not, so a seven-tile rack was a row the exemption refused and the
+figure could not reach — 36.8px across in Chromium, with nothing measuring it. Poodl's
+`game.allium` states the ten-across version of this clause and its own keyboard is ten across,
+so **nothing Poodl renders changes**; what changes is the text, and the two copies now say
+different things until Poodl takes this one. That is the same shape as every other item in
+[what Poodl drops](#what-poodl-drops): a clause a check in Poodl's gate would have to compare.
+
+**Two lookups read the prototype every plain object carries.** `claimKey` indexed
+`bindings.actions` by the pressed key's own name and `Keyboard` indexed `marks` by the key's
+value, so `constructor`, `toString` and `valueOf` each came back as a built-in function:
+`claimKey` returned one to a caller its signature promises `string | null`, and `Keyboard`
+handed one to `drawnMark`, which threw reading `description` off it and took the whole keyboard
+down. A word game reaches those names by spelling them. Both now ask `Object.hasOwn` first.
+**Poodl's copy of the claiming guard carries the first defect**, and any surface of its own that
+keys marks by a game-supplied value carries the second.
+
+**A key is named from the first of its fields that has a word in it.** `label ?? content ??
+value` is a nullish chain and a blank is not nullish, so a rack's blank tile —
+`{ value: 'blank', content: ' ' }` — drew a button whose accessible name was empty, which is
+exactly what `EveryKeyIsAControl` exists to refuse. `keyName` in
+`src/lib/components/layouts.ts` decides it, the way `drawnMark` decides whether a mark has
+words. Poodl's own keys all carry words, so nothing it renders changes.
+
 ## What a cross-repository link costs
 
 Once a reference crosses a repository boundary it stops being a path and becomes an

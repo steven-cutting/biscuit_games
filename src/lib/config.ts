@@ -32,9 +32,12 @@ export const MINIMUM_BOUNDARY_CONTRAST = 3.0;
  *
  * Across a control, in both directions, for
  * `DirectManipulation.@invariant EveryControlIsAComfortableTarget`. A row of
- * many like controls sharing the full width is the one place this cannot be met
- * in both, which is why that invariant says what happens instead rather than
- * stating a size alone.
+ * like controls sharing the full width is the one place this cannot be met in
+ * both, which is why that invariant says what happens instead rather than
+ * stating a size alone. Which rows those are is arithmetic over the room the row
+ * is given rather than a count of the controls in it: the gaps between them are
+ * counted with them, and leaving the gaps out is what once left a seven-tile
+ * rack unexempted and 37px across at the same time.
  */
 export const MINIMUM_TOUCH_TARGET = 44;
 

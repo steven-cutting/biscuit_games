@@ -639,13 +639,37 @@ textarea {
  * 37px button. It takes only part of the first rule above, and for the opposite
  * reason — text a reader copies by hand has to stay selectable.
  *
+ * "Every other control" is every other control this stylesheet can name, and the
+ * list used to name three. A `<select>` is a control `Modal.svelte`'s own
+ * focusable list already recognises, a `<summary>` is one the browser activates
+ * exactly as it activates a button, and an `<input>` is not only `type='text'` —
+ * a number, a date, a search box and a submit drawn as an input are each a
+ * control a game will put on a page, and each stood at whatever height the user
+ * agent chose while the invariant said outright that it did not. So the input
+ * half is written as an exclusion rather than a list: a type this stylesheet has
+ * never heard of is still a control, and a list is a rule that goes out of date
+ * every time the platform adds one.
+ *
+ * Three shapes are excluded, each for a stated reason. A checkbox and a radio
+ * are granted the label that contains them instead — a floor on the native box
+ * would size the thing the finger is not aimed at — and the rule below this one
+ * is where they meet the figure. A hidden input is not a control at all.
+ *
  * A link is deliberately absent, and that is the invariant's second exemption
  * rather than an omission: a link inside a sentence takes its size from the text
  * around it, so a floor here would break the line it sits in. The hub's own route
  * has one, in the list of games.
+ *
+ * A control a surface builds out of a generic element — a `[role='button']`, a
+ * `[tabindex]` — is absent for the reason a `for`-bound label is: this stylesheet
+ * cannot see that it is a control. The invariant says so outright and hands it to
+ * the surface that wrote it, rather than leaving the shape to fall through with
+ * nothing saying whose it was.
  */
 button,
-input[type='text'],
+select,
+summary,
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
 textarea {
   min-block-size: 44px;
 }

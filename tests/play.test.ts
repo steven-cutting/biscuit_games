@@ -230,6 +230,23 @@ describe('Keyboard', () => {
   });
 
   /*
+   * And keyed by the values the game actually marked. `marks` is a plain object
+   * a game builds, so a bare index also answers for everything
+   * `Object.prototype` carries: a key valued `constructor` found a built-in
+   * function under it, `drawnMark` read `description` off the function and the
+   * whole keyboard threw. A game names its own key values, and nothing stops one
+   * of them being a word JavaScript has already used.
+   */
+  it.each(['constructor', 'toString', 'valueOf', 'hasOwnProperty'])(
+    'reads no mark off %s, which the game never marked',
+    (value) => {
+      render(Keyboard, { layout: [[{ value, content: 'X', label: 'Wild' }]], marks: {} });
+
+      expect(screen.getByRole('button', { name: 'Wild' })).toBeInTheDocument();
+    }
+  );
+
+  /*
    * A key is never nameless. The label is what a key drawn as a glyph must
    * supply, and where a key draws its own words those words are already the
    * name — so the fallback runs content, then value, and a layout that says
@@ -242,6 +259,42 @@ describe('Keyboard', () => {
 
     expect(screen.getByRole('button', { name: 'Q' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'wild' })).toBeInTheDocument();
+  });
+
+  /*
+   * Nameless includes named with a blank. The fallback was a nullish chain, so a
+   * key whose content is a space — a rack's blank tile is the shape that
+   * occurs, and a phrase game's space bar is the other — selected the space and
+   * rendered a control whose accessible name was empty. Every one of the three
+   * fields takes an arbitrary string, so the chain has to skip a blank one
+   * rather than stop at it.
+   */
+  it('never names a key with a blank the layout happened to carry', () => {
+    render(Keyboard, {
+      layout: [
+        [
+          { value: 'blank', content: ' ' },
+          { value: 'space', content: ' ', label: '   ' }
+        ]
+      ]
+    });
+
+    expect(screen.getByRole('button', { name: 'blank' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'space' })).toBeInTheDocument();
+  });
+
+  /*
+   * And the end of the chain, which is a key the layout gave no words at all.
+   * The platform has nothing to name it with and will not invent one, so the key
+   * is drawn and left unnamed: dropping it would change how many keys the row
+   * has, which is a worse answer than a control the layout's own author can see
+   * is missing its word.
+   */
+  it('draws a key its layout named with nothing, and invents no name for it', () => {
+    render(Keyboard, { layout: [[{ value: ' ', content: ' ' }]] });
+
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: /\S/u })).not.toBeInTheDocument();
   });
 
   it('can be turned off as a whole', () => {

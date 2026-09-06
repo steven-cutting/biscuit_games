@@ -78,6 +78,14 @@ export function latinLetters(key: string): string | null {
  * than as an action — reached the open channel below and took the key from the
  * focused control, which is the same defect the guard exists to prevent
  * arriving by the other door.
+ *
+ * The action is read as an own entry rather than by a bare index. `actions` is a
+ * plain object a game writes, so an index answers for everything
+ * `Object.prototype` carries as well: `constructor`, `toString`, `valueOf` and
+ * the rest each came back as a function, `??` had nothing to refuse, and the
+ * caller was handed something the declared `string | null` says cannot arrive.
+ * A word game reaches those keys by spelling them, so this is a press a real
+ * surface takes rather than one only a test could make.
  */
 export function claimKey(press: KeyPress, bindings: KeyBindings): string | null {
   if (press.modified || press.inTextEntry) {
@@ -88,5 +96,9 @@ export function claimKey(press: KeyPress, bindings: KeyBindings): string | null 
     return null;
   }
 
-  return bindings.actions[press.key] ?? bindings.content(press.key);
+  const bound = Object.hasOwn(bindings.actions, press.key)
+    ? bindings.actions[press.key]
+    : undefined;
+
+  return bound ?? bindings.content(press.key);
 }

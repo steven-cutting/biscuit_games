@@ -1,6 +1,6 @@
 <script lang="ts">
   import Key from './Key.svelte';
-  import { QWERTY } from './layouts.js';
+  import { keyName, QWERTY } from './layouts.js';
   import type { KeyboardLayout } from './layouts.js';
   import type { Mark } from '../domain/types.js';
 
@@ -48,6 +48,18 @@
    * find nothing inside is worse than no group at all.
    */
   const anyKeys = $derived(layout.some((row) => row.length > 0));
+
+  /*
+   * Own entries only. `marks` is a plain object a game builds, so a bare index
+   * also answers for everything `Object.prototype` carries — a key valued
+   * `constructor` or `toString` found a built-in function under it, `?? null`
+   * had nothing to refuse, and `drawnMark` threw reading `description` off a
+   * function. A game names its own key values, and nothing stops one of them
+   * being a word JavaScript has already used.
+   */
+  function markFor(value: string): Mark | null {
+    return Object.hasOwn(marks, value) ? (marks[value] ?? null) : null;
+  }
 </script>
 
 {#if anyKeys}
@@ -56,10 +68,10 @@
       <div class="row">
         {#each row as key (key.value)}
           <Key
-            label={key.label ?? key.content ?? key.value}
+            label={keyName(key)}
             content={key.content ?? key.value}
             icon={key.icon}
-            mark={marks[key.value] ?? null}
+            mark={markFor(key.value)}
             action={key.kind === 'action'}
             {disabled}
             onpress={() => onpress?.(key.value)}

@@ -54,7 +54,10 @@
     '- `DirectManipulation.@invariant EveryControlIsAComfortableTarget`. **At the narrowest',
     '  supported width** is the evidence: the row meets the figure top to bottom, divides its',
     '  width equally among the keys that build a turn, keeps a gap between them, and does not',
-    '  scroll sideways. A key that ends a turn is wider and never narrower.',
+    '  scroll sideways. A key that ends a turn is wider and never narrower. Which rows the',
+    '  invariant exempts from the figure *across* is measured — the figure plus the gaps',
+    '  against the room the row is given — and each width story asserts the answer, so a row',
+    '  that is not exempt is measured across rather than taken on trust.',
     '- `Operation.@guarantee FullyKeyboardOperable`. Every key is a tab stop and both activation',
     '  keys work, which the two interaction stories hold.',
     '',
@@ -114,13 +117,46 @@
     return frame;
   }
 
-  async function divides(canvasElement: HTMLElement, layout: KeyboardLayout): Promise<void> {
+  /** The space between each neighbouring pair, left to right. */
+  function gapsOf(row: MeasuredKey[]): number[] {
+    const gaps: number[] = [];
+
+    for (let index = 1; index < row.length; index += 1) {
+      const left = row[index];
+      const before = row[index - 1];
+
+      if (left === undefined || before === undefined) {
+        throw new Error('A measured row lost a key between reads');
+      }
+      gaps.push(left.box.left - before.box.right);
+    }
+    return gaps;
+  }
+
+  /*
+   * Measures the row against `EveryControlIsAComfortableTarget` and reports,
+   * row by row, which ones the invariant exempts from the figure across.
+   *
+   * The exemption is measured rather than counted, because counting is what was
+   * wrong: seven keys at 44px fit inside a 320px screen and the six gaps between
+   * them do not, so a rack's row was left unexempted and unmeasurable at once.
+   * The room is what the row is actually given — a keyboard inside a page's
+   * gutters has less than the viewport — and the gaps are counted with the keys.
+   */
+  async function divides(canvasElement: HTMLElement, layout: KeyboardLayout): Promise<boolean[]> {
     const frame = frameOf(canvasElement);
 
     await expect(frame.scrollWidth).toBeLessThanOrEqual(frame.clientWidth);
 
+    const room = within(canvasElement).getByRole('group').getBoundingClientRect().width;
+    const exempt: boolean[] = [];
+
     for (const row of keyRows(canvasElement, layout)) {
       const builders = row.filter((key) => !key.action).map((key) => key.box.width);
+      const gaps = gapsOf(row);
+      const needed = row.length * MINIMUM_TOUCH_TARGET + gaps.reduce((all, one) => all + one, 0);
+
+      exempt.push(needed > room);
 
       /*
        * "Divides its width equally among the controls that build a turn" says
@@ -136,6 +172,13 @@
       for (const key of row) {
         await expect(key.box.height).toBeGreaterThanOrEqual(MINIMUM_TOUCH_TARGET);
 
+        // And across, for every row the invariant does not exempt. This is the
+        // half the story used to take on trust: a row that asks for less than it
+        // is given has no licence to be narrow.
+        if (needed <= room) {
+          await expect(key.box.width).toBeGreaterThanOrEqual(MINIMUM_TOUCH_TARGET);
+        }
+
         // Wider, never narrower: a key that ends a turn is the last place to
         // save width, so it is measured against the narrowest key beside it
         // that builds one.
@@ -144,18 +187,14 @@
         }
       }
 
-      for (let index = 1; index < row.length; index += 1) {
-        const left = row[index];
-        const before = row[index - 1];
-
-        if (left === undefined || before === undefined) {
-          throw new Error('A measured row lost a key between reads');
-        }
-        // A gap between every pair, which is the half of the clause an equal
-        // division alone would not give.
-        await expect(left.box.left).toBeGreaterThan(before.box.right);
+      // A gap between every pair, which is the half of the clause an equal
+      // division alone would not give.
+      for (const gap of gaps) {
+        await expect(gap).toBeGreaterThan(0);
       }
     }
+
+    return exempt;
   }
 
   const { Story } = defineMeta({
@@ -231,7 +270,9 @@
 <Story
   name="At the narrowest supported width"
   play={async ({ canvasElement }) => {
-    await divides(canvasElement, QWERTY);
+    // All three rows are the shape the invariant exempts, and the assertion says
+    // so rather than leaving it to be inferred from what was not measured.
+    await expect(await divides(canvasElement, QWERTY)).toEqual([true, true, true]);
   }}
 >
   {#snippet template(args)}
@@ -244,12 +285,17 @@
   {/snippet}
 </Story>
 
-<!-- The same rule over a layout the component has never seen. -->
+<!--
+  The same rule over a layout the component has never seen, and the row that
+  showed the exemption could not be a count. Seven tiles at 44px fit inside 320
+  and the six gaps between them do not, so this row is exempt and the three-key
+  action row below it is not — which is the pair the counting rule got wrong.
+-->
 <Story
   name="A rack at the narrowest supported width"
   args={{ layout: RACK, label: 'Your rack' }}
   play={async ({ canvasElement }) => {
-    await divides(canvasElement, RACK);
+    await expect(await divides(canvasElement, RACK)).toEqual([true, false]);
   }}
 >
   {#snippet template(args)}
@@ -262,17 +308,15 @@
   {/snippet}
 </Story>
 
-<!-- At the width a page shell gives it, where every key meets the figure both ways. -->
+<!--
+  At the width a page shell gives it, where no row is exempt and every key meets
+  the figure both ways. `divides` asserts the width itself for a row it does not
+  exempt, so what this story adds is that none of the three is exempt here.
+-->
 <Story
   name="At the width the page gives it"
   play={async ({ canvasElement }) => {
-    await divides(canvasElement, QWERTY);
-
-    for (const row of keyRows(canvasElement, QWERTY)) {
-      for (const key of row) {
-        await expect(key.box.width).toBeGreaterThanOrEqual(MINIMUM_TOUCH_TARGET);
-      }
-    }
+    await expect(await divides(canvasElement, QWERTY)).toEqual([false, false, false]);
   }}
 >
   {#snippet template(args)}

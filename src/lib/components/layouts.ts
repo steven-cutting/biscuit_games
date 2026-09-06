@@ -16,9 +16,10 @@ export interface KeyDefinition {
   /** What the key shows. Defaults to `value`. */
   content?: string;
   /**
-   * The accessible name, before any mark's words. Defaults to `content`, then to
-   * `value`, so a key is never nameless — but a key drawn as a glyph has nothing
-   * worth falling back to and should say its own word here.
+   * The accessible name, before any mark's words. Defaults to the first of
+   * `content` and `value` that has a word in it, so a key is never nameless —
+   * but a key drawn as a glyph has nothing worth falling back to and should say
+   * its own word here. `keyName` below is where the fallback is decided.
    */
   label?: string;
   /** Drawn instead of `content`, for a key whose meaning is a glyph. */
@@ -35,6 +36,37 @@ export interface KeyDefinition {
 
 export type KeyboardRow = readonly KeyDefinition[];
 export type KeyboardLayout = readonly KeyboardRow[];
+
+/**
+ * What a key is called, from whichever of its fields has a word in it.
+ *
+ * `play-surfaces.allium`'s `EveryKeyIsAControl` asks that a key report its name,
+ * and `label ?? content ?? value` did not hold it: a nullish chain stops at a
+ * value that is present, and a blank is present. A rack's blank tile is
+ * `{ value: 'blank', content: ' ' }` and a phrase game's space bar is the same
+ * shape, so the chain selected the space and drew a button with an empty
+ * accessible name — the one failure that clause exists to name. Every one of the
+ * three fields takes an arbitrary string and no type TypeScript has refuses a
+ * blank one, so the rule is where it is refused, the way `drawnMark` refuses a
+ * mark with no words.
+ *
+ * A layout that gives all three nothing gets `value` back and is left unnamed.
+ * The platform will not invent a word for a key, and dropping the key instead
+ * would change how many keys the row has — a worse answer than a control whose
+ * own author can see it is missing its word.
+ *
+ * Not exported from the package: what the platform calls a key is the platform's
+ * to decide, as the icon map and the marker bar are.
+ */
+export function keyName(key: KeyDefinition): string {
+  for (const candidate of [key.label, key.content, key.value]) {
+    if (candidate !== undefined && candidate.trim() !== '') {
+      return candidate;
+    }
+  }
+
+  return key.value;
+}
 
 /*
  * Written out rather than spread from a string. Splitting a string into

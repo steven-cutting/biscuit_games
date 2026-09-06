@@ -306,6 +306,46 @@ could not say what the code had to do:
   Written down because `drawnMark` trims, and a threshold decided in code rather than in the
   specification is the thing invariant 1 exists to stop — including when the code is right.
 
+Four more the same reviewers found in the round after that, and again nothing is released, so
+no version moves and no consumer took any of them.
+
+- Two lookups no longer read the prototype every plain object carries. `claimKey` indexed
+  `bindings.actions` by the pressed key's own name and `Keyboard` indexed `marks` by the key's
+  value, so `constructor`, `toString` and `valueOf` each came back as a built-in function:
+  `claimKey` returned one to a caller its own signature promises `string | null`, and
+  `Keyboard` handed one to `drawnMark`, which threw reading `description` off a function and
+  took the whole keyboard down. A word game reaches those names by spelling them. Both ask
+  `Object.hasOwn` first now.
+- A key is named from the first of its fields that has a word in it. `label ?? content ??
+  value` is a nullish chain and a blank is not nullish, so a rack's blank tile —
+  `{ value: 'blank', content: ' ' }` — drew a control whose accessible name was empty, which is
+  what `EveryKeyIsAControl` exists to refuse. `keyName` in `src/lib/components/layouts.ts`
+  decides it, the way `drawnMark` decides whether a mark has words, and a layout that gives all
+  three fields nothing is left unnamed rather than given an invented word or dropped from its
+  row.
+- The 44px floor reaches every native control `src/app.css` can name. It was `button`, a text
+  input and a textarea, while `EveryControlIsAComfortableTarget` says every control outside its
+  two exempt shapes meets the figure outright — so a `<select>`, a `<summary>` and every input
+  that is not a text one stood at whatever height the user agent chose. The input half is
+  written as an exclusion rather than a list, so a type nobody has heard of yet is still a
+  control; the checkbox and the radio stay excluded because the invariant grants them the label
+  that contains them instead.
+
+And one clause reworded rather than repaired, because the specification was wrong:
+
+- `EveryControlIsAComfortableTarget` earns its dense-row exemption from the room the row is
+  actually given, with the gaps counted alongside the controls, rather than from a count of
+  controls against the narrowest supported width. Counting ignores the gaps: seven keys at 44px
+  fit inside 320 and the six gaps between them do not, so the seven-tile rack in
+  `stories/Keyboard.stories.svelte` was a row the exemption refused and the figure could not
+  reach — 36.8px across, measured in Chromium, with nothing looking. The same invariant also
+  says now that a control a surface builds out of a generic element is that surface's own to
+  size, for the reason a `for`-bound label is: no shared rule can tell it from ordinary
+  content. Each width story asserts row by row which rows the exemption reaches, so a row that
+  is not exempt is measured across rather than left unmeasured, and
+  [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md) carries a dated
+  amendment retracting the arithmetic it recorded.
+
 ### Deliberately not included
 
 - Any deployment. There is no Pages workflow, no `site-root/`, no staging script and no

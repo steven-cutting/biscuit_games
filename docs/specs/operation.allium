@@ -118,15 +118,24 @@ contract DirectManipulation {
     @invariant EveryControlIsAComfortableTarget
         -- Every control is at least config.minimum_touch_target across, in both
         -- directions. Two shapes cannot be. The first is a row of like controls
-        -- sharing the full width, with more of them in it than that figure
-        -- divides into config.narrowest_supported_width — counted before the
-        -- gaps between them, which only make it harder. There the row meets the
-        -- figure top to bottom, divides its width equally among the controls
-        -- that build a turn, and keeps a gap between them, so what such a
-        -- control gives up is bounded by the width of the screen and by nothing
-        -- else. A control in that row that ends a turn rather than builds one
-        -- may be wider than the others, and never narrower: those are the last
-        -- place to save width.
+        -- sharing the full width, where the figure and the gaps between them
+        -- together ask for more room than the row is given.
+        --
+        -- How many controls are in the row is not the test, and stating it as
+        -- one was wrong. Seven controls at that figure fit inside
+        -- config.narrowest_supported_width and the six gaps between them do
+        -- not, so a row this invariant declined to exempt could not meet the
+        -- figure either — a rack of seven tiles is the shape that found it. The
+        -- gaps are counted with the controls, and the room is what the row is
+        -- actually given rather than the whole viewport, because a row inside a
+        -- page's margins has less than the screen it is drawn on.
+        --
+        -- There the row meets the figure top to bottom, divides its width
+        -- equally among the controls that build a turn, and keeps a gap between
+        -- them, so what such a control gives up is bounded by the width of the
+        -- screen and by nothing else. A control in that row that ends a turn
+        -- rather than builds one may be wider than the others, and never
+        -- narrower: those are the last place to save width.
         --
         -- The second is a control inside a line of running text, a link in a
         -- sentence being the one that occurs: its size is set by the text around
@@ -148,6 +157,13 @@ contract DirectManipulation {
         -- surface that binds that way answers for the row itself. Stated rather
         -- than left out, because the shape is legal, common, and would otherwise
         -- fall through the figure with nothing saying whose it was.
+        --
+        -- A control a surface builds out of a generic element is the surface's
+        -- own to size for the same reason: an element the platform cannot tell
+        -- from ordinary content is one no shared rule can reach. What the
+        -- platform answers for is what it can name — every native control, and
+        -- the label that contains one — and it answers for all of those rather
+        -- than for the few a stylesheet happened to list.
         --
         -- All of this holds down to config.narrowest_supported_width, at which
         -- the surface is usable without scrolling sideways.

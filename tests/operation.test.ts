@@ -61,6 +61,12 @@ const CONTROLS = `
   <input type="radio" />
   <label for="dark">Dark</label>
   <input id="dark" type="checkbox" />
+  <select><option>Light</option></select>
+  <details><summary>How to play</summary><p>Guess a word.</p></details>
+  <input type="number" />
+  <input type="search" />
+  <input type="submit" value="Send" />
+  <input type="hidden" />
 `;
 
 let stylesheet: HTMLStyleElement;
@@ -231,6 +237,41 @@ describe('EveryControlIsAComfortableTarget', () => {
     expect(resolved('button', 'min-block-size')).toBe(floor);
     expect(resolved('input[type="text"]', 'min-block-size')).toBe(floor);
     expect(resolved('textarea', 'min-block-size')).toBe(floor);
+  });
+
+  /*
+   * "Every other control" is every other control the platform can name, and the
+   * rule named three of them. A `<select>` is a control `Modal`'s own focusable
+   * list already names and this rule did not, a `<summary>` is one the browser
+   * activates exactly as it activates a button, and an `<input>` is not only
+   * `type="text"` — a number, a search box and a submit drawn as an input are
+   * each a control a game will put on a page, and each one of them stood at
+   * whatever height the user agent chose. The guarantee was the specification's
+   * and the stylesheet was where it was not kept.
+   */
+  it.each([
+    ['a select', 'select'],
+    ['a disclosure summary', 'summary'],
+    ['a number input', 'input[type="number"]'],
+    ['a search input', 'input[type="search"]'],
+    ['a submit drawn as an input', 'input[type="submit"]']
+  ])('gives %s the figure too', (_what, selector) => {
+    expect(resolved(selector, 'min-block-size')).toBe(`${String(MINIMUM_TOUCH_TARGET)}px`);
+  });
+
+  /*
+   * And the shapes the rule leaves alone, each for a stated reason rather than
+   * because a selector happened to miss them. A floor on a native checkbox or
+   * radio would size the box the finger is not aimed at — the invariant grants
+   * those the label that contains them, which the test below measures — and a
+   * hidden input is not a control at all.
+   */
+  it.each([
+    ['a checkbox, whose row carries the figure instead', 'input[type="checkbox"]'],
+    ['a radio, for the same reason', 'input[type="radio"]'],
+    ['a hidden input, which is not a control at all', 'input[type="hidden"]']
+  ])('leaves the figure off %s', (_what, selector) => {
+    expect(resolved(selector, 'min-block-size')).not.toBe(`${String(MINIMUM_TOUCH_TARGET)}px`);
   });
 
   /*
