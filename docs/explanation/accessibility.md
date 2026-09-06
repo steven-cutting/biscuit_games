@@ -258,7 +258,13 @@ port's and the derivations'; `stories/` holds a file per component and the token
 
 **Query by accessible role and name.** A component test finds a control the way a screen
 reader does, so an assertion fails when a name is missing or wrong. Never by class, never by
-test id.
+test id, with one bounded exception: an element that is `aria-hidden` because the guarantee it
+discharges is the *visual* half of a claim whose spoken half is carried elsewhere. The marker
+bar on a cell and a key is that element — it has no name precisely because the name beside it
+already says the same thing in the game's words — and [Testing](../reference/testing.md)
+states the terms it is granted on. An accessible name is no substitute there: the words arrive
+through a prop, so asserting the name ends in them proves the prop was plumbed and nothing
+about whether a reader who cannot separate the two inks has anything to separate them by.
 
 **Axe runs on every story.** `.storybook/preview.ts` sets the accessibility addon's test mode
 to `error`, where the addon's own default only reports, and the story run renders each story

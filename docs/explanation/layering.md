@@ -20,13 +20,19 @@ Four layers, and imports only ever run downwards.
 `src/routes/` is three files: `+layout.svelte`, which imports the stylesheet and renders
 its children; `+layout.ts`, which prerenders the tree; and `+page.svelte`, the front door.
 `src/lib/components/` is the platform primitives — `Wordmark`, `Icon`, `IconButton`,
-`Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` — which take callbacks as props,
-hold no application state and touch no browser global; `Modal` reads
+`Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` for the chrome, and `Tile`, `Key`,
+`Keyboard`, `PhysicalKeyboard` and `Explainer` for the play surface — which take callbacks
+as props, hold no application state and touch no browser global. `PhysicalKeyboard` is the
+case that proves the rule rather than bending it: what it needs is a window-level key
+subscription, which is squarely what this row forbids, so the subscription is a port it is
+handed and the guards are a pure predicate in the domain. `Modal` reads
 `document.activeElement`, and
 [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) says why focus on the
 component's own document is not a global in the sense this table means. `src/lib/domain/`
 is `appearance.ts`, the three derivations the `Appearance` surface states, and `types.ts`,
-the `ThemeChoice` enumeration. `src/lib/ports/` is `preferences.ts`, the first port. Nothing
+the `ThemeChoice` enumeration, alongside `typing.ts`, the rule deciding what a bare key
+press means. `src/lib/ports/` is `preferences.ts` and `keys.ts` — the device's answers, and
+the device's keyboard. Nothing
 above the components calls the domain or the port yet: the hub's front door writes its
 appearance flat, and a game is the consumer of both.
 

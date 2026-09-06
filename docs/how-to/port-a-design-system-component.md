@@ -34,13 +34,17 @@ only implementation lives in a game is the arrangement
 That is decision 0014, and it replaces the earlier rule that a component waited for its
 second consumer.
 
-What has not changed is the line. [What the hub owns](../project/what-the-hub-owns.md) asks
-whether a second game would need the shape unchanged. A header bar, a button, a dialog
-shell: yes, and they are here. A board, a tile, an on-screen keyboard, a result mark: no,
-and they stay in the game that has them, however carefully they are built, because the
-shape only means something inside that game. The ledger applies the test component by
-component, and a row that moves from one side to the other is a decision record, not an
-edit.
+What has not changed is the test. [What the hub owns](../project/what-the-hub-owns.md) asks
+whether a second game would need the shape unchanged, and the answer has moved for four rows
+below, because the answer depends on what is in the shape. A header bar, a button, a dialog
+shell: yes, and they are here. A cell and a key: yes as well, and
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) is why — both are
+drawn entirely in tokens this repository declares and measures, so what was left in the game
+was the markup rather than the shape. What a game keeps is the arrangement and the meaning: a
+board is six rows of five because a rule says six and five, and "in the word, wrong place" is
+a sentence about one game's rules. The ledger applies the test component by component, and a
+row that moves from one side to the other is a decision record, not an edit — four did, and
+0016 is the record.
 
 The cost of holding a component here is real and is paid in this repository. Nothing lands
 under `src/lib/` without a test in `tests/` and a story in `stories/`, the coverage floor
@@ -153,8 +157,13 @@ install, and game material stays where it is rendered however well it is built.
 | `Announcer` | The visually hidden live region | Platform | Ported. Not in the design project — it has nothing to draw — and here because every game owes an announcement somewhere. |
 | `brand/MascotSlot` | Where Biscuit mounts | Platform | Not ported. Waits for the illustrated poses. She lands at the boundaries — the page bookends and a game's outcome moments — and reduces to the mark when motion is off, per [The Biscuit character](../design/character.md). |
 | `brand/Mark` as its own component | The reduced icon-mark | Platform | Folded into `Wordmark.svelte`. Extract when the favicon or the mascot's motion-off state needs it standalone. |
-| `game/Board`, `game/Tile`, `game/Key`, `game/Keyboard` | Play primitives | Game | Stay with the game. Poodl's own components carry the behaviour contracts and Poodl's own specifications decide them; they become shared material only when Pawjong renders the same shape. |
-| `game/StatFigure`, `game/Distribution` | Statistics chrome | Game | Stay with the game. Poodl carries them as restyles inside its statistics panel, and a game's figures are its own data. Nothing here has any. |
+| `game/Tile` | The single cell | Platform | Ported and generalised by [decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md): `content` rather than a letter, a mark that carries the game's own words with it, and a `label` the caller writes. "Position 3, C, correct" is composed at the call site. |
+| `game/Key` | One key of an on-screen keyboard | Platform | Ported by 0016 as a component rather than an inlined button: a real button, an optional mark, a required name, `onpress`, and a glyph for a key that ends a turn. |
+| `game/Keyboard` | The keyboard's grouped layout | Platform | Ported and generalised by 0016. The layout is data the caller supplies — `QWERTY` is a default and not a rule — and one callback carries the pressed key's value, because a rack needs five actions and two named callbacks cannot express them. |
+| `PhysicalKeyboard` | Typing straight into a surface | Platform | Ported by 0016, over a port. The guards are a pure predicate in `src/lib/domain/typing.ts`, the subscription is `src/lib/ports/keys.ts`, and the component wires the two for as long as it is mounted — so "off" means no listener rather than a listener that declines. Not in the design project: it draws nothing. |
+| `HowToPlay` | The mark legend, as a scaffold | Platform | Ported by 0016 as `Explainer`, words injected: prose, a list of example-and-sentence rows drawn with the real `Tile`, and a note. The weakest row in this table under "unchanged", and 0016 says so — what earns it a place is that the legend and the surface draw the same component, so they cannot drift. Not in the design project. |
+| `game/Board` | The arrangement of cells | Game | Stays with the game, and by argument rather than by grouping. Poodl's reads `MAX_ATTEMPTS`, `WORD_LENGTH`, `describeAttempt` and `ScoredGuess`: six rows of five is a rule wearing a grid, and a second game changes both numbers. A `Grid` that knew only its rows and cells would be a different component and a different record. |
+| `game/StatFigure`, `game/Distribution` | Statistics chrome | Game | Stay with the game, refused on the same test that admitted the cell: what they draw is a game's own data, and no token-level argument says this repository already decides their shape. Poodl carries them as restyles inside its statistics panel. Nothing here has any figures. |
 
 Unported variants of ported components, recorded so that a consumer who reaches for one
 knows it is a port rather than an omission:

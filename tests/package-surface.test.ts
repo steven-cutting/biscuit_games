@@ -31,11 +31,16 @@ import type {
 const COMPONENTS = [
   'Announcer',
   'Button',
+  'Explainer',
   'HeaderBar',
   'Icon',
   'IconButton',
+  'Key',
+  'Keyboard',
   'Modal',
   'Notice',
+  'PhysicalKeyboard',
+  'Tile',
   'Wordmark'
 ] as const;
 

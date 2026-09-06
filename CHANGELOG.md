@@ -19,8 +19,29 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `DeviceAnswers`; `tests/contrast.test.ts`, which measures every pair the stylesheet
   declares in all four combinations of theme and high contrast against the floors
   `src/lib/config.ts` mirrors from the specification; and `stories/Foundations.stories.svelte`,
-  the token sheet. The play-surface primitives stay in Poodl. See
+  the token sheet. See
   [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md).
+
+- The play surface. `Tile` and `Key` are the two units every game renders and no game renders
+  differently — a cell that is read and a cell that is pressed, same paint and the same marker
+  bar. `Keyboard` lays keys out from data the caller supplies, with `QWERTY` as a default
+  rather than a rule and one callback carrying the pressed key's value, because a rack needs
+  shuffle, recall, play, pass and exchange and two named callbacks cannot express five.
+  `PhysicalKeyboard` wires the device's own keyboard to a surface over `keys.ts`, the second
+  port, whose guards are a pure predicate in `typing.ts`. `Explainer` is the shape a "how to
+  play" turns out to be, with the words left to whoever is explaining themselves.
+
+  A mark is `exact`, `present` or `absent`, after `--result-exact`, `--result-present` and
+  `--result-absent` — the tokens this repository has declared and measured since decision
+  0010, which is the argument for the move and why it did not wait for a second game. A mark
+  arrives with the game's own sentence for it and cannot arrive without one, so a painted
+  state with nothing to say is unrepresentable rather than merely discouraged. A game whose
+  vocabulary says `correct` maps at its call site.
+
+  `tests/play.test.ts` and `tests/typing.test.ts` are the evidence, five story files are the
+  specimens, and `docs/reference/testing.md` grants this repository's first structural-hook
+  exception — `[data-marker]`, on stated terms, for `aria-hidden` decoration alone. See
+  [decision 0016](docs/decisions/0016-the-play-surface-is-the-platforms.md).
 
 - Two more specifications, and the figures they state. `docs/specs/operation.allium` says how
   a Biscuit Games surface is *worked* — every operation reachable from the keyboard with
@@ -205,10 +226,12 @@ Two gaps in the evidence rather than in the code, found by the same review:
   move rather than an addition. See
   [decision 0012](docs/decisions/0012-the-domain-root-stays-with-poodl.md).
 
-- The play-surface primitives — `Tile`, `Board`, `Keyboard`, `PhysicalKeyboard`,
-  `DistributionChart` and `HowToPlay` — and the block of Poodl's contrast test that measures
-  Poodl's own state separations. Both are a game's, and
-  [decision 0014](docs/decisions/0014-the-hub-holds-the-design-system.md) says why.
+- `Board` and `DistributionChart`, and a game's rules with them. An arrangement of cells
+  encodes a rule — six rows of five is one game's — and a distribution chart draws a game's
+  own data, so both stay where they are rendered.
+  [Decision 0016](docs/decisions/0016-the-play-surface-is-the-platforms.md) refuses each on
+  the same test that admitted the pieces they are built from, rather than by leaving them
+  out.
 
 - Poodl's own edits. This repository records what Poodl has to change in
   `docs/operations/poodl-handover.md`; it does not change it.

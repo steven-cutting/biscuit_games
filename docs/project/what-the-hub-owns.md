@@ -29,7 +29,7 @@ game — cites it rather than restating it, and a page that restates it is the b
 | Biscuit, and how she is used | [The Biscuit character](../design/character.md) |
 | The token vocabulary | [Design tokens](../design/tokens.md), carried by `src/app.css` |
 | Shared components | [Port a design system component](../how-to/port-a-design-system-component.md) |
-| Shared behaviour | [`appearance.allium`](../specs/appearance.allium) |
+| Shared behaviour | The Allium modules under `docs/specs/` — [`appearance.allium`](../specs/appearance.allium), [`operation.allium`](../specs/operation.allium) and [`play-surfaces.allium`](../specs/play-surfaces.allium) |
 | The naming of the platform and its games | [Design direction](../design/direction.md) |
 | Platform decisions | [Architecture decisions](../decisions/README.md) |
 | The design research | [Design resource index](../design/resource-index.md) and [Mobile and game design research](../design/research-report.md) |
@@ -47,9 +47,15 @@ components live here rather than in the first game that rendered them.
   mode are Poodl's; tiles and matches will be Pawjong's. `docs/specs/` here holds one
   module, and it imports nothing precisely so that a game can take appearance as given
   rather than restate it.
-- **Its play-surface primitives.** A board, a tile, a rack, an on-screen keyboard, a
-  result mark. Anything whose shape only means something inside one game is that game's,
-  however carefully it is built.
+- **How its play surface is arranged, and what its marks mean.** A board, a rack, a row of
+  six attempts across five letters: an arrangement encodes a rule, and the rule is the
+  game's. So does a mark's meaning — that a letter is in the word but in the wrong place is
+  one game's sentence about its own rules, and no second game inherits it. The pieces those
+  arrangements are built from are not a game's: a cell and a key are drawn entirely in
+  tokens this repository declares and this repository measures, so their shape was settled
+  here before their markup moved, and
+  [decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) moved it. The line
+  is the arrangement and the meaning, not the piece.
 - **Its data.** Word lists, tile sets, puzzle sources — whatever the game draws from. None
   of it is shared material, and none of it belongs here.
 - **Its address and its deployment.** Where a game is served from, the workflow that
@@ -62,6 +68,12 @@ components live here rather than in the first game that rendered them.
 ## The test
 
 > **Would a second game need this, unchanged?**
+
+The play surface is the worked example of how much that word does. A tile is a cell with a
+glyph, a border in a result ink and a bar whose length says which result without using its
+hue; a second game renders that unchanged, which is why it is here. A board is six rows of
+five because one game's rules say six and five; a second game changes both numbers, which is
+two facts with a family resemblance, and it stays where its rules are.
 
 Yes, and it belongs here. No, and it belongs in the game that has it. The word *unchanged*
 carries the weight: if a second game would need the fact only after bending it, that is two

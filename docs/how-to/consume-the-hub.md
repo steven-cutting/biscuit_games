@@ -106,7 +106,7 @@ is `ReducedMotionOverridesTheAnimationSetting`.
 
 ```svelte
 <script lang="ts">
-  import { Button, HeaderBar, Icon } from '@steven-cutting/biscuit-games';
+  import { Button, HeaderBar, Icon, Keyboard, QWERTY, Tile } from '@steven-cutting/biscuit-games';
 
   const openSettings = () => {};
   const play = () => {};

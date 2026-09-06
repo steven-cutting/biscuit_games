@@ -31,8 +31,9 @@ game, is intended and not yet built.
 - **The Biscuit character.** Her look, her registers and her voice are settled here, once,
   rather than drifting apart in each game that uses her.
 - **Shared components.** The platform primitives — `Wordmark`, `Icon`, `IconButton`,
-  `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` — each with its test and its
-  story. A component earns a place here by being a shape every game would render
+  `Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` for the chrome, and `Tile`,
+  `Key`, `Keyboard`, `PhysicalKeyboard` and `Explainer` for the play surface — each with its
+  test and its story. A component earns a place here by being a shape every game would render
   unchanged, not by being written well; see
   [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md).
 - **The shared specifications.** `docs/specs/` holds three Allium modules.

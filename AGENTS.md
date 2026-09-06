@@ -70,8 +70,8 @@ These hold everywhere. Breaking one is a defect, not a trade-off.
    reports its state to the accessibility tree and keeps every non-colour
    indication its live form carried.
 7. **Coverage does not fall below the floor.** 90% on branches, functions, lines
-   and statements over `src/lib/**` — eight components, the icon map, the port,
-   the domain and the barrel, every one of them tested. Lower the code's
+   and statements over `src/lib/**` — every component, the icon map, the key
+   layouts, both ports, the domain and the barrel, every one of them tested. Lower the code's
    complexity, not the threshold in `vite.config.ts`. Nothing lands under
    `src/lib/` without a test in `tests/`: an untested file inside the coverage
    glob is reported at zero and sinks the run.
@@ -211,13 +211,18 @@ nothing in this repository was taken from the template directly.
 Deliberate deviations from Poodl, each recorded in
 [the decision records](docs/decisions/README.md):
 
-- The application came over in two steps. The toolchain came whole, with
+- The application came over in three steps. The toolchain came whole, with
   `src/app.css`, one route and `Wordmark`; the platform primitives, the icon set,
   the contrast test and the preferences port followed by decision 0014, ported
-  from Poodl at `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`, and the play-surface
-  primitives stayed where they are rendered.
-- Two component contracts are generalised — `HeaderBar` takes a brand snippet,
-  a chip and actions; `Notice` takes a message and a tone — and the preferences
+  from Poodl at `a24f6c7112fbd8bf7a814c655ccaa81108a92b30`; and the play-surface
+  pieces — `Tile`, `Key`, `Keyboard`, `PhysicalKeyboard` and `Explainer` —
+  followed by decision 0016, generalised out of that game's vocabulary. A board
+  and a distribution chart stayed where they are rendered, because an
+  arrangement encodes a rule.
+- Component contracts are generalised on arrival — `HeaderBar` takes a brand
+  snippet, a chip and actions; `Notice` takes a message and a tone; `Tile` takes
+  content and the caller's own sentence about where the cell is; `Keyboard`
+  takes a layout and one callback carrying the pressed key's value — and the preferences
   adapter takes its host object rather than a `matchMedia` function. Decision
   0014 records each, and the Poodl handover carries what each costs Poodl.
 - The site is published nowhere. No Pages workflow, no `site-root/`, no staging

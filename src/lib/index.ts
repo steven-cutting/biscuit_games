@@ -25,15 +25,26 @@
  */
 export { default as Announcer } from './components/Announcer.svelte';
 export { default as Button } from './components/Button.svelte';
+export { default as Explainer } from './components/Explainer.svelte';
 export { default as HeaderBar } from './components/HeaderBar.svelte';
 export { default as Icon } from './components/Icon.svelte';
 export { default as IconButton } from './components/IconButton.svelte';
+export { default as Key } from './components/Key.svelte';
+export { default as Keyboard } from './components/Keyboard.svelte';
 export { default as Modal } from './components/Modal.svelte';
 export { default as Notice } from './components/Notice.svelte';
+export { default as PhysicalKeyboard } from './components/PhysicalKeyboard.svelte';
+export { default as Tile } from './components/Tile.svelte';
 export { default as Wordmark } from './components/Wordmark.svelte';
 export type { IconName } from './components/icons.js';
+export { QWERTY, QWERTY_BINDINGS } from './components/layouts.js';
+export type { KeyboardLayout, KeyboardRow, KeyDefinition } from './components/layouts.js';
 export { animationsActive, darkActive, highContrastActive } from './domain/appearance.js';
-export type { ThemeChoice } from './domain/types.js';
+export type { Mark, MarkName, ThemeChoice } from './domain/types.js';
+export { claimKey, latinLetters } from './domain/typing.js';
+export type { KeyBindings, KeyPress } from './domain/typing.js';
+export { createFakeKeys, createWindowKeys } from './ports/keys.js';
+export type { FakeKeys, KeyHost, KeysPort } from './ports/keys.js';
 export { createFakePreferences, createMediaPreferences } from './ports/preferences.js';
 export type {
   DeviceAnswers,

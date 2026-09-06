@@ -231,6 +231,56 @@ test block and its story go: `src/lib/components/{Icon,IconButton,Button,HeaderB
 `src/lib/domain/types.ts`. Poodl keeps `src/lib/config.ts`, which mirrors Poodl's own
 specifications, and keeps every test that measures a figure those specifications state.
 
+Since [decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) the package
+also carries the play surface — `Tile`, `Key`, `Keyboard`, `PhysicalKeyboard` and
+`Explainer` — with the `Mark` type they all speak. Five more of Poodl's copies become
+imports, and the copy, its test block and its story go with each:
+`src/lib/components/{Tile,Keyboard,PhysicalKeyboard,HowToPlay,HowToPlayPanel}.svelte`, and
+the inlined key buttons inside `Keyboard.svelte`, which become `Key`.
+`src/lib/components/Board.svelte` and `DistributionChart.svelte` stay: Poodl keeps them, and
+`Board.svelte` imports `Tile` from the package instead of from `$lib`. `WelcomeScreen.svelte`
+keeps its frame and passes the words down.
+
+Five more contract changes come with them:
+
+- **The mark's name changes at every call site.** `src/lib/domain/types.ts` declares
+  `LetterMark` as `correct | present | absent`; the package's `MarkName` is
+  `exact | present | absent`, after `--result-exact`, `--result-present` and
+  `--result-absent` — the tokens both repositories have declared identically since decision
+  0010. Poodl imports `MarkName` rather than declaring `LetterMark`, and maps at its
+  boundary: the scoring engine keeps saying `correct` if that is what Poodl's rules say, and
+  the value to change it to is literally `exact` in every place a mark reaches a rendered
+  component. Renaming the engine's vocabulary instead would be Poodl changing its own rules
+  to suit a stylesheet, which is the opposite of what this move was for.
+- **A mark carries its own words.** The package takes `{ name, description }` together
+  rather than a state and a separate sentence, because two optional props could not stop a
+  caller painting a state with nothing to say. Poodl's two duplicated `DESCRIPTION` maps —
+  one in `Tile.svelte`, one in `Keyboard.svelte` — become one map beside the other sentences
+  the game speaks, in `src/lib/domain/announcements.ts`.
+- **`Tile` takes its content and the caller's own sentence.** Poodl's takes `letter` and
+  `position` and composes "Position 3, C, correct" itself. The package's takes `content`, an
+  optional mark, and a `label` that is where the cell is. `Board.svelte` composes it — it
+  already composes the row label through `describeAttempt` — so the sentence does not move,
+  only who writes it does, and Poodl's assertions that read
+  `getByRole('img', { name: 'Position 1, C, correct' })` do not move at all. One thing does
+  change: the package never uppercases its content, because `text-transform` rewrites "ß" to
+  "SS" and would disagree with the name beside it, so Poodl passes `letter.toUpperCase()`.
+- **`Keyboard` takes its layout and one callback.** Poodl's holds
+  `const ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']` and three named callbacks; the
+  package's holds neither. Poodl passes `QWERTY` — which the package exports and which names
+  the same two action values, `submit` and `delete` — and switches on the value `onpress`
+  hands back. Its `knowledge` array becomes a `marks` record keyed by value, which is one
+  `Object.fromEntries` over `keyboardKnowledge()`.
+- **`PhysicalKeyboard` takes a port.** Poodl's route constructs `createWindowKeys()` and
+  passes it in. The guards are unchanged in behaviour and now live in the package as a pure
+  predicate, so Poodl's `tests/screens.test.ts` cases for them can be retired in favour of a
+  case that the route wires the port at all.
+
+**And one visual change Poodl should expect in Chromatic.** `Tile` and `Key` drew the same
+indication to different figures — 62%/22% at 3px on a tile, 56%/20% at 2px on a key — and the
+system owns one set now, which is the tile's. Poodl's `Tile` baselines are unchanged; its
+`Keyboard` baselines all diff on the version it adopts.
+
 Three of the contracts changed on the way, and Poodl's call sites change with them:
 
 - `HeaderBar` takes `brand`, `chip` and `actions` rather than a mode, a status and five

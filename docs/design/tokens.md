@@ -151,10 +151,12 @@ What a component names. Each row lists tokens that move together between palette
 | Brand | `--brand-warm`, `--brand-warm-ink` | The rationed warm pair, pinned once |
 | Scrim | `--scrim` | The dialog backdrop, `rgba(0, 0, 0, 0.72)` |
 
-The result and key groups are the game surface's. Nothing in the hub renders a mark or a
-key, and that is not a reason to delete them: the palette is decided here, so
-`tests/contrast.test.ts` measures them here, and `--key-untried-rule` is the boundary of two
-platform controls — `Button`'s secondary and `HeaderBar`'s chip. `--key-untried-bg` and
+The result and key groups are the play surface's, and the hub renders one since
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md): `Tile` and `Key`
+spend every token in both groups, and `tests/contrast.test.ts` measures them against the
+floors and against each other. That the palette was decided here while the markup lived in a
+game is the inversion 0016 exists to end. `--key-untried-rule` is also the boundary of two
+chrome controls — `Button`'s secondary and `HeaderBar`'s chip. `--key-untried-bg` and
 `--key-scored-bg` are derived once on bare `:root` from `--background` and
 `--surface-raised`, so they follow the theme through the tokens they name rather than
 being restated per palette.

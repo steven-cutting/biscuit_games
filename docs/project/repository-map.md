@@ -63,7 +63,7 @@ recipe's own exit code is read.
 | --- | --- |
 | `src/app.css` | The token vocabulary, the `@font-face` blocks and the four combinations of theme and high contrast. This is the platform's design system and the reason the repository exists; [Design tokens](../design/tokens.md) is the page that owns it. |
 | `src/lib/assets/` | Vendored fonts with their licence texts, per [decision 0010](../decisions/0010-biscuit-games-design-system.md), with provenance in the `src/app.css` header; and the icon set with its ISC text, per [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md). |
-| `src/lib/components/` | Rendering and interaction. Components take callbacks as props and hold no application state of their own. Eight today — the lockup, the icon renderer and the six platform primitives — and nothing lands here without a test and a story. |
+| `src/lib/components/` | Rendering and interaction. Components take callbacks as props and hold no application state of their own. Thirteen today — the lockup, the icon renderer, six chrome primitives and five of the play surface — plus `icons.ts` and `layouts.ts`, which are data beside the components that read them. Nothing lands here without a test and a story. |
 | `src/lib/domain/` | The three derivations `appearance.allium`'s `Appearance` surface states, as pure functions, and the `ThemeChoice` type. |
 | `src/lib/ports/` | The preferences port: what the reader asked their operating system for, read through `matchMedia` and watched, with the fake a test injects. |
 | `src/lib/config.ts` | The six figures the three modules state, mirrored for the contrast test and the story plays to read. Not exported. |
