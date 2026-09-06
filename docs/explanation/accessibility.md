@@ -206,23 +206,23 @@ that is the narrowest supported width. Both figures are stated here now, in
 surface is *operated* rather than how it looks — which is `appearance.allium`'s scope and the
 reason it was the wrong home. Poodl's `game.allium` states the same two figures and will keep
 its copy until a check in Poodl's own gate compares the two, which is a handover item rather
-than something a version bump settles. What spends the figures is in
-`src/app.css`: a `min-block-size` floor on every native control the stylesheet can name —
-buttons, selects, disclosure summaries, textareas and every input but a checkbox, a radio and
-a hidden one — and a 34rem shell rather
-than the design system's 480px, because a 480px shell caps a key in a ten-across row at about
-40px on a screen with room for 44. The input half is written as an exclusion rather than a
-list, so a type this stylesheet has never heard of is still a control; the checkbox and the
-radio are excluded because the invariant grants them the label that contains them instead, and
-a control a surface builds out of a generic element is the surface's own to size, since no
-shared rule can tell it from ordinary content. Across is
-deliberately not declared, since a floor in that direction would be wrong for a dense row and
-would have to be fought back wherever it applied. Which rows are dense is arithmetic over the
-room the row is given, gaps counted with the controls — a count of controls against the
-viewport once left a seven-tile rack unexempted and 37px across at the same time, and
-`stories/Keyboard.stories.svelte` now asserts row by row which rows the exemption reaches. A game that genuinely cannot meet the figure
-in both directions says so in its own specification and states what the width of the screen is
-allowed to take away. `src/lib/config.ts` holds both figures, mirrored from the module that
+than something a version bump settles. What spends the figures is in `src/app.css`: a
+`min-block-size` floor on every native control the stylesheet can name — buttons, selects,
+disclosure summaries, textareas and every input but a checkbox, a radio and a hidden one — and
+a 34rem shell rather than the design system's 480px, because a 480px shell caps a key in a
+ten-across row at about 40px on a screen with room for 44. The input half is written as an
+exclusion rather than a list, so a type this stylesheet has never heard of is still a control,
+and an `<input>` with no `type` at all is reached where `input[type='text']` never reached it.
+The checkbox and the radio are excluded because the invariant grants them the label that
+contains them instead, and a control a surface builds out of a generic element is the surface's
+own to size, since no shared rule can tell it from ordinary content. Across is deliberately not
+declared, since a floor in that direction would be wrong for a dense row and would have to be
+fought back wherever it applied. Which rows are dense is arithmetic over the room the row is
+given, gaps counted with the controls — a count of controls against the viewport once left a
+seven-tile rack unexempted and 37px across at the same time, and
+`stories/Keyboard.stories.svelte` now asserts row by row which rows the exemption reaches. A
+game that genuinely cannot meet the figure in both directions says so in its own specification
+and states what the width of the screen is allowed to take away. `src/lib/config.ts` holds both figures, mirrored from the module that
 states them, for the plays that measure a rendered control: `Button`'s and `IconButton`'s boxes against the 44, and `HeaderBar` laid
 out at 320px with nothing scrolling sideways and every target whole. `IconButton` sets its
 own 44px width and takes its height from the stylesheet's floor.

@@ -67,6 +67,7 @@ const CONTROLS = `
   <input type="search" />
   <input type="submit" value="Send" />
   <input type="hidden" />
+  <input id="typeless" />
 `;
 
 let stylesheet: HTMLStyleElement;
@@ -254,7 +255,10 @@ describe('EveryControlIsAComfortableTarget', () => {
     ['a disclosure summary', 'summary'],
     ['a number input', 'input[type="number"]'],
     ['a search input', 'input[type="search"]'],
-    ['a submit drawn as an input', 'input[type="submit"]']
+    ['a submit drawn as an input', 'input[type="submit"]'],
+    // A text field to the browser, and matched by no selector here before:
+    // `input[type='text']` reads the attribute rather than the default.
+    ['an input written with no type at all', '#typeless']
   ])('gives %s the figure too', (_what, selector) => {
     expect(resolved(selector, 'min-block-size')).toBe(`${String(MINIMUM_TOUCH_TARGET)}px`);
   });

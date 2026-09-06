@@ -328,8 +328,9 @@ no version moves and no consumer took any of them.
   two exempt shapes meets the figure outright — so a `<select>`, a `<summary>` and every input
   that is not a text one stood at whatever height the user agent chose. The input half is
   written as an exclusion rather than a list, so a type nobody has heard of yet is still a
-  control; the checkbox and the radio stay excluded because the invariant grants them the label
-  that contains them instead.
+  control — and so is an `<input>` with no `type` attribute, which is a text field to the
+  browser and was matched by no selector here before. The checkbox and the radio stay excluded
+  because the invariant grants them the label that contains them instead.
 
 And one clause reworded rather than repaired, because the specification was wrong:
 

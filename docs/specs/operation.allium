@@ -161,9 +161,12 @@ contract DirectManipulation {
         -- A control a surface builds out of a generic element is the surface's
         -- own to size for the same reason: an element the platform cannot tell
         -- from ordinary content is one no shared rule can reach. What the
-        -- platform answers for is what it can name — every native control, and
-        -- the label that contains one — and it answers for all of those rather
-        -- than for the few a stylesheet happened to list.
+        -- platform answers for is what it can name — every native control the
+        -- two shapes above do not exempt, and the label that contains one — and
+        -- it answers for all of those rather than for the few a stylesheet
+        -- happened to list. A link in a sentence is named as easily as any of
+        -- them and is still exempt, because the exemption is about where the
+        -- control sits rather than about whether it can be reached.
         --
         -- All of this holds down to config.narrowest_supported_width, at which
         -- the surface is usable without scrolling sideways.

@@ -504,8 +504,10 @@ user agent chose while the invariant said they did not. The rule is now
 written as an exclusion on the input half so a type nobody has heard of yet is still a control.
 **What this costs Poodl is a rendered change wherever it draws one of the newly-named shapes**:
 a `<select>` in a settings row, a `<summary>` on a "how to play" disclosure, a number or a date
-input. Each grows to 44px if it was shorter, and none moves if it was already taller. Poodl's
-copy of the stylesheet carries the three-selector rule until it takes the package. The two
+input. One is easy to miss — an `<input>` written with no `type` attribute is a text field to
+the browser and was never matched by `input[type='text']` as a selector, so a bare `<input>`
+grows here too. Each grows to 44px if it was shorter, and none moves if it was already taller.
+Poodl's copy of the stylesheet carries the three-selector rule until it takes the package. The two
 excluded input types are excluded deliberately and must stay so: the invariant grants a
 checkbox and a radio the label that contains them, and a floor on the native box would size the
 thing the finger is not aimed at.
