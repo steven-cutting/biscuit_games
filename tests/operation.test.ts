@@ -66,6 +66,8 @@ const CONTROLS = `
   <input type="number" />
   <input type="search" />
   <input type="submit" value="Send" />
+  <input type="button" value="Undo" />
+  <input type="reset" value="Reset" />
   <input type="hidden" />
   <input id="typeless" />
 `;
@@ -177,6 +179,8 @@ describe('ATapDoesOnlyWhatTheControlDoes', () => {
     ['a number input', 'input[type="number"]'],
     ['a search input', 'input[type="search"]'],
     ['a submit drawn as an input', 'input[type="submit"]'],
+    ['a button drawn as an input', 'input[type="button"]'],
+    ['a reset drawn as an input', 'input[type="reset"]'],
     ['an input written with no type at all', '#typeless']
   ])('sends a tap on %s to the control too', (_what, selector) => {
     expect(resolved(selector, 'touch-action')).toBe('manipulation');
@@ -192,7 +196,9 @@ describe('ATapDoesOnlyWhatTheControlDoes', () => {
   it.each([
     ['a select', 'select'],
     ['a disclosure summary', 'summary'],
-    ['a submit drawn as an input', 'input[type="submit"]']
+    ['a submit drawn as an input', 'input[type="submit"]'],
+    ['a button drawn as an input', 'input[type="button"]'],
+    ['a reset drawn as an input', 'input[type="reset"]']
   ])('does not select the label on %s', (_what, selector) => {
     expect(resolved(selector, 'user-select')).toBe('none');
   });

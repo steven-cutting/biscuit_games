@@ -540,10 +540,16 @@ draws a control that way, the package gives it nothing here.
 controls in it.** The clause said "more of them in it than that figure divides into
 `config.narrowest_supported_width`", which ignores the gaps between them: seven keys at 44px fit
 inside 320 and the six gaps do not, so a seven-tile rack was a row the exemption refused and the
-figure could not reach — 36.8px across in Chromium, with nothing measuring it. Poodl's
-`game.allium` states the ten-across version of this clause and its own keyboard is ten across,
-so **nothing Poodl renders changes**; what changes is the text, and the two copies now say
-different things until Poodl takes this one. That is the same shape as every other item in
+figure could not reach — 36.8px across in Chromium, with nothing measuring it. **Three terms,
+not two**: a first attempt at this repair counted the figure and the gaps and stopped, which is
+exact only for a row where every control builds a turn. The same invariant grants a control that
+*ends* one more width, and `Key` spends that grant unconditionally, so a row carrying two of them
+has that much less to divide — QWERTY's bottom row was then declared unexempted at a 480px shell
+and renders 41.4px there. Poodl's shell is 34rem like this one, so that window is not a width it
+lays out at; its `Key` carries the same share, so the arithmetic is what matters rather than the
+figure. Poodl's `game.allium` states the ten-across version of this clause and its own keyboard
+is ten across, so **nothing Poodl renders changes**; what changes is the text, and the two copies
+now say different things until Poodl takes this one. That is the same shape as every other item in
 [what Poodl drops](#what-poodl-drops): a clause a check in Poodl's gate would have to compare.
 
 **Two lookups read the prototype every plain object carries.** `claimKey` indexed
@@ -560,7 +566,30 @@ value` is a nullish chain and a blank is not nullish, so a rack's blank tile —
 `{ value: 'blank', content: ' ' }` — drew a button whose accessible name was empty, which is
 exactly what `EveryKeyIsAControl` exists to refuse. `keyName` in
 `src/lib/components/layouts.ts` decides it, the way `drawnMark` decides whether a mark has
-words. Poodl's own keys all carry words, so nothing it renders changes.
+words. `Tile` decided the same question with `content === ''` and now trims too, so the same
+blank tile is named when it is on show rather than pressed. Poodl's own keys and cells all carry
+words, so nothing it renders changes.
+
+**And `EveryKeyIsAControl` itself was amended, which is a `@guarantee` changing in meaning.** The
+clause read "Each key is a real control with an accessible name" and said nothing about a layout
+that supplies no words at all — a case the implementation had to answer, and first answered in a
+doc comment and a test, which is a shared-behaviour decision taken outside the module that owns
+it. The guarantee now carries two additions: that a field holding nothing but spaces has no word
+in it, and that a layout supplying no words anywhere is the one case the guarantee does not
+reach, where the key is drawn and left unnamed because the platform will not invent a word and
+dropping the key would change what the row is. **This is the change most likely to be missed on
+Poodl's side**, because it costs nothing rendered and everything textual: Poodl's `game.allium`
+carries the clause this module was lifted from under
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md), and its copy
+promises a name without qualification where the packaged module now states an exception. It
+belongs with the other clause comparisons a check in Poodl's gate would have to make, and it is
+the second `@guarantee` in this section to move rather than merely be kept.
+
+**One decision record moved with them.** Decision 0015 carries a dated amendment retracting the
+counting arithmetic it recorded as reachable in prose. Poodl cites that record by slug rather
+than by content, so nothing on its side breaks — but a reader following the citation now arrives
+at a record that says its own proposal was wrong, which is the point of amending rather than
+editing.
 
 ## What a cross-repository link costs
 
