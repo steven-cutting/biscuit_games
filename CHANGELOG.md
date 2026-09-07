@@ -7,6 +7,87 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The rest of the design system. `Card`, `CardLabel` and `Badge` are the grouping chrome;
+  `GameCard` is the platform's game switcher and the front door now renders two of them;
+  `Switch`, `SegmentedControl`, `SettingsRow`, `Input` and `Select` are the fields; and
+  `Monogram` is the brand mark, extracted from `Wordmark`, which composes it. Ten components,
+  each with a test in `tests/` and a story in `stories/`. Five of those rows had been waiting
+  behind a trigger nobody had fired — a second game, a first settings surface, a consumer —
+  and [decision 0017](docs/decisions/0017-the-rest-of-the-design-system-is-ported.md)
+  overrules four of them and records that the fifth, `GameCard`, had merely gone stale when
+  decision 0014 replaced the wait-for-a-consumer rule.
+
+  The mark is `Monogram` and not `Mark`, because `Mark` is already exported as a play
+  surface's mark and renaming that would be Major. Its ratios reproduce the four literals
+  `Wordmark` carried — 20px, `2px 2px 8px 2px`, a 12px glyph, a 1px nudge — exactly at the
+  size `Wordmark` asks for, which is what makes the extraction a refactor rather than a
+  redraw, and `tests/brand.test.ts` pins it.
+
+  Three of the ports depart from the design system deliberately, and each departure is a
+  defect on the reference's side. `GameCard` draws a planned game as no control at all rather
+  than a dimmed `<a aria-disabled>` with no `href`: an anchor without an `href` has no link
+  role, so the attribute is not allowed on it, and `AnUnavailableControlIsExempt` is spent
+  "only while the control genuinely cannot be operated". `SegmentedControl` is native radios
+  in a `<fieldset>` rather than buttons wearing `role="radio"`, which are each their own tab
+  stop and answer no arrow key. And `Switch` draws its off state in `--key-untried-rule`
+  rather than `--rule-strong`, which stands 2.33 off the dark page against a boundary floor of
+  3.0, with the track being the checkbox itself under `appearance: none` so that focus lands
+  where the reader is looking.
+
+- `Wordmark` takes an optional `product`, so a game renders `biscuit games / poodl` from the
+  package. Without it a game could not render its own lockup at all and had to rebuild one,
+  matching `--font-display`, weight 600, `--track-display` and the `words` class `HeaderBar`'s
+  26rem collapse reaches into — a cost recorded nowhere until now.
+
+- `surface Fields` in `docs/specs/operation.allium`, and
+  `config.minimum_field_text_size` at 16 beside the touch target and the narrowest width.
+  Five guarantees that were stated nowhere: `AFieldIsNamedByALabelBoundToIt`,
+  `AFieldsOwnWordsAreBoundToIt`, `AFieldThatIsWrongSaysSo`,
+  `AGroupOfExclusiveChoicesIsOneStopAndArrowsMoveWithinIt` and
+  `AFieldDoesNotMagnifyThePageWhenItTakesFocus`. The surface says what a control owes to being
+  worked and never which controls a surface has — a settings panel still belongs to the
+  product that owns it, which is why none of the five new controls is wired to a setting: a
+  `Switch` bound to `high_contrast` would answer `appearance.allium`'s open question by
+  building it.
+
+  The config figure closes an inversion. The 16px floor under a field's text was prose in this
+  repository answering a guarantee that lived in *Poodl's* specifications, which is exactly
+  what [decision 0015](docs/decisions/0015-operation-and-play-are-specified-here.md) exists to
+  end. It is mirrored in `src/lib/config.ts` as `MINIMUM_FIELD_TEXT_SIZE` and is the one
+  figure there no test under `tests/` can measure — jsdom's own default input font is already
+  16px, so an assertion there would pass whether or not the rule existed, and
+  `stories/Input.stories.svelte` takes the measurement in Chromium.
+
+### Changed
+
+- The front door renders the platform's own components: `HeaderBar` at the top, `CardLabel`
+  over the games, and a `GameCard` each for Poodl and for Pawjong, which is `planned` and says
+  "Not built yet" in words. It stays one route — decision 0011's shape is untouched — and the
+  header and the page now share one column, because `HeaderBar` sets no padding of its own.
+
+- `--text-3` is measured on a card as well as on the page, and `docs/design/tokens.md` now
+  records where it may not be read at all: it reaches 3.60 against `--surface-hover` in light
+  standard against a floor of 4.5. That is what stopped `GameCard` darkening its ground under
+  the pointer and left it strengthening its rule instead.
+
+- `tests/wordmark.test.ts` is `tests/brand.test.ts`, covering `Monogram` as well.
+
+### Fixed
+
+- Four documentation drifts the port surfaced. `docs/explanation/specifications.md` and
+  `docs/how-to/work-with-the-specs.md` each said one open question was outstanding when there
+  were four across three modules; `docs/reference/testing.md` gave a story count two ports out
+  of date and named `ButtonHost.svelte` as the only host `.svelte` when `ExplainerHost.svelte`
+  exists; and the porting ledger refused `StatFigure` and `Distribution` on the ground that
+  "nothing here has any figures", which `--fs-stat`, `--figures-tabular` and
+  `stories/Foundations.stories.svelte` all contradict. The refusal stands on the argument that
+  an arrangement encodes a rule; only its stated reason changed.
+
+- `.agents/skills/component-change` and `.agents/skills/consumer-impact` each named
+  `appearance.allium` alone, stale since decision 0015 put three modules in the package.
+
 ## [1.0.0] - 2026-09-06
 
 ### Added

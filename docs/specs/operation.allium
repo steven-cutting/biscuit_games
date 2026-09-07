@@ -21,6 +21,11 @@
 --   - Touch: a tap doing the control's action and nothing else, deliberate zoom
 --     kept, and a touch acknowledged from the moment of contact.
 --   - A change nobody is looking at being said in words.
+--   - What a field owes: a name that is bound to it rather than beside it, its
+--     own helper and refusal sentences bound to it too, a refusal that is
+--     reported and not only inked, a group of exclusive choices that is one stop
+--     with the arrows moving inside it, and text large enough that reaching the
+--     field does not magnify the page.
 --   - What a surface owes when it claims bare key presses for itself, and what
 --     dropping that claim has to leave behind.
 --
@@ -39,7 +44,11 @@
 --     this module's, under EveryControlIsAComfortableTarget.
 --   - How a surface binds a label to the control it names. The invariant says
 --     which shape the platform answers for and which the surface answers for
---     itself, and says nothing about how either is written.
+--     itself, and Fields says that a field has such a label at all; neither
+--     says how either is written.
+--   - Which fields a surface has, what any of them sets, and where the panel
+--     holding them lives. Fields states what a control owes to being worked, as
+--     this whole module does; it never states that a particular control exists.
 --   - Where the switch is that stops a surface claiming bare keys, and whether
 --     there is one. A control that changes a setting belongs to the product
 --     that owns it, as it does in appearance.allium; the open question at the
@@ -90,6 +99,12 @@ config {
     -- without scrolling sideways, and the width every target and spacing figure
     -- has to hold at.
     narrowest_supported_width: Integer = 320
+
+    -- CSS pixels. The smallest a field's own text may be, for the guarantee
+    -- that names it. It is a floor under one kind of control's text and under
+    -- nothing else: the type scale is appearance.allium's, and this figure
+    -- constrains it only where a field is drawn.
+    minimum_field_text_size: Integer = 16
 }
 
 ------------------------------------------------------------
@@ -269,6 +284,68 @@ surface Dialog {
         -- On the way out, focus goes back to the control that opened the dialog
         -- if it is still on the page. This is the clause easiest to leave out
         -- and invisible until someone tries it.
+}
+
+-- A control a reader fills in, switches, or chooses among. Stated here because
+-- the shapes are the platform's — a switch, a choice among a few, a field with
+-- words in it — while which of them a surface has, and what any of them sets,
+-- belong to the product that owns them, exactly as appearance.allium says of the
+-- controls that change its settings. This surface says what such a control owes
+-- to being worked. It says nothing about what any of them is for.
+surface Fields {
+    exposes:
+        within_supported_width
+
+    contracts:
+        fulfils DirectManipulation
+
+    @guarantee AFieldIsNamedByALabelBoundToIt
+        -- A field's name comes from a label bound to the control, and from
+        -- nothing else. Placeholder text is not a name: it is gone the moment
+        -- the reader types, so a name carried there is a name that disappears
+        -- exactly when the field is being used. Words merely sitting beside a
+        -- field are not a name either, however plainly they read — a reader who
+        -- arrives at the control without seeing the page hears what is bound to
+        -- it and nothing that only neighbours it. Which binding shape carries
+        -- that is not this module's, as the Excludes above says; that there is
+        -- one is.
+
+    @guarantee AFieldsOwnWordsAreBoundToIt
+        -- A field's helper line, and the sentence saying what it will not take,
+        -- are bound to the field rather than left beside it. The reader who most
+        -- needs that sentence is the one who reached the field without seeing
+        -- the page, and a sentence nothing ties to the field is one they never
+        -- hear. A surface with nothing to add owes no such line; a surface that
+        -- draws one owes the binding.
+
+    @guarantee AFieldThatIsWrongSaysSo
+        -- A field the surface is refusing reports that it is refusing, in the
+        -- same breath as its name. Ink alone does not carry it, because
+        -- appearance.allium's AppearanceNeverCarriesMeaningAlone admits no
+        -- exemption at all, and neither does a sentence underneath that nothing
+        -- ties to the field — which is the previous clause, and the reason these
+        -- two are worth stating together.
+
+    @guarantee AGroupOfExclusiveChoicesIsOneStopAndArrowsMoveWithinIt
+        -- A group of choices where taking one drops the last is a single stop
+        -- for Tab, and the arrow keys move between the choices inside it.
+        -- Dialog's TabIsHeldInsideTheDialog already counts such a group as one
+        -- stop when it counts what a panel's contents really offer; this states
+        -- it where the group is rather than only where it is being counted, and
+        -- adds the half that clause had no reason to state. One stop and no way
+        -- to move inside it is not a reachable choice, it is a reachable first
+        -- option — which is how a group can satisfy FullyKeyboardOperable on a
+        -- reading of it and still be unusable.
+
+    @guarantee AFieldDoesNotMagnifyThePageWhenItTakesFocus
+        -- A field's own text is at least config.minimum_field_text_size. Below
+        -- that figure a mobile browser magnifies the page when the field takes
+        -- focus, and leaves it magnified afterwards, so a reader who did no more
+        -- than reach a control finds the surface moved under them. That is the
+        -- platform's guess rather than the reader's intent — the distinction
+        -- DeliberateZoomIsNeverTakenAway already draws — arriving through the
+        -- one control that can trip it without being tapped at all, which is why
+        -- the figure is stated rather than left to the type scale.
 }
 
 -- Bare key presses reaching a surface directly, rather than reaching whichever

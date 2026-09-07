@@ -59,6 +59,7 @@
     {"path": "decisions/0013-shared-material-travels-as-a-package.md", "title": "Decision 0013: Shared material travels as a package", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_shared_material_package"], "requires": []},
     {"path": "decisions/0014-the-hub-holds-the-design-system.md", "title": "Decision 0014: The hub holds the design system", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_hub_holds_the_system"], "requires": []},
     {"path": "decisions/0015-operation-and-play-are-specified-here.md", "title": "Decision 0015: Operation and play are specified here", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_operation_and_play_specs"], "requires": []},
-    {"path": "decisions/0016-the-play-surface-is-the-platforms.md", "title": "Decision 0016: The play surface is the platform's", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_play_surface_ownership"], "requires": []}
+    {"path": "decisions/0016-the-play-surface-is-the-platforms.md", "title": "Decision 0016: The play surface is the platform's", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_play_surface_ownership"], "requires": []},
+    {"path": "decisions/0017-the-rest-of-the-design-system-is-ported.md", "title": "Decision 0017: The rest of the design system is ported", "kind": "decision", "audience": ["contributor", "maintainer", "agent"], "canonical_for": ["decision_design_system_completion"], "requires": []}
   ]
 }

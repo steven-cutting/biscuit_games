@@ -183,6 +183,32 @@ describe('EveryCombinationMeetsTheLegibilityFloor', () => {
       });
 
       /*
+       * The quiet ink on a card, which decision 0017 introduced and this file
+       * did not previously reach. `--text-3` was measured on the page alone,
+       * because nothing drew it anywhere else; `CardLabel` and `GameCard`'s meta
+       * line now draw it on `--surface`, and a card sits on the page rather than
+       * replacing it, so the ground under those words is the panel and not the
+       * background the old pair measured.
+       */
+      it('paints the quiet ink legibly on a card', () => {
+        expect(ratio(token('--text-3'), token('--surface'))).toBeGreaterThanOrEqual(
+          MINIMUM_TEXT_CONTRAST
+        );
+      });
+
+      /*
+       * `--text-3` is measured on the page and on a card, and on no third
+       * ground, because there is no third ground it may be read on. It reaches
+       * 3.60 against `--surface-hover` in light standard — the one combination
+       * of four where it fails — which is what stopped `GameCard` darkening its
+       * ground under the pointer and left it strengthening its rule instead.
+       * `docs/design/tokens.md` carries that as a rule about the token rather
+       * than as a fact about one component; a pair nothing paints is not
+       * measured here, so the finding is recorded there and the pair is absent
+       * on purpose rather than by omission.
+       */
+
+      /*
        * The grounds a game's controls sit on and the inks they are painted in.
        * Every pair is held to the 4.5 text bar, including the result fills a
        * game might letter at a size WCAG calls large, where 3.0 would be the

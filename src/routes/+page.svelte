@@ -1,12 +1,21 @@
 <script lang="ts">
-  import Wordmark from '$lib/components/Wordmark.svelte';
+  import CardLabel from '$lib/components/CardLabel.svelte';
+  import GameCard from '$lib/components/GameCard.svelte';
+  import HeaderBar from '$lib/components/HeaderBar.svelte';
 
   /*
-   * The front door. One page, deliberately: the hub says what Biscuit Games is
-   * and links to the games, and the design system it holds is seen in the
-   * workshop rather than here. Decision 0011 is the one-route shape; decision
-   * 0014 is why the components live here now, and why this page does not yet
-   * mount them.
+   * The front door. One page, deliberately: decision 0011's one-route shape
+   * stands, and decision 0017 is why the page now renders the platform's own
+   * components instead of describing them. A hub whose front page did not use
+   * the design system it holds was the arrangement decision 0001 exists to end,
+   * one storey up from where decision 0014 found it.
+   *
+   * `HeaderBar` sets no padding of its own, so the route supplies the gutter and
+   * the two share one column.
+   *
+   * `HeaderBar` carries the page's `<h1>` — it draws the lockup as the heading
+   * itself — so there is no heading here, and `CardLabel` is the `<h2>` beneath
+   * it. Two `<h1>`s is what this page had for about a minute.
    *
    * Every selector below names an element rather than a class, because
    * `svelte-check --fail-on-warnings` turns an unused selector into a failed
@@ -22,78 +31,70 @@
   />
 </svelte:head>
 
-<main>
-  <h1><Wordmark /></h1>
+<div class="page">
+  <HeaderBar />
 
-  <p>
-    Small, exacting games that run in your browser. No accounts, no telemetry, and nothing kept
-    anywhere else.
-  </p>
+  <main>
+    <p>
+      Small, exacting games that run in your browser. No accounts, no telemetry, and nothing kept
+      anywhere else.
+    </p>
 
-  <h2>The games</h2>
+    <CardLabel>The games</CardLabel>
 
-  <ul role="list">
-    <li>
-      <a href="https://pnut.fans/poodl/">Poodl</a> — an unlimited-play word game. Guess a five-letter
-      word in six attempts, then play again.
-    </li>
-  </ul>
-</main>
+    <!--
+      `role="list"` is what keeps this a list. WebKit drops list semantics from a
+      `<ul>` whose markers are removed, so VoiceOver would stop announcing the
+      games as a collection; the role restores what the markup already said. It
+      is redundant only where the marker survives, which is why it sits beside
+      the declaration that removes it.
+    -->
+    <ul role="list">
+      <li>
+        <GameCard
+          name="poodl"
+          description="An unlimited-play word game. Guess a five-letter word in six attempts, then play again."
+          href="https://pnut.fans/poodl/"
+          meta="5 letters, 6 guesses"
+        />
+      </li>
+      <li>
+        <GameCard name="pawjong" description="A tile-matching game." status="planned" />
+      </li>
+    </ul>
+  </main>
+</div>
 
 <style>
-  main {
+  /*
+   * The header and the page share one column. `HeaderBar` sets no padding of its
+   * own — it is chrome a game frames for itself — so the gutter is here, and the
+   * rule it draws stops where the content does rather than running to the edges
+   * of a screen the content never reaches.
+   */
+  .page {
     max-inline-size: var(--shell-max);
     margin-inline: auto;
-    padding: var(--s-8) var(--shell-pad) var(--s-11);
+    padding-inline: var(--shell-pad);
+  }
+
+  main {
+    padding-block: var(--s-8) var(--s-11);
     color: var(--text);
     font-family: var(--font-ui);
   }
 
-  h1 {
-    margin: 0;
-    padding-block-end: var(--s-5);
-    border-block-end: var(--rule-w) solid var(--rule);
-    font-size: inherit;
-    font-weight: inherit;
-  }
-
   p {
-    margin-block: var(--s-6) 0;
+    margin-block: 0 var(--s-8);
     color: var(--text-2);
     line-height: 1.5;
   }
 
-  h2 {
-    margin-block: var(--s-8) 0;
-    color: var(--text-3);
-    font-family: var(--font-ui);
-    font-size: var(--fs-mono-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-  }
-
-  /*
-   * `role="list"` on the element above is what keeps this a list. WebKit drops
-   * list semantics from a `<ul>` whose markers are removed, so VoiceOver would
-   * stop announcing the games as a collection; the role restores what the markup
-   * already said. It is redundant only where the marker survives, which is why
-   * it sits beside the declaration that removes it.
-   */
   ul {
-    margin-block: var(--s-4) 0;
+    display: grid;
+    gap: var(--s-5);
+    margin-block: var(--s-5) 0;
     padding: 0;
     list-style: none;
-  }
-
-  li {
-    padding-block: var(--s-4);
-    border-block-end: var(--rule-w) solid var(--rule);
-    line-height: 1.5;
-  }
-
-  a {
-    color: var(--text);
-    font-weight: 600;
   }
 </style>

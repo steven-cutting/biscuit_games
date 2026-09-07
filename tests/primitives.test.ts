@@ -3,7 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { createRawSnippet } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 
+import Badge from '../src/lib/components/Badge.svelte';
 import Button from '../src/lib/components/Button.svelte';
+import Card from '../src/lib/components/Card.svelte';
+import CardLabel from '../src/lib/components/CardLabel.svelte';
+import GameCard from '../src/lib/components/GameCard.svelte';
 import HeaderBar from '../src/lib/components/HeaderBar.svelte';
 import Icon from '../src/lib/components/Icon.svelte';
 import IconButton from '../src/lib/components/IconButton.svelte';
@@ -327,5 +331,119 @@ describe('HeaderBar', () => {
     render(HeaderBar, { actions: [action] });
 
     expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+});
+
+/*
+ * The grouping chrome, and the switcher the hub's front door is made of.
+ *
+ * What these three draw is held in `stories/` rather than here. A `Card`'s tone,
+ * a `Badge`'s ink and the rule around either are paint, jsdom has no layout
+ * engine and resolves none of it, and the story run reads the real thing in
+ * Chromium — the same division `Tile` already makes for the marker bar. What is
+ * asserted here is what the components are for: that they carry the words they
+ * were given, and that a `GameCard` is a control exactly when there is somewhere
+ * to go.
+ */
+describe('Card', () => {
+  it('carries what it is given', () => {
+    render(Card, { children: says('Nothing is kept anywhere else.') });
+
+    expect(screen.getByText('Nothing is kept anywhere else.')).toBeInTheDocument();
+  });
+
+  it.each([['surface'], ['raised'], ['flat']] as const)('takes the %s tone', (tone) => {
+    const { unmount } = render(Card, { tone, children: says('Grouped') });
+
+    expect(screen.getByText('Grouped')).toBeInTheDocument();
+    unmount();
+  });
+});
+
+describe('CardLabel', () => {
+  it('carries the words it labels a group with', () => {
+    render(CardLabel, { children: says('The games') });
+
+    expect(screen.getByText('The games')).toBeInTheDocument();
+  });
+});
+
+describe('Badge', () => {
+  /*
+   * `AppearanceNeverCarriesMeaningAlone` is why a badge has no tone that is only
+   * a colour: whatever it is saying is in the word it carries, and the ink is
+   * the second telling rather than the first.
+   */
+  it('says its state in words', () => {
+    render(Badge, { children: says('Not built yet') });
+
+    expect(screen.getByText('Not built yet')).toBeInTheDocument();
+  });
+
+  it.each([['neutral'], ['strong']] as const)('takes the %s tone', (tone) => {
+    const { unmount } = render(Badge, { tone, children: says('Beta') });
+
+    expect(screen.getByText('Beta')).toBeInTheDocument();
+    unmount();
+  });
+});
+
+describe('GameCard', () => {
+  it('is a link named by the game, when there is a game to reach', () => {
+    render(GameCard, {
+      name: 'poodl',
+      description: 'Guess a five-letter word in six attempts.',
+      href: 'https://pnut.fans/poodl/'
+    });
+
+    const link = screen.getByRole('link', { name: /poodl/ });
+
+    expect(link).toHaveAttribute('href', 'https://pnut.fans/poodl/');
+    expect(link).toHaveTextContent('Guess a five-letter word in six attempts.');
+  });
+
+  /*
+   * The reference draws a planned game as a dimmed `<a>` with no `href` and an
+   * `aria-disabled`, and decision 0017 refuses it twice over. An anchor without
+   * an `href` has no link role, so `aria-disabled` on it is not an allowed
+   * attribute and axe judges that at error level; and
+   * `AnUnavailableControlIsExempt` is spent "only while the control genuinely
+   * cannot be operated, never on one that is merely quiet" — a game nobody has
+   * built is not a control that has gone quiet, it is not a control.
+   */
+  it('is not a control at all when the game is only planned', () => {
+    render(GameCard, { name: 'pawjong', description: 'A tile game.', status: 'planned' });
+
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(document.querySelector('[aria-disabled]')).toBeNull();
+  });
+
+  it('says in words that a planned game is not built', () => {
+    render(GameCard, { name: 'pawjong', description: 'A tile game.', status: 'planned' });
+
+    expect(screen.getByText('Not built yet')).toBeInTheDocument();
+  });
+
+  it('says nothing of the kind about a game that is ready', () => {
+    render(GameCard, { name: 'poodl', description: 'A word game.', href: '/poodl/' });
+
+    expect(screen.queryByText('Not built yet')).toBeNull();
+  });
+
+  it('shows a line about the game when it is given one', () => {
+    render(GameCard, {
+      name: 'poodl',
+      description: 'A word game.',
+      href: '/poodl/',
+      meta: '5 letters, 6 guesses'
+    });
+
+    expect(screen.getByText('5 letters, 6 guesses')).toBeInTheDocument();
+  });
+
+  it('draws no such line when it is given none', () => {
+    render(GameCard, { name: 'poodl', description: 'A word game.', href: '/poodl/' });
+
+    expect(screen.queryByText(/letters/)).toBeNull();
   });
 });

@@ -20,7 +20,7 @@ just storybook-test       # every story in Chromium, with axe over each
 To iterate on one file, watch it:
 
 ```console
-just frontend-watch tests/wordmark.test.ts
+just frontend-watch tests/brand.test.ts
 just frontend-watch                          # everything, still watching
 ```
 

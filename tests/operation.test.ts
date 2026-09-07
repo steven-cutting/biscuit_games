@@ -26,7 +26,11 @@ import { resolve } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { MINIMUM_TOUCH_TARGET, NARROWEST_SUPPORTED_WIDTH } from '../src/lib/config';
+import {
+  MINIMUM_FIELD_TEXT_SIZE,
+  MINIMUM_TOUCH_TARGET,
+  NARROWEST_SUPPORTED_WIDTH
+} from '../src/lib/config';
 
 /*
  * Read from disk rather than imported. A `.css` file is claimed by Vite's
@@ -369,16 +373,22 @@ describe('EveryControlIsAComfortableTarget', () => {
   });
 
   /*
-   * Both figures, because the invariant closes on the second: every target
-   * holds "down to config.narrowest_supported_width". Only the stories consume
-   * that one, and a story frames itself to whatever the constant says — so
-   * raising it would widen the frame, keep the run green and leave
-   * `src/lib/config.ts` drifted from `operation.allium` with no gate noticing.
-   * Pinned here instead.
+   * All three figures, because each is consumed somewhere a green run would not
+   * notice it drifting. Every target holds "down to
+   * config.narrowest_supported_width", and only the stories consume that one — a
+   * story frames itself to whatever the constant says, so raising it would widen
+   * the frame and keep the run green. `Fields.@guarantee
+   * AFieldDoesNotMagnifyThePageWhenItTakesFocus` is worse still: the rule it
+   * answers cannot be measured in jsdom at all, because jsdom's own default
+   * input font is already the figure and the assertion would pass whether or not
+   * `app.css` declared anything — which is why `src/app.css` says so beside the
+   * rule, and why `stories/Input.stories.svelte` measures it in Chromium. Pinned
+   * here so that all three are held against the specification in one place.
    */
-  it('states the two figures once, where the specification can be checked against them', () => {
+  it('states the three figures once, where the specification can be checked against them', () => {
     expect(MINIMUM_TOUCH_TARGET).toBe(44);
     expect(NARROWEST_SUPPORTED_WIDTH).toBe(320);
+    expect(MINIMUM_FIELD_TEXT_SIZE).toBe(16);
   });
 });
 

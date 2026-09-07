@@ -24,16 +24,26 @@
  * itself, and docs/design/tokens.md says so.
  */
 export { default as Announcer } from './components/Announcer.svelte';
+export { default as Badge } from './components/Badge.svelte';
 export { default as Button } from './components/Button.svelte';
+export { default as Card } from './components/Card.svelte';
+export { default as CardLabel } from './components/CardLabel.svelte';
 export { default as Explainer } from './components/Explainer.svelte';
+export { default as GameCard } from './components/GameCard.svelte';
 export { default as HeaderBar } from './components/HeaderBar.svelte';
 export { default as Icon } from './components/Icon.svelte';
 export { default as IconButton } from './components/IconButton.svelte';
+export { default as Input } from './components/Input.svelte';
 export { default as Key } from './components/Key.svelte';
 export { default as Keyboard } from './components/Keyboard.svelte';
 export { default as Modal } from './components/Modal.svelte';
+export { default as Monogram } from './components/Monogram.svelte';
 export { default as Notice } from './components/Notice.svelte';
 export { default as PhysicalKeyboard } from './components/PhysicalKeyboard.svelte';
+export { default as SegmentedControl } from './components/SegmentedControl.svelte';
+export { default as Select } from './components/Select.svelte';
+export { default as SettingsRow } from './components/SettingsRow.svelte';
+export { default as Switch } from './components/Switch.svelte';
 export { default as Tile } from './components/Tile.svelte';
 export { default as Wordmark } from './components/Wordmark.svelte';
 export type { IconName } from './components/icons.js';

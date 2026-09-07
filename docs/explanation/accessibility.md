@@ -16,10 +16,14 @@ rather than restating them, and owes an account of any state it adds on top.
 
 This is the platform's model, and since
 [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) the platform
-primitives that implement it are here too: `Button`, `IconButton`, `HeaderBar`, `Modal`,
-`Notice` and `Announcer`, the preferences port that reads the device, and the contrast test
-that measures the palette. What is stated below names, for each obligation, what here
-discharges it and what still waits. An obligation nobody has written down is one the first
+primitives that implement it are here too: the chrome, the play surface
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) moved, and the
+fields [decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md)
+brought over — `Switch`, `SegmentedControl`, `SettingsRow`, `Input` and `Select`, which
+answer to the `Fields` surface that record added to `operation.allium`. With them come the
+preferences port that reads the device and the contrast test that measures the palette.
+What is stated below names, for each obligation, what here discharges it and what still
+waits. An obligation nobody has written down is one the first
 implementation gets to decide by accident.
 
 ## How the figures are measured
@@ -231,6 +235,15 @@ A text control is included on purpose: a 37px input is as much a target as a 37p
 also needs a font no smaller than 16px, below which iOS Safari magnifies the page when the
 field takes focus — the platform zooming on its own initiative, which is the thing the rule
 below refuses.
+
+That figure is no longer prose. It is `operation.allium`'s `config.minimum_field_text_size`,
+mirrored in `src/lib/config.ts` as `MINIMUM_FIELD_TEXT_SIZE`, and decision 0017 states it
+here because porting `Input` forced the question: the rule lived in this repository while the
+guarantee it answered lived in Poodl's specifications, which is precisely the inversion
+[decision 0015](../decisions/0015-operation-and-play-are-specified-here.md) exists to close.
+It is also the one figure no test under `tests/` can measure — jsdom's own default input font
+is already 16px, so an assertion there would pass whether or not the rule existed, and
+`stories/Input.stories.svelte` takes the measurement in Chromium instead.
 
 **A tap does only what the control does, and says that it landed.** Touch is the primary way
 these games are played, and a gesture the platform interprets for itself is a gesture that did

@@ -19,10 +19,14 @@ Four layers, and imports only ever run downwards.
 
 `src/routes/` is three files: `+layout.svelte`, which imports the stylesheet and renders
 its children; `+layout.ts`, which prerenders the tree; and `+page.svelte`, the front door.
-`src/lib/components/` is the platform primitives — `Wordmark`, `Icon`, `IconButton`,
-`Button`, `HeaderBar`, `Modal`, `Notice` and `Announcer` for the chrome, and `Tile`, `Key`,
-`Keyboard`, `PhysicalKeyboard` and `Explainer` for the play surface — which take callbacks
-as props, hold no application state and touch no browser global. `PhysicalKeyboard` is the
+`src/lib/components/` is the platform primitives — `Wordmark`, `Monogram`, `Icon`,
+`IconButton`, `Button`, `Card`, `CardLabel`, `Badge`, `GameCard`, `HeaderBar`, `Modal`,
+`Notice` and `Announcer` for the chrome; `Switch`, `SegmentedControl`, `SettingsRow`,
+`Input` and `Select` for the fields, which
+[decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md) brought over
+with the `Fields` surface they answer to; and `Tile`, `Key`, `Keyboard`, `PhysicalKeyboard`
+and `Explainer` for the play surface — which take callbacks as props, hold no application
+state and touch no browser global. `PhysicalKeyboard` is the
 case that proves the rule rather than bending it: what it needs is a window-level key
 subscription, which is squarely what this row forbids, so the subscription is a port it is
 handed and the guards are a pure predicate in the domain. `Modal` reads

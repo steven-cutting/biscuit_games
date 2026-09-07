@@ -168,6 +168,16 @@ break by accident. A live control's boundary is `--key-untried-rule` or a result
 never `--rule` or `--rule-strong`. And `--text-2` and `--text-3` are reading inks for the
 quiet grounds, not a general dimmer.
 
+The second of those has a figure behind it, found while decision 0017 was porting
+`GameCard`. `--text-3` reaches 4.89 against `--surface` and 5.33 against `--background`, and
+**3.60 against `--surface-hover` in light standard** — the one combination of four where it
+fails the 4.5 floor. So `--surface-hover` is a ground for `--text` and nothing quieter, and a
+component that both darkens on hover and carries a tertiary line has to give one of them up.
+`GameCard` gives up the darkening and strengthens its rule instead, which is what this
+system says elevation is for. `tests/contrast.test.ts` measures `--text-3` on the page and on
+a card and deliberately not on the hover ground, because a pair nothing paints is a pair it
+does not measure — the rule lives here instead, where it applies to whatever is written next.
+
 `--text-disabled` and a disabled control's `--rule` border are the two inks the design
 system states rather than derives. They are exempt from every figure by
 `Appearance.@guarantee AnUnavailableControlIsExempt`, so the contrast test measures neither
@@ -200,10 +210,25 @@ Renaming any of the three is a cross-repository change, not a token change.
 | `--figures-tabular` | `tabular-nums`, for the figures the display face carries |
 
 `--fs-body` is copy only. Below 16px iOS Safari magnifies the page when a text control
-takes focus, so inputs and textareas take `font: inherit` off the 16px body instead — a
-rule the file carries for a guarantee that lives in Poodl's specifications rather than in
-this repository's. `--fs-board` is sized to the 48px cell decision 0010 records rather than
-the design reference's 56px.
+takes focus, so inputs and textareas take `font: inherit` off the 16px body instead. That
+rule used to answer a guarantee living in Poodl's specifications rather than in this
+repository's; since
+[decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md) it answers
+`operation.allium`'s `config.minimum_field_text_size`, and `Input` and `Select` set `1rem`
+themselves rather than trusting the inheritance — `font: inherit` reaches the 16px body only
+when nothing in between sets a size, and a field inside anything that sets `--fs-body` is
+15px with every gate green. `--fs-board` is sized to the 48px cell decision 0010 records
+rather than the design reference's 56px.
+
+Three rules about type that no token can carry, and that had never been written down on
+either side of the split until 0017's survey went looking for them. **Uppercase is the
+system's one decorative typographic device**, and it is spent on micro-labels — `CardLabel`,
+a `Badge`, a `GameCard`'s meta line — and nowhere else. **Everything else is sentence case.**
+And **a sentence is never uppercased**: the device is for labels of two or three words, and
+`text-transform` on running prose also rewrites the eszett, which is a second reason for a
+rule that already had one. Numerals are the fourth: `--figures-tabular` exists because
+figures that move under their own digits are unreadable in a column, so **numerals are never
+proportional** anywhere a reader compares two of them.
 
 Nothing resolves a token name, either. A declaration naming a token no block defines is
 invalid at computed-value time and silently falls back to the inherited value, so a
@@ -223,11 +248,24 @@ Form is four radii and two rule weights: `--radius-tile` and `--radius-key` at 3
 `--radius-card` at 4px, `--radius-max` at 6px, `--rule-w` at 1px and `--rule-w-strong` at
 1.5px, plus `--lift-dialog`, the hard offset shadow a dialog sits on.
 
+**`--radius-max` is a ceiling and not merely the largest one in use.** Nothing in this system
+is pill-shaped, and a radius above 6px is the shape of a different system. The corollary is
+the one that gets forgotten: **rules do the work shadows would do elsewhere.** Depth here is a
+hairline and a ground, which is why there is one shadow token rather than a lift scale, why
+`Card` has no `lift`, and why `GameCard` answers a pointer by strengthening its rule instead
+of floating.
+
 Motion is `--ease` and three durations. `--dur-1`, `--dur-2` and `--dur-3` are `0ms` on
 bare `:root` and become 120ms, 150ms and 180ms only under `:root[data-animations='on']`,
 which is how a component may write its transition unconditionally and leave the appearance
 surface as the single gate. Keyframe animations cannot use that trick — a 0ms animation
 still fires its events — so they gate on the attribute themselves.
+
+The three are a ladder of scope rather than three interchangeable speeds, which the token
+names do not say and the design system's did: **`--dur-1` is a control changing under a
+pointer or a finger, `--dur-2` is a surface arriving or leaving, and `--dur-3` is something
+covering the page.** A control that animates at the overlay's pace reads as sluggish, and an
+overlay at the control's pace reads as a flicker.
 
 ## The fonts
 

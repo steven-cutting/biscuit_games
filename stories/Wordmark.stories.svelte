@@ -8,16 +8,28 @@
     'The brand lockup: the placeholder mark and "biscuit games", always lowercase, always in',
     'the display face.',
     '',
-    'No governing surface — this is brand, from `docs/design/direction.md`. The mark is the',
-    'brand initial in a ruled square whose fourth corner is the one soft break ("perfect,',
-    'broken once"), set in type until an illustrator draws the real one, and it is',
-    '`aria-hidden`: the words are the whole accessible text, which the play holds.'
+    'No governing surface — this is brand, from `docs/design/direction.md`. The mark is',
+    '`Monogram`, and it is `aria-hidden` here: the words are the whole accessible text, which',
+    'the play holds.',
+    '',
+    '`product` names a game after the platform. Before [decision 0017] a game installing the',
+    'package could not render its own lockup at all and had to rebuild one, matching the',
+    'display face, the weight, the tracking and the `words` class `HeaderBar` reaches into —',
+    'a cost paid twice the moment there are two games. The separator lives inside `words`, so',
+    'the whole lockup collapses together under that 26rem rule rather than leaving a slash',
+    'behind on a phone.'
   ].join('\n');
 
   const { Story } = defineMeta({
     title: 'Brand/Wordmark',
     component: Wordmark,
     tags: ['autodocs'],
+    argTypes: {
+      product: {
+        control: 'text',
+        description: "A game named after the platform. Omitted, the lockup is the platform's alone."
+      }
+    },
     parameters: { docs: { description: { component: OVERVIEW } } }
   });
 </script>
@@ -32,6 +44,19 @@
     // would pass with the mark audible. The mark is held hidden on its own.
     await expect(canvas.getByText('b')).toHaveAttribute('aria-hidden', 'true');
     await expect(canvas.getByText(/biscuit/)).toHaveTextContent(/^biscuit games$/);
+  }}
+/>
+
+<Story
+  name="With a game"
+  args={{ product: 'poodl' }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The platform first, then the game, in one accessible string — and the mark
+    // still silent, which is the half a text query cannot see.
+    await expect(canvas.getByText(/biscuit/)).toHaveTextContent(/^biscuit games \/ poodl$/);
+    await expect(canvas.getByText('b')).toHaveAttribute('aria-hidden', 'true');
   }}
 />
 

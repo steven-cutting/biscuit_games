@@ -627,10 +627,18 @@ textarea {
  * control in the app already says this in its own scoped styles, so this rule
  * changes nothing on the screen today; what it changes is that a control which
  * arrives without them inherits the body's figure instead of the user agent's
- * smaller one. Poodl measures this in Chromium by its
- * `stories/LinkReady.stories.svelte`, because jsdom's default input font is
- * already 16px and an assertion there would pass whether or not this rule
- * existed. That story is not here, and the hub has no text control to measure.
+ * smaller one. jsdom's default input font is already 16px, so an assertion in
+ * `tests/` would pass whether or not this rule existed — which is why the
+ * measurement is a story's. Poodl takes it in Chromium by its
+ * `stories/LinkReady.stories.svelte`; the hub now has text controls of its own,
+ * and `stories/Input.stories.svelte` and `stories/Select.stories.svelte` measure
+ * theirs inside an element that sets `--fs-body`, which is the shape this rule
+ * is actually for.
+ *
+ * The figure is `operation.allium`'s `config.minimum_field_text_size` since
+ * decision 0017, mirrored in `src/lib/config.ts`. `Input` and `Select` set
+ * `1rem` themselves rather than trusting the inheritance, because `font:
+ * inherit` reaches the 16px body only when nothing in between sets a size.
  */
 input,
 textarea {
