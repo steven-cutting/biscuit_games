@@ -1,6 +1,6 @@
 {
   "name": "@steven-cutting/biscuit-games",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "The Biscuit Games design system: the platform's design tokens, its two typefaces, its shared Svelte 5 components, and the Allium specification they answer to.",
   "license": "UNLICENSED",
   "repository": {

@@ -227,8 +227,7 @@ Deliberate deviations from Poodl, each recorded in
   0014 records each, and the Poodl handover carries what each costs Poodl.
 - The site is published nowhere. No Pages workflow, no `site-root/`, no staging
   script, and no `BASE_PATH` set anywhere: the domain root stays with Poodl for
-  now. The workshop is published, the package is ready to publish, and the site
-  is neither.
+  now. The workshop and the package are both published; the site is not.
 - Three Allium modules rather than five, and none of them a game's.
   `docs/specs/appearance.allium` carries the shared surface lifted from Poodl's
   `settings.allium`; `operation.allium` and `play-surfaces.allium` carry what

@@ -53,12 +53,11 @@ it does not work.
 ## 2. Install a version
 
 ```console
-npm install @steven-cutting/biscuit-games@0.1.0 --save-exact
+npm install @steven-cutting/biscuit-games@1.0.0 --save-exact
 ```
 
-`0.1.0` is the version the first release will carry; until it is cut this command returns the
-same `404` described above, for an entirely different reason, and
-[Published artefacts](../reference/published-artefacts.md) says whether one has been.
+`1.0.0` is the first release. [Published artefacts](../reference/published-artefacts.md) says
+what the number promises, and the `CHANGELOG.md` the package carries says what is in it.
 
 Exact, no range. That is this repository's fourth invariant and a game built from the same
 toolchain holds the same one. The version is what makes drift visible; a caret gives it
