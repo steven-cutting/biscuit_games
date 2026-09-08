@@ -446,4 +446,34 @@ describe('GameCard', () => {
 
     expect(screen.queryByText(/letters/)).toBeNull();
   });
+
+  /*
+   * Two cards nobody can ask for, and the type is what refuses them rather than
+   * a branch. `href` and `status` used to be independent options, so a ready
+   * game with nowhere to go compiled and drew an inert card that said nothing
+   * about why, and a planned game handed a URL compiled and swallowed it. Both
+   * are now unrepresentable, which is the whole of the fix: a state a caller
+   * cannot write needs no arm to handle it, and an arm nothing reaches is a
+   * branch nothing covers.
+   *
+   * `@ts-expect-error` is the assertion — `npm run check` fails on a directive
+   * that suppressed nothing, so this is red exactly while the type admits the
+   * card. Both are rendered anyway, because a consumer writing JavaScript is
+   * held to none of it: neither draws a link, which is the runtime half of the
+   * same refusal.
+   */
+  it('refuses the two cards that would say the wrong thing', () => {
+    // @ts-expect-error A ready game owes an `href`. Without one there is nothing to reach.
+    render(GameCard, { name: 'poodl', description: 'A word game.' });
+
+    // @ts-expect-error A planned game is not a control, so a URL for one goes nowhere.
+    render(GameCard, {
+      name: 'pawjong',
+      description: 'A tile game.',
+      status: 'planned',
+      href: '/pawjong/'
+    });
+
+    expect(screen.queryByRole('link')).toBeNull();
+  });
 });

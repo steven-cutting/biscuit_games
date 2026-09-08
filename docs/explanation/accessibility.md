@@ -221,7 +221,11 @@ The checkbox and the radio are excluded because the invariant grants them the la
 contains them instead, and a control a surface builds out of a generic element is the surface's
 own to size, since no shared rule can tell it from ordinary content. Across is deliberately not
 declared, since a floor in that direction would be wrong for a dense row and would have to be
-fought back wherever it applied. Which rows are dense is arithmetic over the room the row is
+fought back wherever it applied — so what the stylesheet leaves undeclared, a component
+declares for itself. A `SegmentedControl` segment is the shape that made the point: the words
+in its options are the caller's, so a group worded "System Light Dark" cleared the figure on
+its words while one worded "S M L" stood 40px across, and a story measuring only the height
+could not tell the two apart. Which rows are dense is arithmetic over the room the row is
 given, gaps counted with the controls — a count of controls against the viewport once left a
 seven-tile rack unexempted and 37px across at the same time, and
 `stories/Keyboard.stories.svelte` now asserts row by row which rows the exemption reaches. A

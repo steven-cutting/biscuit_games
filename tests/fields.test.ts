@@ -100,6 +100,44 @@ describe('Switch', () => {
       userEvent.click(screen.getByRole('switch', { name: 'Animations' }))
     ).resolves.toBeUndefined();
   });
+
+  /*
+   * And that caller still gets a switch whose three tellings agree.
+   * `AppearanceNeverCarriesMeaningAlone` counts the knob's position, the word
+   * beside it and `checked` in the accessibility tree, and a one-way prop left
+   * the browser holding the first and the last while the word held the value
+   * nobody had written back: checked, and saying "Off". A caller that writes
+   * nothing is the supported case above, so it is the case this has to hold in.
+   */
+  it('keeps its word agreeing with its box when nobody writes the value back', async () => {
+    render(Switch, { label: 'Animations' });
+
+    const control = screen.getByRole('switch', { name: 'Animations' });
+    await userEvent.click(control);
+
+    expect(control).toBeChecked();
+    expect(screen.getByText('On')).toBeInTheDocument();
+  });
+
+  /*
+   * Held between writes rather than instead of them. The value the caller gives
+   * wins whenever the caller moves it, and what the reader did in the meantime
+   * is what the switch shows until then. Two rerenders because that is what
+   * moving it means: the value has to leave `false` for the caller to be saying
+   * anything the switch did not already know.
+   */
+  it('follows the caller again the moment the caller moves the setting', async () => {
+    const { rerender } = render(Switch, { label: 'Animations', checked: false });
+
+    await userEvent.click(screen.getByRole('switch', { name: 'Animations' }));
+    expect(screen.getByText('On')).toBeInTheDocument();
+
+    await rerender({ label: 'Animations', checked: true });
+    await rerender({ label: 'Animations', checked: false });
+
+    expect(screen.getByRole('switch', { name: 'Animations' })).not.toBeChecked();
+    expect(screen.getByText('Off')).toBeInTheDocument();
+  });
 });
 
 describe('SegmentedControl', () => {
@@ -134,7 +172,14 @@ describe('SegmentedControl', () => {
     await userEvent.tab();
     expect(screen.getByRole('radio', { name: 'System' })).toHaveFocus();
 
+    /*
+     * `System` is named here and not only the other two, because without it the
+     * assertion cannot tell one stop from a Tab that did nothing: a second stop
+     * inside the group and a second stop that never happened both leave `Light`
+     * and `Dark` unfocused, and only the first also takes focus off `System`.
+     */
     await userEvent.tab();
+    expect(screen.getByRole('radio', { name: 'System' })).not.toHaveFocus();
     expect(screen.getByRole('radio', { name: 'Light' })).not.toHaveFocus();
     expect(screen.getByRole('radio', { name: 'Dark' })).not.toHaveFocus();
   });

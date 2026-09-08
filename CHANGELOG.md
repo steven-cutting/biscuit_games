@@ -46,6 +46,19 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   switch's name against a group's legend, because a component test queries by role and name
   and the contrast test measures colour, so nothing else in the gate can see the two disagree.
 
+  Three findings from the review of this change are fixed inside it. `Switch` and
+  `SegmentedControl` read every telling of their state off one value: a native control moves
+  the moment it is clicked and a prop written one way is only rewritten when the caller moves
+  it, so a caller that wrote nothing back — the handler-less case both of them support — was
+  left with a box reporting on beside a word reading "Off", and a group reporting the new
+  choice while inking the old one. A `SegmentedControl` segment floors itself at 44px across,
+  because `EveryControlIsAComfortableTarget` asks for the figure in both directions and
+  `src/app.css` declares only the one down the page: a group worded "S M L" stood 40px across
+  where "System Light Dark" cleared the figure on its words alone. And `GameCard`'s `href` and
+  `status` are one choice rather than two independent options, so a ready game with nowhere to
+  go and a planned game handed a URL it would drop are both refused by the type rather than
+  drawn.
+
 - `Wordmark` takes an optional `product`, so a game renders `biscuit games / poodl` from the
   package. Without it a game could not render its own lockup at all and had to rebuild one,
   matching `--font-display`, weight 600, `--track-display` and the `words` class `HeaderBar`'s

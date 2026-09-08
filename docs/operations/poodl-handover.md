@@ -639,6 +639,28 @@ label, taking the package leaves its own fields disagreeing with the package's; 
 the same three declarations, and no version carries it, because these ten components are
 unreleased and reach Poodl for the first time in the release that adds them.
 
+**A control that draws its state twice holds that state itself.** `Switch` draws a word beside
+its box and `SegmentedControl` inks the segment a radio fills, and both used to read those off
+the prop while the browser read the control off itself. A native control moves the moment it is
+clicked, and a prop written one way is only rewritten when the caller moves it — so a caller
+that wrote nothing back was left with a switch reporting on and saying "Off", and a group
+reporting the new choice while inking the old one, which is
+`Appearance.@guarantee AppearanceNeverCarriesMeaningAlone` saying two things at once. Both now
+derive every telling from one value that starts as the prop and follows it whenever the caller
+moves it. Poodl owes this to any control of its own that draws a second telling of a state the
+browser also holds; the shapes to check are its `SettingsPanel` rows and anything drawing a
+word, a fill or a weight from a value it hands down one way.
+
+**And the 44px figure across is the component's own.** `src/app.css` declares
+`min-block-size: 44px` and deliberately not the inline direction, because an on-screen key is
+the shape that cannot have it and a global floor would be a fight `Keyboard` has to lose. What
+that leaves undeclared, a component declares for itself, which the stylesheet's own comment now
+says rather than assuming that a control's words carry it past the figure. They do not always:
+a `SegmentedControl` worded "System Light Dark" cleared 44px on its words and one worded
+"S M L" stood 40px across, so a segment now floors itself. Poodl takes `src/app.css` whole and
+so takes the same silence: any control it builds whose width is only the words inside it owes
+the figure across itself, and a story that measures the height alone cannot see the difference.
+
 **Nothing here is wired to a setting, and Poodl should not be the one to wire it.** `Switch`,
 `SegmentedControl` and `SettingsRow` are the controls an appearance panel is built from, and
 binding one to `high_contrast` answers `appearance.allium`'s open question about the contrast

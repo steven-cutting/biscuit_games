@@ -661,10 +661,15 @@ textarea {
  * that, lost, is the sideways scroll this rule exists alongside. That is the
  * exemption `operation.allium` states inside
  * `EveryControlIsAComfortableTarget`, and the width stories in
- * `stories/Keyboard.stories.svelte` measure what it gives instead. Every other
- * control carries a label that takes it past the figure on its own, or sets its
- * own width as `IconButton` does, and the story run measures that rather than
- * assuming it.
+ * `stories/Keyboard.stories.svelte` measure what it gives instead. What is left
+ * undeclared here, a control declares for itself, because this rule cannot tell
+ * which control is exempt: `IconButton` sets 44px outright, and a
+ * `SegmentedControl` segment floors itself because the words in its options are
+ * the caller's and may be one letter each. The rest reach the figure on the
+ * words they carry, and the story run measures that rather than assuming it —
+ * which is how the segment was found. It had the story and not the measurement,
+ * so a group worded "System Light Dark" passed a clause a group worded "S M L"
+ * failed at 40px across.
  *
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite

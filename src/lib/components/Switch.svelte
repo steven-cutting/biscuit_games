@@ -26,6 +26,16 @@
    * and a name that changed as the control was worked would be a different
    * control each time.
    *
+   * Which is why the three are read off one value rather than off the prop and
+   * the browser separately. A checkbox moves the moment it is clicked, and
+   * `checked` written one way is only rewritten when the caller changes it — so
+   * a caller that wrote nothing back left the box and the accessibility tree
+   * saying on while the word said "Off", and two of the three tellings
+   * disagreed. `shown` starts as the prop and follows it whenever the caller
+   * moves it; between those, it is what the reader did. A switch with no
+   * handler at all is a supported caller here, and it is the caller that had
+   * nothing else holding it together.
+   *
    * It sets no `box-shadow`: the ring on the row is `app.css`'s and a component
    * that painted its own would take it away.
    */
@@ -45,6 +55,13 @@
     onchange?: (checked: boolean) => void;
   } = $props();
 
+  /*
+   * The setting the row is showing. A `$derived` rather than a `$state` seeded
+   * from the prop: it recomputes whenever `checked` moves, so the caller stays
+   * in charge without an effect copying one into the other.
+   */
+  let shown = $derived(checked);
+
   /* One call, two ids — `$props.id()` may be used once per component. */
   const uid = $props.id();
   const nameId = `${uid}-name`;
@@ -60,16 +77,19 @@
   </span>
 
   <span class="setting">
-    <span class="state" aria-hidden="true">{checked ? 'On' : 'Off'}</span>
+    <span class="state" aria-hidden="true">{shown ? 'On' : 'Off'}</span>
     <input
       class="track"
       type="checkbox"
       role="switch"
-      {checked}
+      checked={shown}
       {disabled}
       aria-labelledby={nameId}
       aria-describedby={description === undefined ? undefined : describedById}
-      onchange={(event) => onchange?.(event.currentTarget.checked)}
+      onchange={(event) => {
+        shown = event.currentTarget.checked;
+        onchange?.(shown);
+      }}
     />
   </span>
 </label>

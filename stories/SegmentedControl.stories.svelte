@@ -14,6 +14,30 @@
     { value: 'dark', label: 'Dark' }
   ];
 
+  /*
+   * A group whose words are one letter each, which is the width the English
+   * labels above were hiding: the padding is 16px a side and nothing else was
+   * making a segment 44px across.
+   */
+  const SIZES = [
+    { value: 'small', label: 'S' },
+    { value: 'medium', label: 'M' },
+    { value: 'large', label: 'L' }
+  ];
+
+  /**
+   * The segment a radio fills. It is the `<label>` rather than the input,
+   * because the label is the cell `current` inks and the box the finger is aimed
+   * at, which is what both measurements below are about.
+   */
+  function segmentOf(canvasElement: HTMLElement, word: string): HTMLElement {
+    const segment = within(canvasElement).getByRole('radio', { name: word }).closest('label');
+    if (segment === null) {
+      throw new Error(`The ${word} radio is not inside a segment`);
+    }
+    return segment;
+  }
+
   const OVERVIEW = [
     'A few exclusive choices, all of them visible at once.',
     '',
@@ -61,6 +85,19 @@
     await expect(canvas.getByRole('radio', { name: 'Dark' })).toBeChecked();
     await userEvent.click(canvas.getByRole('radio', { name: 'Light' }));
     await expect(onchange).toHaveBeenCalledWith('light');
+
+    /*
+     * And the ink moves with the choice. This story hands the control a spy
+     * rather than a caller that writes the value back, which is the case the
+     * component has to hold on its own: `checked` in the accessibility tree and
+     * the heavier weight beside it are two tellings of one state, so a group
+     * reporting the new choice while inking the old one has
+     * `AppearanceNeverCarriesMeaningAlone` saying two things at once. The weight
+     * rather than the fill, because the fill is the colour the clause declines
+     * to count on its own — and only a browser resolves either.
+     */
+    await expect(getComputedStyle(segmentOf(canvasElement, 'Light')).fontWeight).toBe('600');
+    await expect(getComputedStyle(segmentOf(canvasElement, 'Dark')).fontWeight).not.toBe('600');
   }}
 />
 
@@ -127,27 +164,36 @@
     }
   }}
   play={async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const frame = canvasElement.querySelector('[data-frame]');
     if (frame === null) {
       throw new Error('The story has no frame');
     }
 
-    for (const word of ['System', 'Light', 'Dark']) {
-      const segment = canvas.getByRole('radio', { name: word }).closest('label');
-      if (segment === null) {
-        throw new Error(`The ${word} radio is not inside a segment`);
-      }
-      await expect(segment.getBoundingClientRect().height).toBeGreaterThanOrEqual(
-        MINIMUM_TOUCH_TARGET
-      );
+    /*
+     * Both directions, which the clause asks for and only one of which this
+     * measured. `app.css` declares the figure down the page and deliberately not
+     * across it — an on-screen key is the shape that cannot have it, and a
+     * global floor would be a fight `Keyboard` has to lose. A segment is not
+     * that shape, so it owes the figure across as well, and the six segments
+     * here are the two ways a group can be worded: three that clear it on their
+     * words alone, and three that clear it on nothing but the floor.
+     */
+    for (const word of ['System', 'Light', 'Dark', 'S', 'M', 'L']) {
+      const box = segmentOf(canvasElement, word).getBoundingClientRect();
+
+      await expect(box.height).toBeGreaterThanOrEqual(MINIMUM_TOUCH_TARGET);
+      await expect(box.width).toBeGreaterThanOrEqual(MINIMUM_TOUCH_TARGET);
     }
 
     await expect(frame.scrollWidth).toBeLessThanOrEqual(frame.clientWidth);
   }}
 >
-  <div data-frame style="inline-size: {FRAME_WIDTH}; padding-inline: var(--shell-pad);">
+  <div
+    data-frame
+    style="display: grid; gap: var(--s-6); inline-size: {FRAME_WIDTH}; padding-inline: var(--shell-pad);"
+  >
     <SegmentedControl label="Theme" options={THEMES} value="dark" />
+    <SegmentedControl label="Size" options={SIZES} value="medium" />
   </div>
 </Story>
 

@@ -20,7 +20,13 @@
    *
    * The taken choice is not taken by colour alone. It carries `checked` in the
    * accessibility tree and a heavier weight in the ink, which is `Button`'s
-   * `current` idiom and the same reason it has one.
+   * `current` idiom and the same reason it has one — and both are read off one
+   * value, because they are two tellings of the same thing. A radio moves the
+   * moment it is clicked and `value` written one way is only rewritten when the
+   * caller moves it, so a caller that wrote nothing back left the group
+   * reporting the new choice and inking the old one. `taken` starts as `value`
+   * and follows it whenever the caller moves it; between those, it is the
+   * choice the reader made.
    *
    * The `<legend>` names the group and the description is bound to the fieldset,
    * so a reader arriving at any segment hears what the group is for.
@@ -53,6 +59,13 @@
   const uid = $props.id();
   const describedById = `${uid}-description`;
   const group = `${uid}-group`;
+
+  /*
+   * Which choice the group is showing. A `$derived` rather than a `$state`
+   * seeded from the prop: it recomputes whenever `value` moves, so the caller
+   * stays in charge without an effect copying one into the other.
+   */
+  let taken = $derived(value);
 </script>
 
 <fieldset aria-describedby={description === undefined ? undefined : describedById}>
@@ -63,13 +76,16 @@
 
   <span class="segments">
     {#each options as option (option.value)}
-      <label class="segment" class:current={option.value === value}>
+      <label class="segment" class:current={option.value === taken}>
         <input
           type="radio"
           name={group}
           value={option.value}
-          checked={option.value === value}
-          onchange={() => onchange?.(option.value)}
+          checked={option.value === taken}
+          onchange={() => {
+            taken = option.value;
+            onchange?.(option.value);
+          }}
         />
         <span class="word">{option.label}</span>
       </label>
@@ -150,6 +166,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /*
+     * `EveryControlIsAComfortableTarget` asks for the figure in both directions.
+     * `app.css` declares only the one down the page, and says why: an on-screen
+     * key is the shape that cannot have it across, so a global floor would be a
+     * fight `Keyboard` has to lose. A segment is not that shape and has no
+     * exemption, so it takes the figure here. 44px is
+     * `config.minimum_touch_target` by meaning rather than by coincidence, which
+     * is what keeps it a figure rather than a step on the spacing scale — the
+     * padding alone leaves a one-letter word 40px across, which is a group
+     * worded "S M L" failing a clause a group worded "System Light Dark"
+     * passes.
+     */
+    min-inline-size: 44px;
     padding: 0 var(--s-6);
     color: var(--text-2);
     font-family: var(--font-ui);

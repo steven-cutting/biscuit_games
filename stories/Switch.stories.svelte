@@ -48,6 +48,13 @@
   });
 </script>
 
+<!--
+  The play works this one, so what Chromatic sees is the switch after the click
+  rather than before it. That is the state worth pinning: the story hands the
+  control a spy rather than a caller that writes the value back, and the word,
+  the knob and `checked` all have to have moved together — the case that used to
+  leave a switch reporting on and saying "Off".
+-->
 <Story
   name="Off"
   play={async ({ canvasElement }) => {
@@ -56,8 +63,12 @@
     const control = canvas.getByRole('switch', { name: 'Animations' });
 
     await expect(control).not.toBeChecked();
+    await expect(canvas.getByText('Off')).toBeInTheDocument();
+
     await userEvent.click(control);
     await expect(onchange).toHaveBeenCalledWith(true);
+    await expect(control).toBeChecked();
+    await expect(canvas.getByText('On')).toBeInTheDocument();
   }}
 />
 
