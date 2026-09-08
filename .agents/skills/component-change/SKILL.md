@@ -6,7 +6,7 @@ description: Add or change a shared Biscuit Games component with its test, story
 # Change a shared component
 
 1. Read `AGENTS.md` and `docs/how-to/port-a-design-system-component.md`. Every component here is a shared component: a platform-shaped component is built here first, whether or not a second consumer exists yet, and a game-shaped one stays in its game — `docs/project/what-the-hub-owns.md` is the test, and decision 0014 the rule.
-2. Read `docs/specs/appearance.allium` for the obligations any rendered surface carries, and `docs/design/tokens.md` for the vocabulary. Inspect the existing components and tests before editing.
+2. Read the specification the surface answers to: `docs/specs/appearance.allium` for the obligations any rendered surface carries, `operation.allium` for how it is worked — `Operation`, `Dialog` and, for a field, `Fields` — and `play-surfaces.allium` for a surface played on. Then `docs/design/tokens.md` for the vocabulary. Inspect the existing components and tests before editing.
 3. Use Svelte 5 runes: `$props` for inputs, `$state` for local state, `$derived` for computed values. Pass callbacks as props rather than dispatching events, and take no `...rest` spread.
 4. Map tokens, never hex. Every colour, size, and duration names something `src/app.css` already decides, except a figure that coincides with a token by value rather than by meaning — a control height is not a spacing step — which stays a literal with a comment saying so. A live control's boundary owes `minimum_boundary_contrast` against the page; a decorative rule does not pay it.
 5. Preserve semantic HTML, labels bound to controls, keyboard operation, visible focus, and a non-colour indication for every state the component expresses.

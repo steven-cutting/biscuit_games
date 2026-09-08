@@ -591,6 +591,107 @@ than by content, so nothing on its side breaks — but a reader following the ci
 at a record that says its own proposal was wrong, which is the point of amending rather than
 editing.
 
+## What decision 0017 adds
+
+[Decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md) finished the
+design-system import. Ten components, one optional prop, one specification surface and one
+config figure reach Poodl on its next version bump. None of it is breaking, and all of it is
+Poodl's to take or refuse.
+
+**The level is Minor, and every part of the change agrees on it.** Components added, an
+optional prop added, guarantees added and a config figure added are four separate Minor rows
+in [Published artefacts](../reference/published-artefacts.md), and the change contains
+nothing from the Major column: no token was renamed or removed, no token's value moved, no
+existing component's accessible name or role changed, no `@guarantee` changed in meaning, and
+the Svelte peer range is untouched. `Wordmark` with no `product` still reads exactly "biscuit
+games", which is the one accessible name a release could have moved and did not. The entry
+sits under `[Unreleased]` in `CHANGELOG.md` and `package.json` still says 1.0.0, because
+cutting a release is its own change here — that is what commit `11dfadf96c7ce24672bca256115888b1fac55938`
+did for 1.0.0, and
+`scripts/check_release.py` compares the tag against the pair.
+
+**A specification surface Poodl did not ask for.** `operation.allium` now carries
+`surface Fields` and `config.minimum_field_text_size`, and the three modules ship in the
+package — so Poodl's own fields answer to five guarantees they have never been read against.
+The one worth checking first is `AFieldIsNamedByALabelBoundToIt`: a field named by adjacent
+words rather than by a bound label satisfied nothing before and fails a stated clause now.
+
+**The 16px floor changes hands.** The rule was already in `src/app.css`, which Poodl takes
+whole, and it answered a guarantee that lived in *Poodl's* specifications while the rule
+lived here — the inversion decision 0015 exists to close. It is now
+`config.minimum_field_text_size`, stated here and mirrored in `src/lib/config.ts`. Poodl
+should retire whatever clause of its own carried that figure rather than keeping two.
+
+**A settings-row question this page already flagged is now answerable.** `SettingsRow` here
+is the rule and the room around it and nothing else; the setting's name and its line of
+consequence moved onto the controls, because the row has to *be* the label for the whole of
+it to be the 44px target. If Poodl's rows bind by `for` to a control they do not contain,
+taking the package gives them nothing and they still owe themselves the figure — which is
+what this page said to check, and the shape to check it against is now `Switch`.
+
+**And a field names itself in sentence case here.** `Input`, `Select` and `SegmentedControl`
+each arrived from the design reference drawing the field's name as a quiet uppercase
+micro-label, which put a switch's name and a group's legend in two different shapes in one
+settings sheet the moment the row stopped carrying either. All four now draw it as body copy
+at `--text` and `--fs-body`, and `docs/design/tokens.md` states the rule — uppercase is spent
+on micro-labels and a field's name is not one. If Poodl has copied the reference's field
+label, taking the package leaves its own fields disagreeing with the package's; the repair is
+the same three declarations, and no version carries it, because these ten components are
+unreleased and reach Poodl for the first time in the release that adds them.
+
+**A control that draws its state twice holds that state itself.** `Switch` draws a word beside
+its box and `SegmentedControl` inks the segment a radio fills, and both used to read those off
+the prop while the browser read the control off itself. A native control moves the moment it is
+clicked, and a prop written one way is only rewritten when the caller moves it — so a caller
+that wrote nothing back was left with a switch reporting on and saying "Off", and a group
+reporting the new choice while inking the old one, which is
+`Appearance.@guarantee AppearanceNeverCarriesMeaningAlone` saying two things at once. Both now
+derive every telling from one value that starts as the prop and follows it whenever the caller
+moves it. Poodl owes this to any control of its own that draws a second telling of a state the
+browser also holds; the shapes to check are its `SettingsPanel` rows and anything drawing a
+word, a fill or a weight from a value it hands down one way.
+
+**And the 44px figure across is the component's own.** `src/app.css` declares
+`min-block-size: 44px` and deliberately not the inline direction, because an on-screen key is
+the shape that cannot have it and a global floor would be a fight `Keyboard` has to lose. What
+that leaves undeclared, a component declares for itself, which the stylesheet's own comment now
+says rather than assuming that a control's words carry it past the figure. They do not always:
+a `SegmentedControl` worded "System Light Dark" cleared 44px on its words and one worded
+"S M L" stood 40px across, so a segment now floors itself. Poodl takes `src/app.css` whole and
+so takes the same silence: any control it builds whose width is only the words inside it owes
+the figure across itself, and a story that measures the height alone cannot see the difference.
+
+**Nothing here is wired to a setting, and Poodl should not be the one to wire it.** `Switch`,
+`SegmentedControl` and `SettingsRow` are the controls an appearance panel is built from, and
+binding one to `high_contrast` answers `appearance.allium`'s open question about the contrast
+escape hatch by building it. The same is true of the bare-key claim and
+`operation.allium`'s. Whichever repository draws a panel first decides both, so neither
+should draw one until they are decided.
+
+**`Wordmark` can now render a game's own lockup.** It takes an optional `product`, so
+`biscuit games / poodl` comes from the package. Poodl currently hand-builds that lockup and
+matches `--font-display`, weight 600, `--track-display` and the `words` class `HeaderBar`'s
+26rem collapse reaches into — a cost recorded nowhere until 0017's survey found it. Taking
+the prop deletes that copy.
+
+**The brand mark is `Monogram`, not `Mark`.** A cross-repository reference reaching for
+`Mark` will find the play-surface mark type, which is a different thing entirely. The name
+was forced: renaming the existing export would have been a Major version.
+
+**Two components' shapes are worth reading before adopting them.** `GameCard` refuses the
+design system's dimmed, `aria-disabled` anchor for a game that does not exist yet — an
+anchor with no `href` has no link role, so the attribute is not allowed on it, and
+`AnUnavailableControlIsExempt` is not spendable on something that was never a control. And
+`SegmentedControl` is native radios rather than buttons wearing `role="radio"`, because the
+reference implements neither half of the clause about one tab stop and arrows within it. If
+Poodl has copied either reference shape, both are defects rather than differences.
+
+**One visual change reaches every card-like surface.** `--text-3` may not be read on
+`--surface-hover` — it reaches 3.60 there in light standard against a floor of 4.5 — so a
+Poodl surface that darkens on hover and carries a tertiary line is below the floor today. It
+is measured nowhere on either side, because a pair nothing paints is a pair the contrast test
+does not hold; `docs/design/tokens.md` carries it as a rule about the token instead.
+
 ## What a cross-repository link costs
 
 Once a reference crosses a repository boundary it stops being a path and becomes an

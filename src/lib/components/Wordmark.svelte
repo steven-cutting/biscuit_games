@@ -1,22 +1,39 @@
 <script lang="ts">
+  import Monogram from './Monogram.svelte';
+
   /**
    * The brand lockup: the placeholder mark and the words, together.
    *
-   * The mark is the brand initial in a ruled square whose fourth corner is the
-   * one soft break — `docs/design/direction.md`'s "perfect, broken once" — set
-   * in type until an illustrator draws the real one. It is `aria-hidden`, so
-   * the accessible text of the lockup is exactly "biscuit games" with no stray
-   * "b" in front of it.
+   * The mark is `Monogram`, which decision 0017 extracted from this file and
+   * which is `aria-hidden` here — so the accessible text of the lockup is
+   * exactly its words, with no stray "b" in front of them.
    *
-   * It takes no props. A game's own lockup adds its name after the platform's;
-   * this one is the platform's alone, and a prop for a name nothing here has
-   * would be a branch with nothing to cover it.
+   * `product` names a game after the platform: "biscuit games / poodl". A game
+   * installing the package could not render its own lockup at all before, and
+   * had to rebuild one while matching the display face, the weight, the tracking
+   * and the `words` class `HeaderBar`'s collapse reaches into — a cost paid
+   * twice the moment there are two games. The separator is inside `words` rather
+   * than beside them, so the whole lockup collapses together under that rule
+   * instead of leaving a slash behind on a phone.
+   *
+   * There is deliberately no size and no way to drop the mark, both of which the
+   * design system offers. Nothing here draws the lockup at another size, and a
+   * prop nothing passes is a branch with nothing to cover it.
    */
+  let { product }: { product?: string } = $props();
+
+  /*
+   * Built here rather than in the template. Svelte trims whitespace at the start
+   * of a block, so a literal " / " written inside one arrives as "/" and the
+   * lockup reads "biscuit games/ poodl" — and a mustache holding nothing but a
+   * string is a lint error besides. One expression says what the words are.
+   */
+  const words = $derived(product === undefined ? 'biscuit games' : `biscuit games / ${product}`);
 </script>
 
 <span class="lockup">
-  <span class="mark" aria-hidden="true">b</span>
-  <span class="words">biscuit games</span>
+  <Monogram />
+  <span class="words">{words}</span>
 </span>
 
 <style>
@@ -24,32 +41,6 @@
     display: inline-flex;
     align-items: center;
     gap: var(--s-4);
-  }
-
-  /*
-   * The box is in pixels on purpose, against the usual rule. 20px, 12px and the
-   * 1px nudge each match a token by value — `--s-7`, `--s-5`, `--rule-w` — and
-   * none of them by meaning: two are the spacing scale and one is a rule weight,
-   * so naming them here would tie the brand mark's geometry to scales that move
-   * for unrelated reasons. The radii match no token at all. This is placeholder
-   * geometry for a placeholder glyph and it goes with the glyph.
-   */
-  .mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    inline-size: 20px;
-    block-size: 20px;
-    padding-block-end: 1px;
-    border: var(--rule-w-strong) solid var(--text);
-    /* Three machined corners, one animal one. */
-    border-radius: 2px 2px 8px 2px;
-    color: var(--text);
-    font-family: var(--font-display);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: -0.04em;
   }
 
   .words {

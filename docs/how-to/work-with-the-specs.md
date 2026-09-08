@@ -71,9 +71,14 @@ from as well as an entity would, and they say it without a warning attached.
 ## Handle an open question
 
 An `open question` block records a product decision nobody has made yet, so the gap is
-visible rather than silently filled in. One is outstanding: whether a reader may turn high
-contrast off while the device is asking for more of it. Leave it standing until somebody
-entitled to answer it does.
+visible rather than silently filled in. Four are outstanding: whether a reader may turn high
+contrast off while the device is asking for more of it; whether the platform owes a way to
+stop a surface claiming bare keys, or only that dropping the claim costs nothing; what a game
+owes whose play needs a fourth mark; and whether a game may state a separation of its own in
+place of one stated here. Leave each standing until somebody entitled to answer it does.
+
+The first two are the ones a settings panel would answer by accident, which is why the
+controls decision 0017 ported are wired to nothing.
 
 - If your change depends on one, raise it. Do not answer it in code.
 - If your change creates a new gap, add an `open question` rather than picking an answer.

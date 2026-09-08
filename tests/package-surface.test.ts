@@ -46,16 +46,26 @@ import type {
  */
 const COMPONENTS = [
   'Announcer',
+  'Badge',
   'Button',
+  'Card',
+  'CardLabel',
   'Explainer',
+  'GameCard',
   'HeaderBar',
   'Icon',
   'IconButton',
+  'Input',
   'Key',
   'Keyboard',
   'Modal',
+  'Monogram',
   'Notice',
   'PhysicalKeyboard',
+  'SegmentedControl',
+  'Select',
+  'SettingsRow',
+  'Switch',
   'Tile',
   'Wordmark'
 ] as const;

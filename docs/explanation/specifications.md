@@ -77,9 +77,19 @@ system has already expressed, and the legibility the result has to reach.
 ### `operation.allium` — how a surface is worked
 
 Keyboard operability of every operation a surface provides, focus and what a surface owes
-when it replaces the control a reader is standing on, what a dialog owes, the comfortable
-touch target and the narrowest supported width, the `DirectManipulation` contract a finger
-is owed, and what a surface owes when it claims bare key presses for itself.
+when it replaces the control a reader is standing on, what a dialog owes, what a field owes,
+the comfortable touch target, the narrowest supported width and the floor under a field's own
+text, the `DirectManipulation` contract a finger is owed, and what a surface owes when it
+claims bare key presses for itself.
+
+The `Fields` surface is the newest of the four and
+[decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md) is why: a name
+bound to the control rather than beside it, the control's own words bound to it too, a
+refusal reported and not only inked, a group of exclusive choices that is one stop with the
+arrows moving inside it, and text large enough that reaching the field does not magnify the
+page. It says what a control owes to being worked and never which controls a surface has —
+that stays excluded, here and in `appearance.allium`, because a settings panel belongs to the
+product that owns it.
 
 ### `play-surfaces.allium` — what a surface played on owes
 
@@ -107,16 +117,26 @@ recorded rather than resolved on purpose: an unwritten gap gets filled in by who
 writes the code first, silently and invisibly, while a written one has to be answered by
 someone entitled to answer it.
 
-One is outstanding. That the device wins is settled, and matches how reduced motion
-already behaves; what is not settled is whether it is the last word. A reader who asked
-their system for more contrast but wants this palette left alone has nowhere to say so,
-because the setting they would reach for is the one the device is already overriding.
+Four are outstanding, across all three modules. `appearance.allium` asks whether a reader
+may turn high contrast off while the device asks for more; `operation.allium` asks whether
+the platform owes a way to stop a surface claiming bare keys, or only that dropping the claim
+costs nothing; and `play-surfaces.allium` asks what a game owes whose play needs a fourth
+mark, and whether a game may state a separation of its own in place of one stated here.
+
+The contrast one is the worked example. That the device wins is settled, and matches how
+reduced motion already behaves; what is not settled is whether it is the last word. A reader
+who asked their system for more contrast but wants this palette left alone has nowhere to say
+so, because the setting they would reach for is the one the device is already overriding.
 Nobody has decided that, so the module says nobody has decided it — rather than letting
 whichever repository draws a settings panel first decide it by building one.
 
-One outstanding question in one young module is a normal state, not a defect, and an
-empty count would not be a reason to stop using the construct. A change that reaches a
-decision nobody has taken should add another rather than guess.
+That is not hypothetical any more. Decision 0017 ported `Switch`, `SegmentedControl` and
+`SettingsRow`, which are the controls such a panel would be built from, and deliberately
+wired none of them to a setting: the components exist and the panel does not, precisely so
+that shipping the shapes did not answer the question. Four outstanding questions across three
+young modules is a normal state, not a defect, and an empty count would not be a reason to
+stop using the construct. A change that reaches a decision nobody has taken should add
+another rather than guess.
 
 ## What a specification is not
 

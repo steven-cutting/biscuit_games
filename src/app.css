@@ -627,10 +627,18 @@ textarea {
  * control in the app already says this in its own scoped styles, so this rule
  * changes nothing on the screen today; what it changes is that a control which
  * arrives without them inherits the body's figure instead of the user agent's
- * smaller one. Poodl measures this in Chromium by its
- * `stories/LinkReady.stories.svelte`, because jsdom's default input font is
- * already 16px and an assertion there would pass whether or not this rule
- * existed. That story is not here, and the hub has no text control to measure.
+ * smaller one. jsdom's default input font is already 16px, so an assertion in
+ * `tests/` would pass whether or not this rule existed — which is why the
+ * measurement is a story's. Poodl takes it in Chromium by its
+ * `stories/LinkReady.stories.svelte`; the hub now has text controls of its own,
+ * and `stories/Input.stories.svelte` and `stories/Select.stories.svelte` measure
+ * theirs inside an element that sets `--fs-body`, which is the shape this rule
+ * is actually for.
+ *
+ * The figure is `operation.allium`'s `config.minimum_field_text_size` since
+ * decision 0017, mirrored in `src/lib/config.ts`. `Input` and `Select` set
+ * `1rem` themselves rather than trusting the inheritance, because `font:
+ * inherit` reaches the 16px body only when nothing in between sets a size.
  */
 input,
 textarea {
@@ -653,10 +661,15 @@ textarea {
  * that, lost, is the sideways scroll this rule exists alongside. That is the
  * exemption `operation.allium` states inside
  * `EveryControlIsAComfortableTarget`, and the width stories in
- * `stories/Keyboard.stories.svelte` measure what it gives instead. Every other
- * control carries a label that takes it past the figure on its own, or sets its
- * own width as `IconButton` does, and the story run measures that rather than
- * assuming it.
+ * `stories/Keyboard.stories.svelte` measure what it gives instead. What is left
+ * undeclared here, a control declares for itself, because this rule cannot tell
+ * which control is exempt: `IconButton` sets 44px outright, and a
+ * `SegmentedControl` segment floors itself because the words in its options are
+ * the caller's and may be one letter each. The rest reach the figure on the
+ * words they carry, and the story run measures that rather than assuming it —
+ * which is how the segment was found. It had the story and not the measurement,
+ * so a group worded "System Light Dark" passed a clause a group worded "S M L"
+ * failed at 40px across.
  *
  * A text control is included on purpose: a 37px input is as much a target as a
  * 37px button. It takes only part of the first rule above, and for the opposite

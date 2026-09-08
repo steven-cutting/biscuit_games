@@ -16,8 +16,13 @@ two typefaces across;
 [decision 0014](../decisions/0014-the-hub-holds-the-design-system.md) brought the platform
 primitives — the icon set, `Button`, `IconButton`, `HeaderBar`, `Modal`, `Notice` and
 `Announcer` — with their tests, their stories, the preferences port and the contrast test
-that measures the palette they spend. This page is the procedure for porting what remains,
-one component at a time, and the ledger of what is where.
+that measures the palette they spend;
+[decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md) brought the play
+surface; and
+[decision 0017](../decisions/0017-the-rest-of-the-design-system-is-ported.md) brought the
+rest — the grouping chrome, the game switcher, the fields and the brand mark — overruling
+the triggers five of those rows were waiting behind. This page is the procedure, one
+component at a time, and the ledger of what is where.
 
 The direction of travel is what makes the procedure worth writing down. A component is
 settled here and a game takes it from the package afterwards, which is
@@ -60,8 +65,8 @@ on arrival, or leave the shape in the game.
    contract and its test are the settled ones. Where Poodl does not, read the reference
    component in the design project (`components/**` there). Either way, read the spec
    surface that will consume it — today that is `Appearance` in
-   `docs/specs/appearance.allium`, `Operation` and `Dialog` in `operation.allium`, and the
-   three surfaces in `play-surfaces.allium` — and where source
+   `docs/specs/appearance.allium`, `Operation`, `Dialog` and `Fields` in `operation.allium`,
+   and the three surfaces in `play-surfaces.allium` — and where source
    and specification disagree, the specification wins; that is AGENTS.md invariant 1, and
    the deviations decision 0010 records are what the rule cost the first time anyone applied
    it.
@@ -92,10 +97,13 @@ on arrival, or leave the shape in the game.
 4. **Keep geometry literal where it is not a token by meaning.** A control height that
    happens to equal a spacing step stays a literal, with a comment saying which token it
    coincides with and why it is not named — `Wordmark`'s mark, `Button`'s 48px and
-   `Notice`'s 40px are the worked examples. The 44px touch target and the 320px narrowest
-   width are `operation.allium`'s `config.minimum_touch_target` and
-   `config.narrowest_supported_width`, mirrored in `src/lib/config.ts` and measured by
-   `tests/operation.test.ts` and by the plays.
+   `Notice`'s 40px are the worked examples. The 44px touch target, the 320px narrowest width
+   and the 16px floor under a field's own text are `operation.allium`'s
+   `config.minimum_touch_target`, `config.narrowest_supported_width` and
+   `config.minimum_field_text_size`, mirrored in `src/lib/config.ts` and measured by
+   `tests/operation.test.ts` and by the plays. The last of the three is measured only by a
+   play: jsdom's default input font is already 16px, so an assertion in `tests/` would pass
+   whether or not the rule existed.
 5. **Land component, test and story in one change.** The test queries by role and name in
    `tests/`; the story covers the states the surface names, cites its guarantees, and pins
    dark and high contrast where the look inverts. Never set `box-shadow` on a pressable —
@@ -147,30 +155,51 @@ install, and game material stays where it is rendered however well it is built.
 | `IconButton` | The 44px icon-only control | Platform | Ported: the ghost variant, which is all the platform's chrome consumes. |
 | `Button` | The text control and its variants | Platform | Ported: primary, secondary and ghost at two sizes, with `current` for the selected one of a set. |
 | `HeaderBar` | The page's top bar | Platform | Ported and generalised: a `brand` snippet, an optional chip and a list of actions, so a game supplies its own words. Not yet mounted on the front door. |
-| `core/Card`, `core/Badge` | Grouping chrome | Platform | Not ported. No consumer yet, in either repository, and Poodl has no Svelte version to port from. |
-| `navigation/GameCard` | The platform's game-switcher tile | Platform | Not ported, and the most hub-shaped row in this table. It waits for a second game to switch to. |
-| `forms/Input`, `forms/Select` | Labelled field primitives | Platform | Not ported. Poodl's fields are hand-styled rather than components, so there is no carrier to port; they fold into a component here first. |
-| `forms/SegmentedControl` | The theme picker's proper shape | Platform | Not ported. `Appearance` specifies the choice; no surface in either repository implements it as a component. |
-| `forms/SettingsRow` | The rule-separated preference row | Platform | Not ported. It arrives with the first settings surface built as a component, whichever repository builds one. |
-| `forms/Switch` | The 44×26 toggle | Platform | Not ported. Poodl restyles the native checkbox where it stands; extract on the same trigger as `SettingsRow`. |
+| `core/Card`, `core/Badge` | Grouping chrome | Platform | Ported by 0017. `Card` takes three tones and a snippet; `Badge` takes two tones and the word it carries. Their trigger — a consumer — was overruled rather than met. |
+| `core/CardLabel` | The uppercase label above a group | Platform | Ported by 0017, and a row this table never had: `CardLabel` is a real component of the design project that no earlier pass listed. It is a level-two heading here rather than the reference's `div`, because the front door was already drawing it as one. |
+| `navigation/GameCard` | The platform's game-switcher tile | Platform | Ported by 0017 and mounted on the front door. Its "waits for a second game" was not overruled so much as stale: 0014 had already replaced the wait-for-a-consumer rule and this row was never updated. A reachable game is a link; a planned one is not a control at all, which is where the port departs from the reference. `href` and `status` are one choice here rather than the reference's two independent options: a ready game owes a URL and a planned one may not carry one, so the two cards that say the wrong thing do not compile. |
+| `forms/Input`, `forms/Select` | Labelled field primitives | Platform | Ported by 0017, under the `Fields` surface that record added to `operation.allium`. A real `<label for>`, the hint bound with `aria-describedby`, a refusal reported through `aria-invalid` rather than only inked, and `config.minimum_field_text_size` answered in the field's own `1rem`. The name is sentence-case body copy rather than the reference's quiet uppercase micro-label, for the reason the `forms/SegmentedControl` row gives. |
+| `forms/SegmentedControl` | The theme picker's proper shape | Platform | Ported by 0017 as native radios in a `<fieldset>`, not the reference's buttons wearing `role="radio"` — which are each their own tab stop and answer no arrow key, failing both halves of `AGroupOfExclusiveChoicesIsOneStopAndArrowsMoveWithinIt`. It is wired to no setting: doing that would answer an open question by building it. Its `<legend>` is sentence-case body copy, which is a departure this repository caused rather than one the reference owes: moving the row's name onto the controls put a switch's name beside a group's legend in one sheet, and they arrived in two shapes. `docs/design/tokens.md` states which shape a field's name takes. |
+| `forms/SettingsRow` | The rule-separated preference row | Platform | Ported by 0017, and reduced to the rule and the room around it. The reference's row also carries the setting's name and description; both moved onto the controls, because the row has to *be* the label for the whole of it to be the 44px target and only the control knows which element that is. |
+| `forms/Switch` | The 44×26 toggle | Platform | Ported by 0017. The track is the checkbox itself under `appearance: none`, not a `<span>` beside a hidden one: a hidden control takes focus where the reader cannot see it. The whole `<label>` is the row and the row is the target. The off state draws in `--key-untried-rule`, not the reference's `--rule-strong`, which stands 2.33 off the dark page against a boundary floor of 3.0. |
 | `feedback/Dialog`, `feedback/Toast` | The shell shapes | Platform | Ported as Poodl's shapes, `Modal` and `Notice`, rather than as the design project's primitives: Poodl's are the ones a contrast test measured and an axe run has seen. `Notice` is generalised to a message and a tone. |
 | `Announcer` | The visually hidden live region | Platform | Ported. Not in the design project — it has nothing to draw — and here because every game owes an announcement somewhere. |
-| `brand/MascotSlot` | Where Biscuit mounts | Platform | Not ported. Waits for the illustrated poses. She lands at the boundaries — the page bookends and a game's outcome moments — and reduces to the mark when motion is off, per [The Biscuit character](../design/character.md). |
-| `brand/Mark` as its own component | The reduced icon-mark | Platform | Folded into `Wordmark.svelte`. Extract when the favicon or the mascot's motion-off state needs it standalone. |
+| `brand/MascotSlot` | Where Biscuit mounts | Platform | Not ported, and 0017 declined it explicitly rather than passing over it. The blocker is not a consumer but the art: [The Biscuit character](../design/character.md) says there is "deliberately no placeholder where one would go, because a reserved hollow slot is a second break", and the reference's version is exactly such a placeholder — a dashed box reading "biscuit". Waits for the illustrated poses. |
+| `brand/Mark` as its own component | The reduced icon-mark | Platform | Ported by 0017 as **`Monogram`**, not `Mark`: `src/lib/domain/types.ts` already exports `Mark` for a play surface's mark, and renaming that is a Major version. `Wordmark` composes it, and the reference's ratios reproduce the four literals `Wordmark` carried — exactly, at size 20 — which is what makes it a refactor rather than a redraw. |
 | `game/Tile` | The single cell | Platform | Ported and generalised by [decision 0016](../decisions/0016-the-play-surface-is-the-platforms.md): `content` rather than a letter, a mark that carries the game's own words with it, and a `label` the caller writes. "Position 3, C, correct" is composed at the call site. |
 | `game/Key` | One key of an on-screen keyboard | Platform | Ported by 0016 as a component rather than an inlined button: a real button, an optional mark, a required name, `onpress`, and a glyph for a key that ends a turn. |
 | `game/Keyboard` | The keyboard's grouped layout | Platform | Ported and generalised by 0016. The layout is data the caller supplies — `QWERTY` is a default and not a rule — and one callback carries the pressed key's value, because a rack needs five actions and two named callbacks cannot express them. |
 | `PhysicalKeyboard` | Typing straight into a surface | Platform | Ported by 0016, over a port. The guards are a pure predicate in `src/lib/domain/typing.ts`, the subscription is `src/lib/ports/keys.ts`, and the component wires the two for as long as it is mounted — so "off" means no listener rather than a listener that declines. Not in the design project: it draws nothing. |
 | `HowToPlay` | The mark legend, as a scaffold | Platform | Ported by 0016 as `Explainer`, words injected: prose, a list of example-and-sentence rows drawn with the real `Tile`, and a note. The weakest row in this table under "unchanged", and 0016 says so — what earns it a place is that the legend and the surface draw the same component, so they cannot drift. Not in the design project. |
 | `game/Board` | The arrangement of cells | Game | Stays with the game, and by argument rather than by grouping. Poodl's reads `MAX_ATTEMPTS`, `WORD_LENGTH`, `describeAttempt` and `ScoredGuess`: six rows of five is a rule wearing a grid, and a second game changes both numbers. A `Grid` that knew only its rows and cells would be a different component and a different record. |
-| `game/StatFigure`, `game/Distribution` | Statistics chrome | Game | Stay with the game, refused on the same test that admitted the cell: what they draw is a game's own data, and no token-level argument says this repository already decides their shape. Poodl carries them as restyles inside its statistics panel. Nothing here has any figures. |
+| `game/StatFigure`, `game/Distribution` | Statistics chrome | Game | Stay with the game, refused on the same test that admitted the cell: what they draw is a game's own data, and an arrangement of it encodes a rule. The reason this row used to give — that nothing here has any figures — was simply wrong, and 0017 corrected it rather than the answer: `--fs-stat` and `--figures-tabular` are both declared in `src/app.css`, measured by `tests/contrast.test.ts` and drawn in `stories/Foundations.stories.svelte`. A row refused for a reason that is not true is a row that gets reopened for the wrong one. |
+| `ui_kits/platform` — the page shell, the footer, the About screen | The hub's own page furniture | Platform | Not ported, and a row this table never had. The design project's platform kit carries all three and none was ever catalogued. An About screen is a *second route*, which [decision 0011](../decisions/0011-skeleton-not-a-second-application.md) names as its own reopener, so the three wait on that decision rather than on this page. |
 
 Unported variants of ported components, recorded so that a consumer who reaches for one
 knows it is a port rather than an omission:
 
 - `Button`: the design project's `lg` size and its `warm` variant. The platform's chrome
-  consumes neither, and the warm family is rationed to `::selection`.
-- `IconButton`: the `outline` variant. The platform's chrome is ghost throughout.
+  consumes neither, and the warm family is rationed to `::selection`. Also its `full` width
+  and its `as`/`href` forms, both found unrecorded by 0017's survey — a `Button` that rendered
+  a link would drop silently out of `EveryControlIsAComfortableTarget`, since `src/app.css`
+  floors buttons and fields at 44px and deliberately not links.
+- `IconButton`: the `outline` variant. The platform's chrome is ghost throughout. Also its
+  `size` and `box` props, which let a caller draw a smaller glyph in a smaller target.
+- `Modal`: the reference's `width`. The panel is `min(28rem, 100%)` here and a caller cannot
+  narrow it. Whether it should also dismiss on a scrim click is genuinely undecided — the
+  reference does, the port does not, and its doc comment never says which it meant.
+- `Notice`: the reference is a floating `Toast` a caller positions; this is a block in the
+  page's flow. Whether the platform owes both shapes is open, and it decides whether the
+  missing animation and shadow are questions at all.
+- `Wordmark`: the reference's `md` and `lg` sizes and its `withMark`. Its `product` is no
+  longer among them — 0017 ported it, because without one a game could not render its own
+  lockup from the package at all.
+- `Card`: `pad` and `lift`. A `pad` taking a CSS string is an escape hatch out of the spacing
+  scale; a lift needs a shadow scale this repository has argued against having.
+- `Badge`: `exact`, `present` and `warm`. The first two are a play surface's marks and a badge
+  is not a play cell. `warm` fails twice: the ration, and `--brand-warm` standing about 2.1 off
+  the light page against a text floor of 4.5.
+- `Monogram`: the `warm` tone, for the second of those reasons.
 
 ## Related pages
 

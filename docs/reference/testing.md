@@ -33,13 +33,14 @@ why the tokens earn the exception here.
 | --- | --- |
 | `*.test.ts` | Vitest in jsdom. Everything in `tests/`. |
 | `*.stories.svelte` | Vitest in Chromium, driven by Storybook. Everything in `stories/`. |
-| `*.svelte` in `tests/` | None. A caller a test imports so it can write a binding in the shape a consumer writes it, matched by no glob and collected by nothing. `ButtonHost.svelte` is the only one. |
+| `*.svelte` in `tests/` | None. A caller a test imports so it can write a binding in the shape a consumer writes it, matched by no glob and collected by nothing. `ButtonHost.svelte` and `ExplainerHost.svelte` are the two: one writes a `bind:`, the other passes snippet values inside a prop object, and neither shape can be written from a `.ts` file. |
 | `*.spec.ts` | Playwright directly. Reserved. Playwright itself is installed — it supplies the browser the story run drives — but no suite of this kind exists. |
 
 Files are named for what they cover rather than mirroring a source path.
-`tests/primitives.test.ts` covers four components, `tests/contrast.test.ts` covers one
-guarantee across a stylesheet, and `tests/wordmark.test.ts` happens to coincide with its
-source; the rule is the first of those.
+`tests/primitives.test.ts` covers eight components, `tests/contrast.test.ts` covers one
+guarantee across a stylesheet, and `tests/brand.test.ts` covers both halves of one lockup
+rather than either half's file — it was `wordmark.test.ts` until decision 0017 gave
+`Wordmark` a `Monogram` to compose. The rule is the first of those.
 
 Two files in `tests/` are not tests. `setup.ts` holds the single import that registers the
 jest-dom matchers, and it reaches the run through `setupFiles` in `vite.config.ts`.
@@ -56,8 +57,10 @@ leave the other behind.
 
 **Query by accessible role and name.** Never by class, never by test id. A query that
 fails because a name is missing has found a real defect: it is the same information a
-screen reader uses. The front door's one link is `screen.getByRole('link', { name: 'Poodl' })`
-to whichever test reaches for it first; no route test exists yet.
+screen reader uses. The front door's one link is a `GameCard`, whose name is the whole card —
+the game's name, its line of prose and its meta line, in that order — so the query that
+reaches it is `screen.getByRole('link', { name: /poodl/ })` rather than an exact string. No
+route test exists yet; `tests/primitives.test.ts` asserts that name on the component instead.
 
 Text that is not a control is the stated exception, and the wordmark's test is it. A
 wordmark has no role, so it is found by its text — and it takes two assertions, not one:
@@ -127,13 +130,19 @@ addon's test mode to error; the addon's own default only reports. Play functions
 same pass, which is where a guarantee about interaction becomes executable rather than
 described.
 
-Seventy-three stories across fourteen files. `Wordmark`'s **Dark theme** is the one every other
-dark pin rests on: it asserts that `data-theme` reached `document.documentElement`, which is
+A hundred and twenty-four stories across twenty-four files. `Wordmark`'s **Dark theme** is
+the one every other dark pin rests on: it asserts that `data-theme` reached `document.documentElement`, which is
 the element every palette in `src/app.css` is keyed on — an attribute written onto a wrapper
 instead would satisfy no selector in that file. The plays that carry a guarantee about
 interaction are `Modal`'s focus trap, `Notice`'s keyboard dismissal, `HeaderBar`'s tab order
-and its layout at the narrowest supported width, and the target sizes `Button` and
-`IconButton` measure.
+and its layout at the narrowest supported width, the target sizes `Button`, `IconButton`,
+`GameCard`, `Switch` and `SegmentedControl` measure, `SegmentedControl`'s one-stop-and-arrows
+contract — which also holds that nothing between the radio and its fieldset clips, because
+the ring `app.css` draws lands entirely outside a radio that fills its segment and a
+rounded row once ate all but a sliver of it — and `Input`'s text floor — the last of which is the only figure in
+`src/lib/config.ts` no test under `tests/` can measure at all, because jsdom's own default
+input font is already 16px and an assertion there would pass whether or not the rule
+existed.
 
 Stories are fixtures, not assertions. The evidence and the coverage floor stay in `tests/`.
 And axe is not exhaustive: it skips what it cannot attribute, including anything behind
@@ -166,9 +175,22 @@ v8 provider, measured over `src/lib/**`, with a 90% floor on branches, functions
 and statements. Below the floor the run fails. That glob matches every component, the icon
 map, the barrel, the ports, the domain and `config.ts`; a file landing under `src/lib/`
 without a test is reported at zero and drags the figure down, and
-[Test and debug](../how-to/test-and-debug.md) works that case through. One arm is dead by
-construction and accepted: `Icon`'s `size` interpolation compiles to a nullish fallback no
-default can reach, and it is the one branch the glob leaves uncovered.
+[Test and debug](../how-to/test-and-debug.md) works that case through. A few arms are dead by
+construction and accepted, and each is named here so that a new one is noticed rather than
+assumed. `Icon`'s `size` interpolation compiles to a nullish fallback no default can reach.
+`Select`'s `<option value>` compiles to two more, both in code Svelte wrote: a guard that
+skips the write when the option's value has not changed, which cannot fail because the each
+block is keyed by that same value and so a value never changes under a node that is already
+drawn; and a `?? ''` beneath it, which cannot fire because an option's value is a
+required string. None of the three is reachable from a test, all are counted against the
+floor anyway, and the floor is met with room — the figure to watch is the aggregate rather
+than any one file's column.
+
+The `<select>`'s own binding has a fourth arm of the same shape and it *is* reachable, which
+is the distinction worth keeping: it fires only when a value that was given is taken away,
+so `fields.test.ts` takes one away. A generated arm is dead by construction or it is a test
+nobody has written yet, and the two are told apart by reading the compiled output rather
+than by guessing at the mechanism.
 
 Only the jsdom suite is measured. Vitest 4 has no per-project coverage option and the v8
 provider merges every project that ran into one report before it checks the thresholds, so
@@ -186,15 +208,16 @@ should be deleted rather than covered; see
 
 | Suite | Covers |
 | --- | --- |
-| `wordmark.test.ts` | That `Wordmark` renders, and that its accessible text is exactly the lockup: the mark is `aria-hidden`, so "biscuit games" is the whole of it. |
+| `brand.test.ts` | `Wordmark` and `Monogram`: that the lockup's accessible text is exactly "biscuit games" with the mark `aria-hidden`, that it names a game after the platform when given one, and that the mark is silent by default, named when it stands alone, and draws at 20px the four figures it drew as literals before decision 0017 pulled it out of `Wordmark`. |
 | `icons.test.ts` | That the map and the directory agree, that every value is SVG markup restroked to 1.5 in `currentColor`, and that the ISC text is beside the files. |
-| `primitives.test.ts` | `Icon`, `IconButton`, `Button` and `HeaderBar`: role, name, press, disabled, `aria-haspopup`, `aria-current`, the sized icon, the element `Button` hands back to a caller that binds it, the brand snippet, the chip, and the actions across a rename and a repeated name. |
+| `primitives.test.ts` | `Icon`, `IconButton`, `Button`, `HeaderBar`, `Card`, `CardLabel`, `Badge` and `GameCard`: role, name, press, disabled, `aria-haspopup`, `aria-current`, the sized icon, the element `Button` hands back to a caller that binds it, the brand snippet, the chip, the actions across a rename and a repeated name, that the grouping chrome carries the words it is given, and that a `GameCard` is a link exactly when there is somewhere to go — a planned game being no control at all rather than a dimmed one, and saying so in words. |
+| `fields.test.ts` | `Switch`, `SegmentedControl`, `SettingsRow`, `Input` and `Select` against the `Fields` surface: a name bound to the control rather than beside it, the control's own line bound as its description, a switch reporting its state in words as well as in position, a group of exclusive choices that is one tab stop with the arrows moving inside it, a placeholder that is never the name, a refusal reported through `aria-invalid` and not only inked, and every one of them asking nothing of a caller that supplied no handler. |
 | `shells.test.ts` | `Announcer`, `Notice` and `Modal`: the two live regions and their repeat-by-sequence, dismissal, and the dialog's focus, Escape and Tab contract in both directions, over the stops the keyboard really makes — a group of radios, a control the layout does not draw, one a disabled `fieldset` has turned off, and a disclosure's summary. |
 | `contrast.test.ts` | Every pair the stylesheet declares against the two floors, in all four combinations; the palette's shape; the two dark blocks and the two high-contrast sets held equal. |
 | `preferences.test.ts` | The port: the three queries, change subscription and its end, the fake, and the absent-`matchMedia` fallback reached by argument and by default. |
 | `appearance.test.ts` | The three derivations, clause by clause. |
 | `package-surface.test.ts` | Every runtime export by name — the components, the two ports, the appearance derivations, the claiming rule and the platform layout — a render through the barrel, and the type exports held at compile time by being written against rather than merely imported. |
-| `operation.test.ts` | `operation.allium` over the stylesheet: a tap reaching the control rather than the platform, text a reader selects left alone, the viewport never refusing to be zoomed, the 44px floor on every native control the stylesheet names — a select, a disclosure summary and every input but a checkbox, a radio and a hidden one — and on the label row that carries it for a checkbox, the same control set declining the platform's tap guess with the label half and the text half split, the link in a sentence the invariant exempts, both config figures, and the pressed ring on exactly the controls whose platform flash was suppressed — the two lists compared outright rather than by asking whether each mentions a label. |
+| `operation.test.ts` | `operation.allium` over the stylesheet: a tap reaching the control rather than the platform, text a reader selects left alone, the viewport never refusing to be zoomed, the 44px floor on every native control the stylesheet names — a select, a disclosure summary and every input but a checkbox, a radio and a hidden one — and on the label row that carries it for a checkbox, the same control set declining the platform's tap guess with the label half and the text half split, the link in a sentence the invariant exempts, all three config figures, and the pressed ring on exactly the controls whose platform flash was suppressed — the two lists compared outright rather than by asking whether each mentions a label. |
 | `play.test.ts` | `Tile`, `Key`, `Keyboard` and `Explainer`: the name a caller composes and the one the platform falls back to, the three marks and none, the bar present on two of them and absent on the third, the press, the disabled key that keeps its bar and its name, a layout the component has never seen, a layout with no keys in it drawing no keyboard at all, a mark whose words are blank or absent drawn as no mark, a cell and a key whose only words are a blank named as though they had none, a key its layout named with nothing drawn and left unnamed, a key valued `constructor` reading no mark off `Object.prototype` and still reading the one the game keyed there, and the sentences carrying an explanation whose examples are silent — including two rows that say the same thing. |
 | `typing.test.ts` | `claimKey`'s guards one at a time with no DOM at all; `latinLetters` naming the twenty-six and refusing the two that Unicode case folding once let through; the adapter reading a real event down to a `KeyPress` — each shortcut modifier on its own, Shift not among them, a focused `<summary>` as something the browser activates, and a press that began at no element; `QWERTY` and `QWERTY_BINDINGS` held equal, which is the gate `layouts.ts` cited before it existed; and that unmounting `PhysicalKeyboard` leaves no listener behind. |
 

@@ -40,6 +40,7 @@ unresolved ones are recorded there as `open question` blocks — see
 | [0014](0014-the-hub-holds-the-design-system.md) | The hub holds the design system |
 | [0015](0015-operation-and-play-are-specified-here.md) | Operation and play are specified here |
 | [0016](0016-the-play-surface-is-the-platforms.md) | The play surface is the platform's |
+| [0017](0017-the-rest-of-the-design-system-is-ported.md) | The rest of the design system is ported |
 
 ## The numbering
 

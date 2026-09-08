@@ -46,10 +46,28 @@ export const MINIMUM_TOUCH_TARGET = 44;
  *
  * The narrowest viewport every promise that module makes survives without
  * scrolling sideways, and the width every target and spacing figure has to hold
- * at. `tests/operation.test.ts` pins both figures, because only the stories
- * consume this one and a story frames itself to whatever the constant says.
+ * at. `tests/operation.test.ts` pins all three of this module's figures,
+ * because only the stories consume this one and a story frames itself to
+ * whatever the constant says.
  */
 export const NARROWEST_SUPPORTED_WIDTH = 320;
+
+/**
+ * `operation.allium` — `config.minimum_field_text_size`, in CSS pixels.
+ *
+ * The smallest a field's own text may be, for
+ * `Fields.@guarantee AFieldDoesNotMagnifyThePageWhenItTakesFocus`. Below it a
+ * mobile browser magnifies the page when the field takes focus and leaves it
+ * magnified, which is the platform's guess rather than the reader's intent.
+ *
+ * The one figure here that no test in `tests/` can measure. jsdom's own default
+ * input font is already 16px, so an assertion there would pass whether or not
+ * `src/app.css` declared anything — `app.css` says so beside the rule, and
+ * `stories/Input.stories.svelte` takes the measurement in Chromium instead.
+ * `tests/operation.test.ts` pins the number against the specification, which is
+ * a different thing from measuring what a field renders at.
+ */
+export const MINIMUM_FIELD_TEXT_SIZE = 16;
 
 /**
  * `play-surfaces.allium` — `config.minimum_state_separation`.

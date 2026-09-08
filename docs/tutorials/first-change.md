@@ -77,10 +77,10 @@ the reasoning.
 
 ## 4. Add a case to the test
 
-`tests/wordmark.test.ts` holds one case: the lockup's accessible text is exactly
-"biscuit games", because the mark's "b" is `aria-hidden`. Add a second for something the
-component also owes and nothing yet asserts — that it renders no heading of its own, for
-instance. `src/routes/+page.svelte` is what wraps the lockup in an `<h1>`; the component is a
+`tests/brand.test.ts` holds the lockup's cases, and the first is the anchor: the accessible
+text is exactly "biscuit games", because the mark's "b" is `aria-hidden`. Add one for
+something the component also owes and nothing yet asserts — that it renders no heading of
+its own, for instance. `HeaderBar` is what wraps the lockup in an `<h1>`; the component is a
 lockup and nothing more.
 
 ```console
