@@ -4,11 +4,10 @@
   /**
    * The small uppercase label that names a group.
    *
-   * Uppercase is the platform's one decorative typographic device and it is
-   * spent on micro-labels — this, a `Badge`, a `GameCard`'s meta line — and
-   * nowhere else: everything else is sentence case, and a sentence is never
-   * uppercased. `docs/design/tokens.md` states that rule; this is the label the
-   * rule is named after.
+   * `docs/design/tokens.md` states where the platform spends uppercase, and this
+   * is the label that rule is named after. The list of places lives there and
+   * not here: the copy this comment used to carry was already missing
+   * `HeaderBar`'s chip. A second copy of a rule goes stale, and this one had.
    *
    * It is a level-two heading rather than the reference's plain `div`, because
    * what it does is label a section and the hub's front door was already drawing

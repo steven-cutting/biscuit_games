@@ -36,6 +36,16 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   3.0, with the track being the checkbox itself under `appearance: none` so that focus lands
   where the reader is looking.
 
+  A fourth difference is this repository's own doing rather than the reference's. Moving the
+  row's name onto the controls put a switch's name beside a group's legend in one settings
+  sheet, and they arrived in two shapes: `Switch` names itself in sentence-case body copy and
+  `Input`, `Select` and `SegmentedControl` named themselves in the reference's quiet uppercase
+  micro-label. All four now take `Switch`'s shape, `docs/design/tokens.md` says which shape a
+  field's name takes and adds `HeaderBar`'s chip to the places uppercase is spent — a place it
+  was already spent and the rule had missed — and the "A sheet of settings" story measures a
+  switch's name against a group's legend, because a component test queries by role and name
+  and the contrast test measures colour, so nothing else in the gate can see the two disagree.
+
 - `Wordmark` takes an optional `product`, so a game renders `biscuit games / poodl` from the
   package. Without it a game could not render its own lockup at all and had to rebuild one,
   matching `--font-display`, weight 600, `--track-display` and the `words` class `HeaderBar`'s

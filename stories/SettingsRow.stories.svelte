@@ -56,6 +56,17 @@
     await expect(canvas.getByRole('switch', { name: 'Animations' })).toBeInTheDocument();
     await expect(canvas.getByRole('group', { name: 'Theme' })).toBeInTheDocument();
     await expect(canvas.getByRole('switch', { name: 'High contrast' })).toBeInTheDocument();
+
+    // Two settings named in one panel have to be named in one shape, and this is
+    // the only place that can be seen: a component test queries by role and name,
+    // and the contrast test measures colour. Which shape the two agree on is
+    // `docs/design/tokens.md`'s to say, and this only holds them to agreeing.
+    const shape = (word: string): string[] => {
+      const style = getComputedStyle(canvas.getByText(word));
+      return [style.textTransform, style.fontSize];
+    };
+
+    await expect(shape('Theme')).toEqual(shape('Animations'));
   }}
 >
   <div style="inline-size: min(100%, 28rem);">

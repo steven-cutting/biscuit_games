@@ -629,6 +629,16 @@ it to be the 44px target. If Poodl's rows bind by `for` to a control they do not
 taking the package gives them nothing and they still owe themselves the figure — which is
 what this page said to check, and the shape to check it against is now `Switch`.
 
+**And a field names itself in sentence case here.** `Input`, `Select` and `SegmentedControl`
+each arrived from the design reference drawing the field's name as a quiet uppercase
+micro-label, which put a switch's name and a group's legend in two different shapes in one
+settings sheet the moment the row stopped carrying either. All four now draw it as body copy
+at `--text` and `--fs-body`, and `docs/design/tokens.md` states the rule — uppercase is spent
+on micro-labels and a field's name is not one. If Poodl has copied the reference's field
+label, taking the package leaves its own fields disagreeing with the package's; the repair is
+the same three declarations, and no version carries it, because these ten components are
+unreleased and reach Poodl for the first time in the release that adds them.
+
 **Nothing here is wired to a setting, and Poodl should not be the one to wire it.** `Switch`,
 `SegmentedControl` and `SettingsRow` are the controls an appearance panel is built from, and
 binding one to `high_contrast` answers `appearance.allium`'s open question about the contrast

@@ -223,12 +223,19 @@ rather than the design reference's 56px.
 Three rules about type that no token can carry, and that had never been written down on
 either side of the split until 0017's survey went looking for them. **Uppercase is the
 system's one decorative typographic device**, and it is spent on micro-labels — `CardLabel`,
-a `Badge`, a `GameCard`'s meta line — and nowhere else. **Everything else is sentence case.**
-And **a sentence is never uppercased**: the device is for labels of two or three words, and
-`text-transform` on running prose also rewrites the eszett, which is a second reason for a
-rule that already had one. Numerals are the fourth: `--figures-tabular` exists because
-figures that move under their own digits are unreadable in a column, so **numerals are never
-proportional** anywhere a reader compares two of them.
+a `Badge`, a `GameCard`'s meta line, the chip in `HeaderBar` — and nowhere else.
+**Everything else is sentence case**, and **a field's name is not an exception**: it is body
+copy at `--text` and `--fs-body`, which is the shape `Switch` draws, because the name of a
+setting is the loudest thing in its row rather than a decoration above it. `Input`, `Select`
+and `SegmentedControl` each arrived from the design reference drawing theirs as a micro-label,
+which left a switch's name and a group's legend in two different shapes in one settings sheet;
+`stories/SettingsRow.stories.svelte` now measures the two against each other, because that
+drift is invisible to every other gate — a component test queries by role and name, and the
+contrast test measures colour. And **a sentence is never uppercased**: the device is for
+labels of two or three words, and `text-transform` on running prose also rewrites the eszett,
+which is a second reason for a rule that already had one. Numerals are the fourth:
+`--figures-tabular` exists because figures that move under their own digits are unreadable in
+a column, so **numerals are never proportional** anywhere a reader compares two of them.
 
 Nothing resolves a token name, either. A declaration naming a token no block defines is
 invalid at computed-value time and silently falls back to the inherited value, so a

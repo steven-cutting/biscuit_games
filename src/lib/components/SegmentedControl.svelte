@@ -90,12 +90,9 @@
 
   legend {
     padding: 0;
-    color: var(--text-3);
+    color: var(--text);
     font-family: var(--font-ui);
-    font-size: var(--fs-mono-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
+    font-size: var(--fs-body);
   }
 
   .description {
