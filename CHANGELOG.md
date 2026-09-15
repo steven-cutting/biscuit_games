@@ -7,6 +7,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-14
+
 ### Added
 
 - The rest of the design system. `Card`, `CardLabel` and `Badge` are the grouping chrome;

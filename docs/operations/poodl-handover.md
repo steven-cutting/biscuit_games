@@ -605,9 +605,8 @@ nothing from the Major column: no token was renamed or removed, no token's value
 existing component's accessible name or role changed, no `@guarantee` changed in meaning, and
 the Svelte peer range is untouched. `Wordmark` with no `product` still reads exactly "biscuit
 games", which is the one accessible name a release could have moved and did not. The entry
-sits under `[Unreleased]` in `CHANGELOG.md` and `package.json` still says 1.0.0, because
-cutting a release is its own change here — that is what commit `11dfadf96c7ce24672bca256115888b1fac55938`
-did for 1.0.0, and
+is `CHANGELOG.md`'s 1.1.0, cut in a change of its own because cutting a release is its own
+change here — that is what commit `11dfadf96c7ce24672bca256115888b1fac55938` did for 1.0.0, and
 `scripts/check_release.py` compares the tag against the pair.
 
 **A specification surface Poodl did not ask for.** `operation.allium` now carries
@@ -636,8 +635,9 @@ settings sheet the moment the row stopped carrying either. All four now draw it 
 at `--text` and `--fs-body`, and `docs/design/tokens.md` states the rule — uppercase is spent
 on micro-labels and a field's name is not one. If Poodl has copied the reference's field
 label, taking the package leaves its own fields disagreeing with the package's; the repair is
-the same three declarations, and no version carries it, because these ten components are
-unreleased and reach Poodl for the first time in the release that adds them.
+the same three declarations, and no version carries it, because these ten components were
+unreleased when it was made and reach Poodl for the first time in 1.1.0, the release that adds
+them.
 
 **A control that draws its state twice holds that state itself.** `Switch` draws a word beside
 its box and `SegmentedControl` inks the segment a radio fills, and both used to read those off
