@@ -697,7 +697,7 @@ does not hold; `docs/design/tokens.md` carries it as a rule about the token inst
 Once a reference crosses a repository boundary it stops being a path and becomes an
 `https://` URL, and almost nothing checks it.
 
-- The documentation contract skips them entirely. `scripts/validate_docs.py` ignores any
+- The documentation contract skips them entirely. `bg-validate-docs` ignores any
   target beginning `http://`, `https://` or `mailto:`, so the exact-case, must-resolve rule
   that governs every internal link does not apply.
 - The offline link checker skips them too. The lychee run inside `just check-docs`, and the

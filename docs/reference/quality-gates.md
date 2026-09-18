@@ -9,7 +9,10 @@ requires: []
 # Quality gates
 
 `just check` runs the gates in the order below and snapshots the worktree between each
-one. A recipe that modifies a file fails the run, because checks are read-only.
+one. A recipe that modifies a file fails the run, because checks are read-only. The order is
+`recipes` under `[tool.biscuit-games-tooling]` in `pyproject.toml`, which `bg-project-check`
+reads and follows with `check-clean`; a gate added to one and not the other is a gate that
+either never runs or is never described.
 
 | Order | Gate | Proves |
 | --- | --- | --- |
@@ -40,7 +43,7 @@ Neither gate trusts the tool's exit code, because neither exit code means what t
 project means by clean. `allium check` exits 0 on an `info` diagnostic —
 `allium.field.unused` is one — and `allium analyse` keys its status on findings alone and
 ignores diagnostics entirely, so a module that does not parse passes it with the `error`
-sitting in the JSON it has just printed. `scripts/run_allium.py` runs the subcommand,
+sitting in the JSON it has just printed. `bg-run-allium` runs the subcommand,
 prints its output whole, and asserts what the contract actually says: every module reports
 an empty `diagnostics` array and an empty `findings` array. A diagnostic may be waived
 only where the checker itself is wrong, on the terms in

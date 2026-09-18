@@ -70,8 +70,8 @@ where most work happens and `just dev` is where you confirm the route still asse
 `just fix` is the repair command, not the only one that writes. `just format`, `just lock`,
 `just lock-upgrade` and `just initialize` all modify tracked files too — the first three by
 design, the last as part of a first run. What is read-only is the **check** set: every recipe
-`just check` runs reports and never repairs, and `scripts/run_project_check.py` proves it per
-run by comparing the worktree before and after each one. That is the guarantee worth relying
+`just check` runs reports and never repairs, and `bg-project-check` proves it per run by
+comparing the worktree before and after each one. That is the guarantee worth relying
 on, and it is the one the other pages cite.
 
 ## Check
@@ -98,7 +98,7 @@ on, and it is the one the other pages cite.
 | `just analyse-specs` | `allium analyse` over `docs/specs/`: the same structural diagnostics plus data flow, reachability, deadlocks and conflicts. Asserts that both arrays are empty; a finding cannot be waived, so any finding is a regression. |
 | `just check-links-online` | Follow external links. Manual; needs the network. |
 
-Both spec recipes go through `scripts/run_allium.py`, which reads the JSON rather than
+Both spec recipes go through `bg-run-allium`, which reads the JSON rather than
 trusting the exit code — `allium check` exits 0 on an `info` diagnostic and `allium
 analyse` ignores diagnostics altogether. Both need the pinned binary, so a worktree that
 has not run `just initialize` must run `just install-allium` first. `docs/specs/` currently

@@ -11,7 +11,7 @@ storybook-static
 # disagreement would surface as a gate that never converges.
 *.md
 
-# The manifest is strict JSON despite the extension, because validate_docs.py
+# The manifest is strict JSON despite the extension, because bg-validate-docs
 # parses it with json.loads. Prettier reads the .yml and rewrites it as YAML
 # with single quotes, which is no longer JSON and fails the contract outright.
 docs/manifest.yml

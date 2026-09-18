@@ -24,7 +24,7 @@ the site is still one page, which is the part of
 ├── CLAUDE.md            One line, deferring to AGENTS.md
 ├── Justfile             Every supported command
 ├── package.json         The site: Svelte, SvelteKit, Vite, Vitest, Storybook
-├── pyproject.toml       Repository tooling only: prek and ruff
+├── pyproject.toml       Repository tooling only: prek, ruff and biscuit-games-tooling
 ├── src/
 │   ├── app.css          The design system: every token, and the @font-face blocks
 │   ├── app.d.ts         SvelteKit's ambient types
@@ -42,7 +42,7 @@ the site is still one page, which is the part of
 ├── tests/               Vitest suites, never colocated with src/
 ├── stories/             Svelte CSF stories, one per component, plus the token sheet
 ├── static/              Copied verbatim into the build: .nojekyll, and nothing else
-├── scripts/             The repository checkers, the installers, the Allium wrapper
+├── scripts/             The first run, the browser check, the release guard, the smoke test
 ├── docs/                This handbook, plus specs/
 ├── .agents/skills/      Canonical agent procedures, ten of them
 ├── .claude/skills/      A bridge per skill, each deferring to .agents/
@@ -71,7 +71,7 @@ recipe's own exit code is read.
 | `tests/` | Vitest suites named for what they cover, not for the file they mirror. |
 | `stories/` | Every state of a component, as something that can be looked at, and the token sheet. Rendered in Chromium with axe over each; the figures a play measures against come from `src/lib/config.ts`, which mirrors the specification that states them. |
 | `static/` | Copied verbatim into the build. It holds `.nojekyll` and nothing else, and that one file is what keeps the directory in Git: `.storybook/main.ts` names `../static` in `staticDirs`, and Storybook treats a listed static directory that does not exist as an error. Nothing publishes the file today. |
-| `scripts/` | `validate_docs.py`, `validate_agents.py`, `run_project_check.py`, `run_ripsecrets_redacted.py`, `install_allium.py`, `run_allium.py`, `check_playwright_browsers.js` and `initialize.sh`. |
+| `scripts/` | `initialize.sh`, `check_playwright_browsers.js`, `check_release.py` and `smoke_package.sh`, which are this repository's alone. The six checkers every Biscuit Games repository runs are not here: they are the console scripts of the `biscuit-games-tooling` package, pinned in `pyproject.toml`. |
 | `docs/specs/` | The Allium specifications. Shared behaviour is decided here, not in code. Three modules today — `appearance.allium`, `operation.allium` and `play-surfaces.allium` — and none of them imports another, because they are peers describing different aspects of the same surfaces. |
 | `.agents/skills/` | The ten agent procedures, canonical. `.claude/skills/` and `.codex/skills/` mirror them one file per skill, each pointing at the `.agents/` original and adding nothing of its own. |
 | `.storybook/` | The workshop's configuration. Served locally, and built both by the gate, which discards it, and by `just chromatic`, which publishes it. |
