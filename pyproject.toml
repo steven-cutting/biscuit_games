@@ -1,5 +1,7 @@
 [project]
-name = "biscuit-games-tooling"
+# Not `biscuit-games-tooling`, which is the package the dev group installs: uv
+# refuses a project that depends on a package sharing its own name.
+name = "biscuit-games-hub-tooling"
 version = "0.1.0"
 description = "Repository tooling for Biscuit Games. Not the site; see package.json for that."
 requires-python = ">=3.14"
@@ -7,14 +9,15 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+  "biscuit-games-tooling @ git+https://github.com/steven-cutting/biscuit_games_tooling@v0.2.0",
   "prek==0.4.12",
   "ruff==0.16.2",
 ]
 
 [tool.uv]
 # Biscuit Games ships no Python package. This project exists so `uv run --frozen`
-# can provide a pinned prek and ruff to the hooks; see
-# docs/decisions/0006-python-toolchain.md.
+# can provide a pinned prek, ruff and biscuit-games-tooling to the hooks and
+# recipes; see docs/decisions/0006-python-toolchain.md.
 package = false
 default-groups = ["dev"]
 
@@ -58,3 +61,14 @@ extend-exclude = [
   "package-lock.json",
   "uv.lock",
 ]
+
+[tool.biscuit-games-tooling]
+# What `just check` runs, in order, before `check-clean`: the package's default
+# plus the two package gates after frontend-build.
+recipes = [
+  "lock-check", "lint", "frontend-static", "frontend-coverage", "frontend-build",
+  "package-build", "package-check", "storybook-build", "storybook-test", "check-docs",
+  "check-agents", "check-specs", "analyse-specs",
+]
+# Predicates a page's `requires` may name, true when enabled. None yet.
+predicates = {}

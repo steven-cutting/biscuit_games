@@ -78,7 +78,7 @@ repository.
 | `.prettierignore` | Notably excludes Markdown, which markdownlint owns, and `docs/manifest.yml`, which is strict JSON despite the extension and which Prettier would rewrite as YAML. |
 | `.markdownlint-cli2.jsonc` | Markdown rules, including the exemptions the documentation contract needs. |
 | `.editorconfig` | Whitespace. LF, UTF-8, two spaces, four for the `Justfile` and the specifications. |
-| `pyproject.toml` | The pinned Python tooling, Ruff's rules, and the `typos` exclusions. |
+| `pyproject.toml` | The pinned Python tooling, `biscuit-games-tooling` among it; Ruff's rules; the `typos` exclusions; and `[tool.biscuit-games-tooling]`, whose `recipes` is the gate `just check` runs and whose `predicates` a page's `requires` may name. |
 | `lychee.toml` | Link checking. |
 | `.pre-commit-config.yaml` | The read-only gate. Installed as the hook. |
 | `.pre-commit-fix.yaml` | The mutating counterpart. Run only by `just fix`. |
@@ -139,8 +139,8 @@ range.
 Two dependencies are outside that scheme, because no lockfile can name a binary. The
 browser the story run drives is downloaded by Playwright into a cache outside the
 repository; its version follows the `playwright` pin and appears in neither lockfile. The
-`allium` checker is pinned by version and checksum in `scripts/install_allium.py` and
-installed into the ignored `.tools/bin/` — that is
+`allium` checker is pinned by version and checksum in the `biscuit-games-tooling` package
+and installed into the ignored `.tools/bin/` — that is
 [decision 0007](../decisions/0007-project-managed-allium-cli.md).
 
 ## Related pages

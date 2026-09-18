@@ -87,11 +87,30 @@ markdownlint-cli2 revs matter for a different reason: `.pre-commit-config.yaml` 
 read-only gate and `.pre-commit-fix.yaml` is what `just fix` runs, so moving one alone
 would leave the repair answering to a different version of the rules from the check.
 
+## Moving the tooling package
+
+`biscuit-games-tooling` holds the six checkers the hooks and `just check` run, and the
+`allium` pin with them. It is a git dependency pinned to a release tag in the `dev` group of
+`pyproject.toml`, and `uv.lock` records the commit behind the tag. To move it:
+
+1. Edit the tag in `pyproject.toml`.
+2. Run `uv lock --upgrade-package biscuit-games-tooling`, then read the lockfile diff: the
+   package's `source` names the new tag and the commit it points at.
+3. Read the package's `CHANGELOG.md` for the level. Its README says what Major, Minor and
+   Patch mean to a consumer: on a Major, a tree that passed may now fail, a console script
+   or a configuration key may have been renamed, or the `allium` version has moved.
+4. Run `just sync` and `just install-allium`. If the release moved `allium`, the second is
+   what fetches it, and until it runs both specification gates fail on the binary the old
+   pin installed; otherwise it finds the binary already in place.
+5. On a Major, run `just check` before committing, and fix what it reports at the root.
+
 ## Moving the Allium binary
 
-`allium` is a checksummed binary, not a package, so no lockfile accounts for it and
-`just lock-check` cannot speak for it. `scripts/install_allium.py` holds the version and
-the SHA-256 of each supported artefact; see
+`allium` is a checksummed binary, not a package, so no lockfile names it and
+`just lock-check` cannot speak for it. The `biscuit-games-tooling` package holds the version
+and the SHA-256 of each supported artefact, so moving `allium` is a release of that package,
+taken here by moving the package pin as
+[Moving the tooling package](#moving-the-tooling-package) says; see
 [decision 0007](../decisions/0007-project-managed-allium-cli.md).
 
 Before moving it, know which thing you are moving. Three version series carry the name
@@ -99,31 +118,17 @@ Allium and only one of them is this pin.
 
 | Series | What it numbers | Where it is pinned |
 | --- | --- | --- |
-| `juxt/allium-tools` | The command-line binary this repository installs and runs. | `VERSION` in `scripts/install_allium.py` |
+| `juxt/allium-tools` | The command-line binary this repository installs and runs. | `VERSION` in the `biscuit-games-tooling` package |
 | `juxt/allium` | The language, and the editor and assistant plugin built from it. | `.claude/settings.json`, which enables the plugin and pins no version |
 | The language version | Which dialect a module is written in. | The `-- allium: 3` header on each `.allium` file |
 
 They advance independently, and the plugin's number runs well ahead of the tool's: an
 assistant plugin at 3.8.0 alongside a binary at 3.6.1 is the normal state and not a
 mismatch to correct. The binary is the only one of the three that `just check` executes, so
-a plugin release is never a reason to move this pin. Move it when
-`juxt/allium-tools` publishes a release, which is the repository the checksums below are
-computed from.
-
-Upstream publishes no checksums for these files — its `SHA256SUMS.txt` covers only the
-editor extension and the language server — so all four have to be recomputed by hand:
-
-```console
-V=3.6.1
-for t in aarch64-apple-darwin x86_64-apple-darwin \
-         aarch64-unknown-linux-gnu x86_64-unknown-linux-gnu; do
-  printf '%s  ' "$t"
-  curl -sL "https://github.com/juxt/allium-tools/releases/download/v$V/allium-$t.tar.gz" \
-    | shasum -a 256 | awk '{print $1}'
-done
-```
-
-Replace `VERSION` and all four entries in `CHECKSUMS`, then reinstall and confirm:
+a plugin release is never a reason to move this pin. It moves when `juxt/allium-tools`
+publishes a release and a release of the package takes it. Recomputing the checksums is the
+package's work, and its README says how. Once the package pin has moved, reinstall and
+confirm:
 
 ```console
 just install-allium
@@ -144,8 +149,8 @@ module in `docs/specs/` carries none at present, but the directive leans on beha
 upstream documents nowhere and was verified against 3.6.1 only, so any waiver added later
 must be re-verified on the commit that moves the pin, dropped where the new version no
 longer needs it, and its count and shape updated in
-[Work with the specifications](work-with-the-specs.md) in that same commit. Editing
-`scripts/install_allium.py` is itself a trigger for both specification hooks, so the gate
+[Work with the specifications](work-with-the-specs.md) in that same commit. Moving the
+package pin in `pyproject.toml` is itself a trigger for both specification hooks, so the gate
 re-reads the module against the new version on the commit that moves the pin — but only
 after `just install-allium` has actually installed it.
 

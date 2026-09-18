@@ -43,7 +43,7 @@ This is the only thing in the repository that resolves a cross-repository link, 
 run by hand. Three facts stack up behind that sentence:
 
 - **The documentation contract skips external links entirely.**
-  `scripts/validate_docs.py` ignores any target beginning `http://`, `https://` or
+  `bg-validate-docs` ignores any target beginning `http://`, `https://` or
   `mailto:`, so the exact-case, must-resolve rule that governs every internal link does
   not apply to a link that leaves the repository.
 - **The offline link checker skips them too.** The lychee run inside `just check-docs`,
